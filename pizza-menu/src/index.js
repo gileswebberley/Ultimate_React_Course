@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 //and now let's get some styling injected into this single page app using the webpack import
 //WHEN STYLING INSTEAD OF USING THE HTML class ATTRIBUTE YOU MUST INSTEAD USE className IN JSX
 import './index.css';
+//try to get the pizza data in here more neatly than copy and paste
+//import pizzaData from '..public/data.js';
 
 function App() {
   //Be aware that a React Component can only return one element so wrap it all in a <div> like here
@@ -23,10 +25,11 @@ function App() {
 function Menu() {
   return (
     <main className="menu">
+      <p>Our Menu</p>
       <h2>Our Menu</h2>
       {/*Now we can place an instance of our Pizza Component in here (ps this is a JSX comment
       We're creating key/value pairs that are added to the props argument in their 'constructor'*/}
-      <Pizza name="Vegan Glory" price={12} />
+      <Pizza name="Vegan Delight" price={12} />
       {/** We use javascript mode {} to pass in anything that is not a string, from numbers to entire js objects */}
     </main>
   );
@@ -34,11 +37,11 @@ function Menu() {
 //accept the props parameter as an argument and the properties defined by the call to this component 'constructor'
 function Pizza(props) {
   return (
-    <div>
-      <img src="pizzas/spinaci.jpg" alt="Picture of the spinach pizza" />
-      <h3>{props.name}</h3>
+    <div className="pizza">
+      <img src="pizzas/spinaci.jpg" alt="spinach pizza" />
+      <h1>{props.name}</h1>
       <p>{props.ingredients}</p>
-      <span>{props.price + 2}</span>
+      <span>£{props.price + 2}</span>
       {/**Because we passed in a number using javascript mode {} above we can use it as a number */}
     </div>
   );
