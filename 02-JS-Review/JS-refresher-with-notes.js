@@ -433,3 +433,16 @@ fetch('https://jsonplaceholder.typicode.com/todos')
       apiResponse.json() /* which is also asyncronous btw!! so daisychain another then() */
   )
   .then((jsonApiResponse) => console.log(jsonApiResponse));
+
+//----------------------------------------------------------------------
+//ASYNC & AWAIT - implement promises more neatly without the use of then()
+//----------------------------------------------------------------------
+
+async function getTodos() {
+  const apiResponse = await fetch('https://jsonplaceholder.typicode.com/todos'); //wait for this to fulfill the promise before continuing
+  const jsonApiResponse = await apiResponse.json();
+  console.log(jsonApiResponse);
+}
+
+//when the async function is called it simply provides a promise and moves onto the next line of code so I think
+//it's best not to return a value from an async function unless you understand that it will be wrapped in a Promise
