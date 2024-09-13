@@ -24,17 +24,22 @@ function Menu() {
   return (
     <main className="menu">
       <h2>Our Menu</h2>
-      {/*Now we can place an instance of our Pizza Component in here too (ps this is a JSX comment*/}
-      <Pizza name="Vegan Glory" />
+      {/*Now we can place an instance of our Pizza Component in here (ps this is a JSX comment
+      We're creating key/value pairs that are added to the props argument in their 'constructor'*/}
+      <Pizza name="Vegan Glory" price={12} />
+      {/** We use javascript mode {} to pass in anything that is not a string, from numbers to entire js objects */}
     </main>
   );
 }
+//accept the props parameter as an argument and the properties defined by the call to this component 'constructor'
 function Pizza(props) {
   return (
     <div>
       <img src="pizzas/spinaci.jpg" alt="Picture of the spinach pizza" />
       <h3>{props.name}</h3>
       <p>{props.ingredients}</p>
+      <span>{props.price + 2}</span>
+      {/**Because we passed in a number using javascript mode {} above we can use it as a number */}
     </div>
   );
 }
