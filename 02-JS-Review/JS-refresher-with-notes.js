@@ -149,6 +149,7 @@ function getBook(id) {
   return data.find((d) => d.id === id);
 }
 
+//----------------------------------------------------------------------
 //Destructuring
 //----------------------------------------------------------------------
 
@@ -168,6 +169,7 @@ console.log(title, author, publicationDate, pages);
 const [firstArrayItem, secondArrayItem] = book.genres;
 console.log(firstArrayItem, secondArrayItem);
 
+//----------------------------------------------------------------------
 //REST AND SPREAD -
 //----------------------------------------------------------------------
 
@@ -206,6 +208,7 @@ console.log(
   unchangedPublicationDateExample.publicationDate
 );
 
+//----------------------------------------------------------------------
 //ARROW FUNCTIONS
 //----------------------------------------------------------------------
 
@@ -234,6 +237,7 @@ const basicInfo = allBooks.map((eachBook) => ({
 }));
 console.log(basicInfo);
 
+//----------------------------------------------------------------------
 //TEMPLATE LITERALS
 //----------------------------------------------------------------------
 
@@ -244,6 +248,7 @@ const templateLiteralBook = `${title} was written by ${author} in the year ${get
 )}`;
 console.log(templateLiteralBook);
 
+//----------------------------------------------------------------------
 //TERNARY OPERATOR
 //----------------------------------------------------------------------
 
@@ -254,6 +259,7 @@ const pagesTernary =
     : 'The book has less than one thousand pages';
 console.log(pagesTernary);
 
+//----------------------------------------------------------------------
 //SHORT CIRCUITING WITH LOGICAL OPERATORS
 //----------------------------------------------------------------------
 
@@ -270,6 +276,7 @@ console.log(hasSpanishTranslation);
 //imagine we check the reviews count and there is zero reviews, that's the data that we want but instead the OR operator simply sees it as false
 //This is why there is a Knowledge Coalescing operator (??) which will not consider 0 or an '' as false (only null or undefined)
 
+//----------------------------------------------------------------------
 //OPTIONAL CHAINING OPERATOR (?.) use when unsure of the data structures you might be recieving
 //----------------------------------------------------------------------
 
@@ -297,6 +304,7 @@ function totalReviewsCountFaulty(b) {
 console.log(totalReviewsCountFixed(getBook(3)));
 //[ERROR] console.log(totalReviewsCountFaulty(getBook(3))); Cannot read properties of UNDEFINED (reading librarything.reviewsCount)
 
+//----------------------------------------------------------------------
 //THE ARRAY MAP METHOD - does not mutate an array but instead returns a new one
 //----------------------------------------------------------------------
 
@@ -311,6 +319,7 @@ console.log(arrayMapExample, exampleArray);
 const titlesArray = allBooks.map((eachBook) => eachBook.title);
 console.log(titlesArray);
 
+//----------------------------------------------------------------------
 //THE ARRAY FILTER METHOD - does not mutate an array but instead returns a new one
 //----------------------------------------------------------------------
 
@@ -321,6 +330,7 @@ const titleOfFantasyBooksOver500PagesLong = allBooks
 
 console.log(titleOfFantasyBooksOver500PagesLong);
 
+//----------------------------------------------------------------------
 //THE ARRAY REDUCE METHOD - does not mutate an array but instead returns a single value (can be an array, an object, a number etc)
 //----------------------------------------------------------------------
 //it takes the form reduce((objectBeingBuilt, eachElement) => function, objectBeingBuiltStartingState)
@@ -335,6 +345,7 @@ const totalNumberOfReviewsOfAllBooks = allBooks.reduce(
 );
 console.log(totalNumberOfReviewsOfAllBooks);
 
+//----------------------------------------------------------------------
 //THE ARRAY SORT METHOD - DOES MUTATE an array!!
 //----------------------------------------------------------------------
 //if the function returns a negative value then a will be sorted to be before b, otherwise it will be reversed
@@ -360,3 +371,65 @@ console.log(
       eachBook.title + ' has ' + eachBook.pages.toString() + ' pages'
   )
 );
+
+//----------------------------------------------------------------------
+//IMMUTABLE ARRAYS
+//----------------------------------------------------------------------
+//How to add/delete/remove etc without affecting the underlying data structure
+
+//To add a new object, for example a new book, simply use the SPREAD operator to put all the existing books into a new array and pop the other
+//one into afterwards eg...
+const newBookObject = {
+  id: allBooks[allBooks.length - 1].id + 1, //so one number higher than the last indexed book id
+  title: "Let's Make Up A Book Title",
+  author: 'Urs Truly',
+  genres: ['fantasy', 'comedy', 'trajedy', 'pulp fiction'],
+  hasMovieAdaptation: true,
+  pages: 835,
+  translations: {
+    spanish: 'Atentamente',
+  },
+  reviews: {
+    goodreads: {
+      rating: 4.44,
+      ratingsCount: 2295233,
+      reviewsCount: 59058,
+    },
+    librarything: {
+      rating: 4.36,
+      ratingsCount: 38358,
+      reviewsCount: 1095,
+    },
+  },
+};
+//then ADD it to a new array so we aren't messing with the original dataset
+const booksWithMineAdded = [...allBooks, newBookObject];
+console.log(booksWithMineAdded);
+
+//To DELETE an entry use a filter() with a NOT-EQUAL statement (!== in javascript) eg remove the book with an id of 4
+const booksAfterDelete = booksWithMineAdded.filter(
+  (eachBook) => eachBook.id !== 4
+);
+console.log(booksAfterDelete);
+
+//To UPDATE use the map method with a ternary statement and override with a spread statement eg change the page number of our newly added book
+const booksAfterUpdate = booksWithMineAdded.map((eachBook) =>
+  eachBook.author === 'Urs Truly' ? { ...eachBook, pages: 947 } : eachBook
+);
+console.log(booksAfterUpdate);
+
+//----------------------------------------------------------------------
+//PROMISES <pending> <rejected> <fulfilled> are the states
+//----------------------------------------------------------------------
+
+//When working asyncroniously (eg when requesting information from a server or api) - here we'll use a dummy api for development
+//ps fetch() was added to Node.js in version 18
+//fetch() creates a Promise which can be accessed using the then() promise-method.
+//The first argument to then() is a callback function which is registered to run when the promise state is <fulfilled>
+//In the meantime whilst waiting javascript continues to 'run' the syncronous statements which follow
+fetch('https://jsonplaceholder.typicode.com/todos')
+  .then(
+    (apiResponse) =>
+      apiResponse.json() /* which is also asyncronous btw!! so daisychain another then() */
+  )
+  .then((jsonApiResponse) => console.log(jsonApiResponse));
