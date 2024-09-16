@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 //WHEN STYLING INSTEAD OF USING THE HTML class ATTRIBUTE YOU MUST INSTEAD USE className IN JSX
 import './index.css';
 //try to get the pizza data in here more neatly than copy and paste
-//import pizzaData from '..public/data.js';
+import { pizzaData } from './data.js';
 
 function App() {
   //Be aware that a React Component can only return one element so wrap it all in a <div> like here
@@ -29,7 +29,11 @@ function Menu() {
       <h2>Our Menu</h2>
       {/*Now we can place an instance of our Pizza Component in here (ps this is a JSX comment
       We're creating key/value pairs that are added to the props argument in their 'constructor'*/}
-      <Pizza name="Vegan Delight" price={12} />
+      {pizzaData.forEach((element) => {
+        console.log('element name:' + element.name);
+        return <Pizza name={element.name} price={element.price} />;
+      })}
+      <Pizza name={pizzaData[0].name} price={pizzaData[0].price} />
       {/** We use javascript mode {} to pass in anything that is not a string, from numbers to entire js objects */}
     </main>
   );
