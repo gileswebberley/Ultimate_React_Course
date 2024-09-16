@@ -12,8 +12,8 @@ function App() {
   return (
     <div className="container">
       <PizzaHeader />
-      <Menu />
       <PizzaOpeningCheck />
+      <Menu />
     </div>
   );
 }
@@ -25,15 +25,16 @@ function App() {
 function Menu() {
   return (
     <main className="menu">
-      <p>Our Menu</p>
       <h2>Our Menu</h2>
       {/*Now we can place an instance of our Pizza Component in here (ps this is a JSX comment
       We're creating key/value pairs that are added to the props argument in their 'constructor'
       Please note that I tried using a forEach loop but map is the way to go*/}
-      {pizzaData.map((element) => {
-        console.log('element name:' + element.name);
-        return <Pizza data={element} />;
-      })}
+      <div className="pizzas">
+        {pizzaData.map((element) => {
+          console.log('element name:' + element.name);
+          return <Pizza data={element} />;
+        })}
+      </div>
       {/** We use javascript mode {} to pass in anything that is not a string, from numbers to entire js objects */}
     </main>
   );
@@ -41,9 +42,9 @@ function Menu() {
 //accept the props parameter as an argument and the properties defined by the call to this component 'constructor'
 function Pizza(props) {
   //use the object destructuring we learnt to grab what we need from the element passed through as 'data'
-  const { photoName, name, ingredients, price } = props.data;
+  const { photoName, name, ingredients, price, soldOut } = props.data;
   return (
-    <div className="pizza">
+    <div className={`pizza ${soldOut ? 'sold-out' : ''}`}>
       <img src={photoName} alt={name} />
       <h1>{name}</h1>
       <p>{ingredients}</p>
@@ -68,7 +69,7 @@ const PizzaOpeningCheck = () => (
 //OPENING TIME FUNCTIONALITY
 //----------------------------------------------------------------------
 //Add a bit of functionality regarding opening hours (not time, just hours!!)
-const tradingHours = { open: 16, close: 23 };
+const tradingHours = { open: 17, close: 23 };
 function isOpen() {
   const nowHour = new Date().getHours();
   return nowHour >= tradingHours.open && nowHour < tradingHours.close;
