@@ -28,25 +28,27 @@ function Menu() {
       <p>Our Menu</p>
       <h2>Our Menu</h2>
       {/*Now we can place an instance of our Pizza Component in here (ps this is a JSX comment
-      We're creating key/value pairs that are added to the props argument in their 'constructor'*/}
-      {pizzaData.forEach((element) => {
+      We're creating key/value pairs that are added to the props argument in their 'constructor'
+      Please note that I tried using a forEach loop but map is the way to go*/}
+      {pizzaData.map((element) => {
         console.log('element name:' + element.name);
-        return <Pizza name={element.name} price={element.price} />;
+        return <Pizza data={element} />;
       })}
-      <Pizza name={pizzaData[0].name} price={pizzaData[0].price} />
       {/** We use javascript mode {} to pass in anything that is not a string, from numbers to entire js objects */}
     </main>
   );
 }
 //accept the props parameter as an argument and the properties defined by the call to this component 'constructor'
 function Pizza(props) {
+  //use the object destructuring we learnt to grab what we need from the element passed through as 'data'
+  const { photoName, name, ingredients, price } = props.data;
   return (
     <div className="pizza">
-      <img src="pizzas/spinaci.jpg" alt="spinach pizza" />
-      <h1>{props.name}</h1>
-      <p>{props.ingredients}</p>
-      <span>£{props.price + 2}</span>
-      {/**Because we passed in a number using javascript mode {} above we can use it as a number */}
+      <img src={photoName} alt={name} />
+      <h1>{name}</h1>
+      <p>{ingredients}</p>
+      <span>£{price + 0.95}</span>
+      {/**Because we passed in a number using javascript mode {} above we can use it as a number and so add a fixed amount (due to costs perhaps)*/}
     </div>
   );
 }
