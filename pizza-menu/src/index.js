@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 //and now let's get some styling injected into this single page app using the webpack import
-//WHEN STYLING INSTEAD OF USING THE HTML class ATTRIBUTE YOU MUST INSTEAD USE className IN JSX
+//WHEN STYLING INSTEAD OF USING THE HTML class ATTRIBUTE YOU MUST INSTEAD USE className IN JSX (also css names are camelCase too eg background-color is backgroundColor)
 import './index.css';
 //try to get the pizza data in here more neatly than copy and paste
 import { pizzaData } from './data.js';
@@ -12,7 +12,7 @@ function App() {
   return (
     <div className="container">
       <PizzaHeader />
-      <PizzaOpeningCheck />
+      <Footer />
       <Menu />
     </div>
   );
@@ -47,6 +47,10 @@ function Menu() {
 function Pizza(props) {
   //use the object destructuring we learnt to grab what we need from the element passed through as 'data'
   const { photoName, name, ingredients, price, soldOut } = props.data;
+
+  //You can use all your javascript statements in here as this is not JSX!!
+  //for example we could have this component return null if it is sold out by using an 'early return' eg
+  //if(soldOut) return null;
   return (
     <li className={`pizza ${soldOut ? 'sold-out' : ''}`}>
       <img src={photoName} alt={name} />
@@ -66,41 +70,57 @@ const PizzaHeader = () => (
     <h1>Fast React Pizza Co.</h1>
   </header>
 );
+
 //using the simplicity of JSX to combine javascript into the html
-const PizzaOpeningCheck = () => (
-  <footer className="footer">
+function Footer() {
+  /** We can use this Conditional Rendering in place of
+   * <p>{openHoursString()}</p>
+   * due to the fact that JSX will not render the boolean from isOpen()
+   *
+   * Remember even though we can't use an if/else (because it does not return a value) we can use the ternary operator instead as that returns it's true or false statement which is a safer way to do Conditional Rendering (in case it's a truey/falsey rather than true/false eg 0 or null)
+   */
+  return (
+    <footer className="footer">
+      {
+        //Logical AND (&&) will return second statement if first is boolean true
+        isOpen() && <OpenMessage />
+      }
+      {
+        //whilst Logical OR (||) will return the second statement if the first is boolean false
+        isOpen() || <ClosedMessage />
+      }
+    </footer>
+  );
+}
+
+//We're just creating these seperate components as the Footer was getting quite scruffy and bloated
+function OpenMessage() {
+  return (
     <div className="order">
-      {
-        //Logical AND (&&) will return second statement if first is true
-        isOpen() && (
-          <p>
-            Blessed be, we're open until {tradingHours.close}:00 to take your
-            order
-          </p>
-        )
-      }
-      {
-        //whilst Logical OR (||) will return the second statement if the first is false
-        isOpen() || (
-          <p>
-            Unfortunately We're Closed At The Moment Come Back Between{' '}
-            {tradingHours.open}:00 and {tradingHours.close}:00
-          </p>
-        )
-      }
-      {/** We can use this Conditional Rendering in place of
-       * <p>{openHoursString()}</p>
-       * due to the fact that JSX will not render the boolean from isOpen()
-       */}
+      <p>
+        Blessed be, we're open until {tradingHours.close}:00 to take your order
+      </p>
+      <button className="btn">Order Now</button>
     </div>
-  </footer>
-);
+  );
+}
+
+function ClosedMessage() {
+  return (
+    <div className="order">
+      <p>
+        Unfortunately We're Closed At The Moment Come Back Between{' '}
+        {tradingHours.open}:00 and {tradingHours.close}:00
+      </p>
+    </div>
+  );
+}
 
 //----------------------------------------------------------------------
 //OPENING TIME FUNCTIONALITY
 //----------------------------------------------------------------------
 //Add a bit of functionality regarding opening hours (not time, just hours!!)
-const tradingHours = { open: 16, close: 23 };
+const tradingHours = { open: 18, close: 23 };
 function isOpen() {
   const nowHour = new Date().getHours();
   return nowHour >= tradingHours.open && nowHour < tradingHours.close;
@@ -108,7 +128,7 @@ function isOpen() {
 
 function openHoursString() {
   //simple ternary operator ie ask the question, if true first value else second one
-  //this can actually be done in PizzaOpeningCheck component with a conditional as JSX does not render booleans
+  //this is now actually be done in Footer component with a conditional as JSX does not render booleans
   return isOpen()
     ? "Blessed Be, We're Open To Take Your Order"
     : `Unfortunately We're Closed At The Moment Come Back Between ${tradingHours.open}:00 and ${tradingHours.close}:00`;
