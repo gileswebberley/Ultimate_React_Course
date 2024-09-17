@@ -28,13 +28,17 @@ function Menu() {
       <h2>Our Menu</h2>
       {/*Now we can place an instance of our Pizza Component in here (ps this is a JSX comment
       We're creating key/value pairs that are added to the props argument in their 'constructor'
-      Please note that I tried using a forEach loop but map is the way to go*/}
-      <div className="pizzas">
+      Please note that I tried using a forEach loop but map is the way to go as JSX needs a new array (of pizzas) to render
+      
+      SEE RENDERING LISTS TUTORIAL
+      All list items should have a unique key (here we just use it's name) for react performance reasons
+      Remeber symantic markup - eg we are producing a list so we should make the container an unordered list <ul> and then each pizza a list item <li>*/}
+      <ul className="pizzas">
         {pizzaData.map((element) => {
-          console.log('element name:' + element.name);
-          return <Pizza data={element} />;
+          //return some JSX in here
+          return <Pizza data={element} key={element.name} />;
         })}
-      </div>
+      </ul>
       {/** We use javascript mode {} to pass in anything that is not a string, from numbers to entire js objects */}
     </main>
   );
@@ -44,13 +48,15 @@ function Pizza(props) {
   //use the object destructuring we learnt to grab what we need from the element passed through as 'data'
   const { photoName, name, ingredients, price, soldOut } = props.data;
   return (
-    <div className={`pizza ${soldOut ? 'sold-out' : ''}`}>
+    <li className={`pizza ${soldOut ? 'sold-out' : ''}`}>
       <img src={photoName} alt={name} />
-      <h1>{name}</h1>
-      <p>{ingredients}</p>
-      <span>£{price + 0.95}</span>
-      {/**Because we passed in a number using javascript mode {} above we can use it as a number and so add a fixed amount (due to costs perhaps)*/}
-    </div>
+      <div>
+        <h3>{name}</h3>
+        <p>{ingredients}</p>
+        <span>£{price + 0.95}</span>
+        {/**Because we passed in a number using javascript mode {} above we can use it as a number and so add a fixed amount (due to costs perhaps)*/}
+      </div>
+    </li>
   );
 }
 
