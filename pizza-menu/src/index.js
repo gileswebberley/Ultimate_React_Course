@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 //and now let's get some styling injected into this single page app using the webpack import
-//WHEN STYLING INSTEAD OF USING THE HTML class ATTRIBUTE YOU MUST INSTEAD USE className IN JSX (also css names are camelCase too eg background-color is backgroundColor)
+// WHEN STYLING INSTEAD OF USING THE HTML class ATTRIBUTE YOU MUST INSTEAD USE className IN JSX (also css names are camelCase too eg background-color is backgroundColor)
 import './index.css';
 //try to get the pizza data in here more neatly than copy and paste
 import { pizzaData } from './data.js';
@@ -52,13 +52,14 @@ function Pizza({ data }) {
   //You can use all your javascript statements in here as this is not JSX!!
   //for example we could have this component return null if it is sold out by using an 'early return' eg
   //if(soldOut) return null;
+  //Bit of pride - I worked out all the sold-out condition stuff before the lecture on how to do it :)
   return (
     <li className={`pizza ${soldOut ? 'sold-out' : ''}`}>
       <img src={photoName} alt={name} />
       <div>
         <h3>{name}</h3>
         <p>{ingredients}</p>
-        <span>£{price + 0.95}</span>
+        <span>{!soldOut ? '£' + (price + 0.95) : 'SOLD OUT'}</span>
         {/**Because we passed in a number using javascript mode {} above we can use it as a number and so add a fixed amount (due to costs perhaps)*/}
       </div>
     </li>
