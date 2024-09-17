@@ -68,7 +68,32 @@ const PizzaHeader = () => (
 );
 //using the simplicity of JSX to combine javascript into the html
 const PizzaOpeningCheck = () => (
-  <footer className="footer">{openHoursString()}</footer>
+  <footer className="footer">
+    <div className="order">
+      {
+        //Logical AND (&&) will return second statement if first is true
+        isOpen() && (
+          <p>
+            Blessed be, we're open until {tradingHours.close}:00 to take your
+            order
+          </p>
+        )
+      }
+      {
+        //whilst Logical OR (||) will return the second statement if the first is false
+        isOpen() || (
+          <p>
+            Unfortunately We're Closed At The Moment Come Back Between{' '}
+            {tradingHours.open}:00 and {tradingHours.close}:00
+          </p>
+        )
+      }
+      {/** We can use this Conditional Rendering in place of
+       * <p>{openHoursString()}</p>
+       * due to the fact that JSX will not render the boolean from isOpen()
+       */}
+    </div>
+  </footer>
 );
 
 //----------------------------------------------------------------------
@@ -83,6 +108,7 @@ function isOpen() {
 
 function openHoursString() {
   //simple ternary operator ie ask the question, if true first value else second one
+  //this can actually be done in PizzaOpeningCheck component with a conditional as JSX does not render booleans
   return isOpen()
     ? "Blessed Be, We're Open To Take Your Order"
     : `Unfortunately We're Closed At The Moment Come Back Between ${tradingHours.open}:00 and ${tradingHours.close}:00`;
