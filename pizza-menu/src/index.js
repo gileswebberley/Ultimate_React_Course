@@ -44,9 +44,10 @@ function Menu() {
   );
 }
 //accept the props parameter as an argument and the properties defined by the call to this component 'constructor'
-function Pizza(props) {
+//it's worth noting that we can immediately destructure the props eg here we could have Pizza({data}) and then we would not have to write props.data
+function Pizza({ data }) {
   //use the object destructuring we learnt to grab what we need from the element passed through as 'data'
-  const { photoName, name, ingredients, price, soldOut } = props.data;
+  const { photoName, name, ingredients, price, soldOut } = data;
 
   //You can use all your javascript statements in here as this is not JSX!!
   //for example we could have this component return null if it is sold out by using an 'early return' eg
