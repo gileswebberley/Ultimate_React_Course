@@ -69,7 +69,7 @@ const PizzaOpeningCheck = () => (
 //OPENING TIME FUNCTIONALITY
 //----------------------------------------------------------------------
 //Add a bit of functionality regarding opening hours (not time, just hours!!)
-const tradingHours = { open: 17, close: 23 };
+const tradingHours = { open: 16, close: 23 };
 function isOpen() {
   const nowHour = new Date().getHours();
   return nowHour >= tradingHours.open && nowHour < tradingHours.close;
