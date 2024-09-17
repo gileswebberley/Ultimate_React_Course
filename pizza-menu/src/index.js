@@ -82,38 +82,42 @@ function Footer() {
    */
   return (
     <footer className="footer">
-      {
-        //Logical AND (&&) will return second statement if first is boolean true
-        isOpen() && <OpenMessage />
-      }
-      {
-        //whilst Logical OR (||) will return the second statement if the first is boolean false
-        isOpen() || <ClosedMessage />
-      }
+      {/**Because we are using a React Fragment in OpenMessage now we can pop our div back around these components */}
+      <div className="order">
+        {
+          //Logical AND (&&) will return second statement if first is boolean true
+          isOpen() && <OpenMessage />
+        }
+        {
+          //whilst Logical OR (||) will return the second statement if the first is boolean false
+          isOpen() || <ClosedMessage />
+        }
+      </div>
     </footer>
   );
 }
 
 //We're just creating these seperate components as the Footer was getting quite scruffy and bloated
 function OpenMessage() {
+  /**Use a react fragment to allow two root components ie <p> and <button> */
   return (
-    <div className="order">
+    <>
       <p>
         Blessed be, we're open until {tradingHours.close}:00 to take your order
       </p>
       <button className="btn">Order Now</button>
-    </div>
+    </>
   );
+  //instead of wrapping these in the div we could use a React Fragment which is either
+  //<></> or if we want to add properties to it then we could use <React.Fragment></React.Fragment>
 }
 
 function ClosedMessage() {
   return (
-    <div className="order">
-      <p>
-        Unfortunately We're Closed At The Moment Come Back Between{' '}
-        {tradingHours.open}:00 and {tradingHours.close}:00
-      </p>
-    </div>
+    <p>
+      Unfortunately We're Closed At The Moment Come Back Between{' '}
+      {tradingHours.open}:00 and {tradingHours.close}:00
+    </p>
   );
 }
 
