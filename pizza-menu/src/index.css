@@ -48,7 +48,7 @@ body {
   font-weight: 300;
   letter-spacing: 3px;
   position: relative;
-  width: 100%;
+  width: auto;
   display: block;
 }
 
@@ -60,7 +60,7 @@ body {
   width: 12rem;
   background-color: #edc84b;
   position: absolute;
-  top: calc(50% - 1px);
+  top: calc(100% - 1px);
 }
 
 .header h1::before {

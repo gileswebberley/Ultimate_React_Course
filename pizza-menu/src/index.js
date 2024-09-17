@@ -69,7 +69,7 @@ function Pizza({ data }) {
 //or for a very simple component like a header we could write arrow functions eg -
 const PizzaHeader = () => (
   <header className="header">
-    <h1>Fast React Pizza Co.</h1>
+    <h1>Fast React Pizza Company</h1>
   </header>
 );
 
@@ -126,7 +126,7 @@ function ClosedMessage() {
 //OPENING TIME FUNCTIONALITY
 //----------------------------------------------------------------------
 //Add a bit of functionality regarding opening hours (not time, just hours!!)
-const tradingHours = { open: 18, close: 23 };
+const tradingHours = { open: 16, close: 23 };
 function isOpen() {
   const nowHour = new Date().getHours();
   return nowHour >= tradingHours.open && nowHour < tradingHours.close;
