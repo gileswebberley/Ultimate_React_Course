@@ -25,7 +25,7 @@ export default function App() {
   IE if you would have to manipulate the DOM when a value changes in vanilla js then use state for that value instead 
   */
   const [step, setStep] = React.useState(2);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   function handleNext() {
     if (step < 3) setStep((s) => s + 1);
@@ -47,6 +47,7 @@ export default function App() {
 
   return (
     <>
+      <PracticeCounter />
       <button className="close" onClick={() => setIsOpen((isOpen) => !isOpen)}>
         {isOpen ? '-' : '+'}
       </button>
@@ -87,5 +88,66 @@ export default function App() {
         </div>
       )}
     </>
+  );
+}
+
+//Here I'll pop the coding challenge component
+function PracticeCounter() {
+  const [stepSize, setStepSize] = useState(1);
+  const [counter, setCounter] = useState(0);
+  const [dateCounter, setDateCounter] = useState(new Date());
+
+  function handleStepSize(stepChange) {
+    setStepSize((sS) => sS + stepChange);
+  }
+
+  function addDaysToDate(date, daysToAdd) {
+    let returnDate = new Date(date);
+    returnDate.setDate(returnDate.getDate() + daysToAdd);
+    return returnDate;
+  }
+
+  function handleCountForward() {
+    setCounter((c) => c + stepSize);
+    setDateCounter((dc) => addDaysToDate(dc, stepSize));
+  }
+
+  function handleCountBackwards() {
+    setCounter((c) => c - stepSize);
+    setDateCounter((dc) => addDaysToDate(dc, -stepSize));
+  }
+
+  function getDateString() {
+    let returnString = '';
+
+    if (counter === 0) returnString = "Today's date is ";
+    else if (counter > 1)
+      returnString =
+        'The date ' + counter.toString() + ' days from now will be ';
+    else if (counter === 1) returnString = 'The date tommorow will be ';
+    else if (counter === -1) returnString = 'The date yesterday was ';
+    else if (counter < -1)
+      returnString = 'The date ' + -counter.toString() + ' days ago was ';
+    return returnString;
+  }
+
+  return (
+    <div>
+      <div className="buttons" id="step buttons">
+        <button onClick={() => handleStepSize(-1)}>-</button>
+        <p className="message">Step Size: {stepSize.toString()}</p>
+        <button onClick={() => handleStepSize(1)}>+</button>
+      </div>
+      <div className="buttons" id="count buttons">
+        <button onClick={handleCountBackwards}>-</button>
+        <p className="message">Count: {counter.toString()}</p>
+        <button onClick={handleCountForward}>+</button>
+      </div>
+      <span style={{ textAlign: 'center' }}>
+        <p style={{ color: '#7a632f' }}>{`${
+          getDateString() + dateCounter.toLocaleDateString()
+        }`}</p>
+      </span>
+    </div>
   );
 }

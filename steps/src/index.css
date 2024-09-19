@@ -87,13 +87,17 @@ body {
   line-height: 1;
 }
 
+.buttons > p {
+  color: #e63323;
+}
+
 h3 {
   margin: 0;
   text-transform: uppercase;
 }
 
 .close {
-  position: absolute;
+  /* position: absolute; */
   top: 16px;
   right: 16px;
   border: none;
