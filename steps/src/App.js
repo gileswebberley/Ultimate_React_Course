@@ -76,6 +76,7 @@ export default function App() {
             >
               Previous
             </button>
+            {/**Note that we do not use parenthesis when setting the onClick handler function, because with then it would run as a function rather than be set as the handler function */}
             <button
               style={{
                 backgroundColor: '#7a632f',
@@ -138,6 +139,7 @@ function PracticeCounter() {
   return (
     <div>
       <div className="buttons" id="step buttons">
+        {/**Notice here we set a callback/arrow function as the onClick handler so that we can pass a parameter to the handleStepSize function ie include the parenthesis */}
         <button onClick={() => handleStepSize(-1)}>-</button>
         <p className="message">Step Size: {stepSize.toString()}</p>
         <button onClick={() => handleStepSize(1)}>+</button>
