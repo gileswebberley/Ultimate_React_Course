@@ -13,23 +13,41 @@ export default function App() {
   Place state within the top Component that uses it, it can be passed down to children with Props remember
   Note that useState can only be called in the top level of a component, not within other scopes (eg inside the handleNext function or an if statement)
   ALWAYS TREAT STATE VARIABLES AS IMMUTABLE AND THUS USE THE SETTER FUNCTION ASSOCIATED WITH IT eg don't write step = 3 but instead write setStep(3) to avoid problems
+  Also note that state is not affected by rerendering but rendering is triggered by a change of a state variable ie when we hide our component below the step variable does not get reset to it's default value but rather remains the same as when the compnent was hidden
+
+  Each instance of a compnent has it's own copy of any state within itself ie state is always an instance variable
+
+  Guidelines to usage of state - 
+  Use state whever you have a variable that will change over time (in vanilla JS this could be a let variable for example) and that variable's value will be tracked by the component it is declared within
+  The above means whenever a value should be dynamic and have a dynamic affect on a component use State (for example the opening and closing of the main component below)
+  DO NOT USE STATE TO DECLARE VARIABLES THAT DO NOT NEED TO TRIGGER A RE-RENDER OF A COMPONENT WHEN THEIR VALUE CHANGES (just use regular variables instead)
+  When building a component we can imagine that it's View is simply a reflection of it's State changing over time
+  IE if you would have to manipulate the DOM when a value changes in vanilla js then use state for that value instead 
   */
   const [step, setStep] = React.useState(2);
   const [isOpen, setIsOpen] = useState(true);
 
   function handleNext() {
-    if (step < 3) setStep(step + 1);
+    if (step < 3) setStep((s) => s + 1);
   }
 
   //I have emulated this function with an arrow function within the onClick property of the Previous button
   function handlePrevious() {
     //DON'T SET STATE MANUALLY - so don't do if(step > 1) step -= 1
-    if (step > 1) setStep(step - 1);
+    //It's also incorrect to hard code a change to the current state like this:
+    //if (step > 1) setStep(step - 1); if it relies on the current value of the state
+    //as the state does not appear to be updated until the function has completed
+    //meaning that if we were to immediately make another change, eg take away another 1
+    //it would not have an affect on the step state. so this would not take away two
+    //if (step > 1) setStep(step - 1); //This expression does what's expected
+    //if (step > 1) setStep(step - 1); //This expression has no affect
+    //instead it should be done with a callback function like this:
+    if (step > 1) setStep((currentStepValue) => currentStepValue - 1);
   }
 
   return (
     <>
-      <button className="close" onClick={() => setIsOpen(!isOpen)}>
+      <button className="close" onClick={() => setIsOpen((isOpen) => !isOpen)}>
         {isOpen ? '-' : '+'}
       </button>
       {isOpen && (
@@ -51,7 +69,7 @@ export default function App() {
                 color: '#99e8e8',
               }}
               onClick={() => {
-                if (step > 1) setStep(step - 1);
+                if (step > 1) setStep((s) => s - 1);
               }}
             >
               Previous
