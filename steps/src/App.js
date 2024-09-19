@@ -48,6 +48,7 @@ export default function App() {
   return (
     <>
       <PracticeCounter />
+
       <button className="close" onClick={() => setIsOpen((isOpen) => !isOpen)}>
         {isOpen ? '-' : '+'}
       </button>
@@ -95,26 +96,29 @@ export default function App() {
 function PracticeCounter() {
   const [stepSize, setStepSize] = useState(1);
   const [counter, setCounter] = useState(0);
-  const [dateCounter, setDateCounter] = useState(new Date());
+  //const [dateCounter, setDateCounter] = useState(new Date());
+  //alternatively we could simply do this for date as the whole component is re-rendered and so normal variables are re-calculated so we don't need to remember the date from the last render
+  const date = new Date();
+  date.setDate(date.getDate() + counter);
 
   function handleStepSize(stepChange) {
     setStepSize((sS) => sS + stepChange);
   }
 
-  function addDaysToDate(date, daysToAdd) {
-    let returnDate = new Date(date);
-    returnDate.setDate(returnDate.getDate() + daysToAdd);
-    return returnDate;
-  }
+  // function addDaysToDate(date, daysToAdd) {
+  //   const returnDate = new Date(date);
+  //   returnDate.setDate(returnDate.getDate() + daysToAdd);
+  //   return returnDate;
+  // }
 
   function handleCountForward() {
     setCounter((c) => c + stepSize);
-    setDateCounter((dc) => addDaysToDate(dc, stepSize));
+    //setDateCounter((dc) => addDaysToDate(dc, stepSize));
   }
 
   function handleCountBackwards() {
     setCounter((c) => c - stepSize);
-    setDateCounter((dc) => addDaysToDate(dc, -stepSize));
+    //setDateCounter((dc) => addDaysToDate(dc, -stepSize));
   }
 
   function getDateString() {
@@ -127,7 +131,7 @@ function PracticeCounter() {
     else if (counter === 1) returnString = 'The date tommorow will be ';
     else if (counter === -1) returnString = 'The date yesterday was ';
     else if (counter < -1)
-      returnString = 'The date ' + -counter.toString() + ' days ago was ';
+      returnString = 'The date ' + Math.abs(counter) + ' days ago was ';
     return returnString;
   }
 
@@ -145,7 +149,7 @@ function PracticeCounter() {
       </div>
       <span style={{ textAlign: 'center' }}>
         <p style={{ color: '#7a632f' }}>{`${
-          getDateString() + dateCounter.toLocaleDateString()
+          getDateString() + date.toLocaleDateString()
         }`}</p>
       </span>
     </div>

@@ -16,11 +16,11 @@ body {
 }
 
 .steps {
-  width: 600px;
+  width: 100%;
   background-color: #f7f7f7;
   border-radius: 7px;
   padding: 25px 100px;
-  margin: 100px auto;
+  margin: 10px auto;
 }
 
 .steps > p {
@@ -97,7 +97,7 @@ h3 {
 }
 
 .close {
-  /* position: absolute; */
+  position: static;
   top: 16px;
   right: 16px;
   border: none;
