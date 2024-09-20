@@ -15,19 +15,48 @@ const initialItems = [
  * Therefore by sending State as a Prop a parent can "configure a child component's settings"
  *
  * How To Think About State Management
+ * When to create pieces of state, where to place that state, what type of state in needed, and how that data will 'flow through the app'
  * In this example, before the tutorial I'm about to go through, I was wondering how to add those items from the form into the initialItems and get them to render in the PackingList -
  * should I make it a state variable in App and then pass it to the packing list? well that doesn't seem right cos how can I get the Form to change the state of it's Parent component App??
  * perhaps have it as state in the Form but then PackingList is a Sibling of Form so that would not cause a re-render of PackingList either....
  *
  *
+ * SOLUTION ------------------------
+ * In the tutorial he starts by having the items array as part of the Form's state which I'll do now along with adding a function to add new items - but of course this does not update (re-render) the PackingList so we'll have to move this piece of state up to the App along with the addItemsToPack function (because we can actually pass a function as a Prop!!)
+ * ---------------------------------
+ *
+ * Local State vs Global State
+ * Local state is defined inside a component and will only be needed by that component or by it's children (by passing it as Props to the child, which occurs when the parent state is re-rendered due to a state change)
+ * Global state is for state that is needed by many unrelated (or sibling) components and this is done by using tolls such as React's Context API or other frameworks such as Redux - ONLY USE GLOBAL STATE IF YOU CAN'T DO IT LOCALLY
+ *
+ * WHEN AND WHERE -
+ * See the course slide for 79: When and Where to use state
+ *
+ *
  */
 
 export default function App() {
+  //here we're adding the items as part of the App components state so we can pass it around through Props
+  const [itemsToPack, setItemsToPack] = useState(initialItems);
+
+  function addItemsToPack(newItem) {
+    //remember that we cannot mutate within react so itemsToPack.push(newItem) is not
+    // allowed and instead we create a new array by spreading the existing one and
+    //adding our new item to the end (just like push would do to the original array)
+    const newItemWithId = {
+      ...newItem,
+      id: itemsToPack[itemsToPack.length - 1].id + 1,
+    };
+    setItemsToPack((itemsToPack) => [...itemsToPack, newItemWithId]);
+  }
+
+  console.log(itemsToPack);
+
   return (
     <div className="app">
       <Logo />
-      <Form />
-      <PackingList />
+      <Form onAddItems={addItemsToPack} />
+      <PackingList itemList={itemsToPack} />
       <Stats />
     </div>
   );
@@ -38,7 +67,7 @@ function Logo() {
 }
 
 //Using HTML form elements to quickly structure a form
-function Form() {
+function Form({ onAddItems }) {
   //to disable the default page reload when a form is submitted we accept the event
   //into the handler function and prevent the default behaviour to keep it a single page app
   /**
@@ -56,7 +85,7 @@ function Form() {
     if (!description) return;
     //otherwise create a new item and add it to our items
     const newItem = {
-      id: initialItems[initialItems.length - 1].id + 1,
+      id: undefined,
       description,
       quantity: numberOfItem,
       packed: false,
@@ -64,7 +93,8 @@ function Form() {
     //reset the form fields...
     setDescription('');
     setNumberOfItem(1);
-    console.log(newItem);
+    //now we call the setter function that was passed as a prop from App
+    onAddItems(newItem);
   }
 
   return (
@@ -102,12 +132,14 @@ function Form() {
     </form>
   );
 }
-function PackingList() {
+function PackingList({ itemList }) {
+  //with the items now being sent as a prop from the App (which holds it as state)
+  //it will always be current as new items are added
   return (
     <div className="list">
       <ul>
         {/** again remember when mapping an array to return elements each needs a unique key property */}
-        {initialItems.map((item) => (
+        {itemList.map((item) => (
           <Item item={item} key={item.id} />
         ))}
       </ul>
