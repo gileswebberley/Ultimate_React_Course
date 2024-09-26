@@ -39,16 +39,6 @@ const initialItems = [
 export default function App() {
   //here we're adding the items as part of the App components state so we can pass it around through Props
   const [itemsToPack, setItemsToPack] = useState(initialItems);
-  //For the Stats component I'll use the reduce method to extract the quantity of each element
-  const numberOfItemsToPack = itemsToPack.reduce(
-    (acc, item) => acc + item.quantity,
-    0
-  );
-  //For the Stats component I'll use the reduce method to extract the quantity of each element that has a packed property set to true...let's see if this is how the course does it....
-  const numberOfItemsPacked = itemsToPack.reduce(
-    (acc, item) => (item.packed ? acc + item.quantity : acc),
-    0
-  );
 
   function addItemsToPack(newItem) {
     //remember that we cannot mutate within react so itemsToPack.push(newItem) is not
@@ -83,7 +73,7 @@ export default function App() {
 
   console.log(itemsToPack);
 
-  //and now we pass the items State and the setter function to the components via Props
+  //and now we pass the itemsToPack State and the setter function to the components via Props
   return (
     <div className="app">
       <Logo />
@@ -94,7 +84,7 @@ export default function App() {
         onDeleteItem={deleteItemToPack}
         onPackItem={packItems}
       />
-      <Stats packed={numberOfItemsPacked} totalItems={numberOfItemsToPack} />
+      <Stats itemsToPack={itemsToPack} />
     </div>
   );
 }
@@ -215,12 +205,36 @@ function Item({ item, onDeleteItem, onPackItem }) {
   );
 }
 
-function Stats({ packed, totalItems }) {
+function Stats({ itemsToPack }) {
+  //I moved all of these calculations down here so we don't do them when there are no items listed
+  //add in an early return statement if there is nothing on the list (remember that 0 is a falsey value in JS)
+  if (!itemsToPack.length) {
+    return (
+      <footer className="stats">
+        <em>Let's get started with this packing list 🧳</em>
+      </footer>
+    );
+  }
+  //else we'll work out all the stats and output accordingly (including a congrats for getting packed)
+  //I'll use the reduce method to extract the quantity of each element rather than add State that I don't require (the itemsToPack State is the "single source of truth")
+  const numberOfItemsToPack = itemsToPack.reduce(
+    (acc, item) => acc + item.quantity,
+    0
+  );
+  //I'll use the reduce method to extract the quantity of each element that has a packed property set to true
+  const numberOfItemsPacked = itemsToPack.reduce(
+    (acc, item) => (item.packed ? acc + item.quantity : acc),
+    0
+  );
+  const percentagePacked = Math.round(
+    (numberOfItemsPacked / numberOfItemsToPack) * 100
+  );
   return (
     <footer className="stats">
       <em>
-        You have {totalItems} items on your list and you've packed {packed} (
-        {Math.round((packed / totalItems) * 100)}%)
+        {percentagePacked < 100
+          ? `You have ${numberOfItemsToPack} items (from ${itemsToPack.length} categories) on your list and you've packed ${numberOfItemsPacked} (${percentagePacked}%)`
+          : `Well done, you've packed all ${numberOfItemsToPack} items from ${itemsToPack.length} categories`}
       </em>
     </footer>
   );
