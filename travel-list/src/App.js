@@ -40,6 +40,7 @@ export default function App() {
   //here we're adding the items as part of the App components state so we can pass it around through Props
   const [itemsToPack, setItemsToPack] = useState(initialItems);
 
+  //State Event Methods ------------------------------------------------------------
   function addItemsToPack(newItem) {
     //remember that we cannot mutate within react so itemsToPack.push(newItem) is not
     // allowed and instead we create a new array by spreading the existing one and
@@ -70,6 +71,8 @@ export default function App() {
       )
     );
   }
+
+  //---------------------------------------------------------------------------------
 
   console.log(itemsToPack);
 
@@ -162,6 +165,34 @@ function Form({ onAddItems }) {
 function PackingList({ itemList, onDeleteItem, onPackItem }) {
   //with the items now being sent as a prop from the App (which holds it as state)
   //it will always be current as new items are added
+
+  //to implement the sorting functionality we'll use a State variable
+  const [sortBy, setSortBy] = useState('input');
+
+  //keeping in mind that we must use the slice() method to avoid mutating the original array, we'll sort our list according to the newly added sortBy state. Note we use let as it allows us to name a variable as a placeholder and then assign it's value unlike const
+
+  let sortedItems;
+  //use a simple switch statement to look after the sorting required
+  switch (sortBy) {
+    case 'input':
+      sortedItems = itemList;
+      break;
+    case 'description':
+      //to sort alphabeticaly you can use the localeCompare() function
+      sortedItems = itemList
+        .slice()
+        .sort((a, b) => a.description.localeCompare(b.description));
+      break;
+    case 'packed':
+      //to sort by false followed by true convert boolean to number (ie 0/1) and minus b from a, to reverse simply add instead
+      sortedItems = itemList
+        .slice()
+        .sort((a, b) => Number(a.packed) - Number(b.packed));
+      break;
+    default:
+      sortedItems = itemList;
+  }
+
   return (
     <div className="list">
       <ul>
@@ -170,7 +201,7 @@ function PackingList({ itemList, onDeleteItem, onPackItem }) {
          * list can be affected by interactions with the individual items eg
          * onDeleteItem will be called by the Item's delete button
          */}
-        {itemList.map((item) => (
+        {sortedItems.map((item) => (
           <Item
             item={item}
             key={item.id}
@@ -179,6 +210,14 @@ function PackingList({ itemList, onDeleteItem, onPackItem }) {
           />
         ))}
       </ul>
+      {/**Now we'll add the sort by menu to interact with the sortBy state variable */}
+      <div className="actions">
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+          <option value="input">Sort by Input Order</option>
+          <option value="description">Sort by Description</option>
+          <option value="packed">Sort by Packed Status</option>
+        </select>
+      </div>
     </div>
   );
 }
