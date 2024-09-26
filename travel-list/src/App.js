@@ -23,6 +23,7 @@ const initialItems = [
  *
  * SOLUTION ------------------------
  * In the tutorial he starts by having the items array as part of the Form's state which I'll do now along with adding a function to add new items - but of course this does not update (re-render) the PackingList so we'll have to move this piece of state up to the App along with the addItemsToPack function (because we can actually pass a function as a Prop!!)
+ * SO the solution is to 'lift' the state and the functions related to altering that state up to the lowest common ancestor (in this case the App component) and then pass the data and functions as Props to the child components (siblings) that need it which obviously happens whenever the App re-renders due to a change in it's State - Lovely :)
  * ---------------------------------
  *
  * Local State vs Global State
@@ -50,13 +51,40 @@ export default function App() {
     setItemsToPack((itemsToPack) => [...itemsToPack, newItemWithId]);
   }
 
+  function deleteItemToPack(id) {
+    setItemsToPack((items) => items.filter((item) => item.id !== id));
+  }
+
+  /* So I am trying to use what I've learnt to work this out before the tutorial on how
+   to do it. I know that we will want to change the state of the packing list and that
+   I will want to change the value of one property of one selected item. Therefore I am
+   taking the arguments of the unique item id and the boolean value of the checkbox in
+   the Item instance. I'm using the map function (firstly because I can't mutate arrays or objects within React and secondly because I don't want to change the size of the array) and within that I am finding the item with the correct id and using the Spread
+   then adapt method we learnt earlier. If it's not the item we are changing the packed
+   property of then simply return the item as is within the inline map function
+  */
+  function packItems(itemId, isItemPacked) {
+    setItemsToPack((items) =>
+      items.map((item) => {
+        if (item.id === itemId) return { ...item, packed: isItemPacked };
+        else return item;
+      })
+    );
+  }
+
   console.log(itemsToPack);
 
+  //and now we pass the items State and the setter function to the components via Props
   return (
     <div className="app">
       <Logo />
       <Form onAddItems={addItemsToPack} />
-      <PackingList itemList={itemsToPack} />
+      {/** The event handlers are being passed down the heirarchy tree to eventually reach the Item instances */}
+      <PackingList
+        itemList={itemsToPack}
+        onDeleteItem={deleteItemToPack}
+        onPackItem={packItems}
+      />
       <Stats />
     </div>
   );
@@ -114,7 +142,7 @@ function Form({ onAddItems }) {
           //remember that when we are rendering a list of elements each element needs a unique key
           Array.from({ length: 20 }, (_, i) => i + 1).map((i) => (
             <option value={i} key={i}>
-              {i}
+              {i.toString()}
             </option>
           ))
         }
@@ -127,34 +155,53 @@ function Form({ onAddItems }) {
         onChange={(e) => setDescription(e.target.value)}
         name="Name of item"
       />
-      {/**This is automatically assigned the role of submit button it seems */}
-      <button>Add</button>
+      {/**This is automatically assigned the role of submit button it seems but let's make it explicit with the type property */}
+      <button type="submit">Add</button>
     </form>
   );
 }
-function PackingList({ itemList }) {
+function PackingList({ itemList, onDeleteItem, onPackItem }) {
   //with the items now being sent as a prop from the App (which holds it as state)
   //it will always be current as new items are added
   return (
     <div className="list">
       <ul>
-        {/** again remember when mapping an array to return elements each needs a unique key property */}
+        {/** again remember when mapping an array to return elements each needs a unique key property.
+         * here we are passing the state manipulation methods onto the Item so the
+         * list can be affected by interactions with the individual items eg
+         * onDeleteItem will be called by the Item's delete button
+         */}
         {itemList.map((item) => (
-          <Item item={item} key={item.id} />
+          <Item
+            item={item}
+            key={item.id}
+            onDeleteItem={onDeleteItem}
+            onPackItem={onPackItem}
+          />
         ))}
       </ul>
     </div>
   );
 }
 
-//immediately destructure the Props and extract the item object
-function Item({ item }) {
+//immediately destructure the Props and extract the item object and the delete item handler function
+function Item({ item, onDeleteItem, onPackItem }) {
   return (
     <li>
-      <span style={item.packed ? { textDecoration: 'line-through' } : {}}>
-        {item.quantity} {item.description}
-      </span>
-      <button>&times;</button>
+      {/** When the checkbox is clicked we fire the event in App sending this item's id and the explicit boolean value of the checked property (which toggles) */}
+      <input
+        type="checkbox"
+        id={item.description}
+        value={item.packed}
+        checked={item.packed}
+        onChange={(e) => onPackItem(item.id, Boolean(e.target.checked))}
+      />
+      <label htmlFor={item.description}>
+        <span style={item.packed ? { textDecoration: 'line-through' } : {}}>
+          {item.quantity} {item.description}
+        </span>
+      </label>
+      <button onClick={() => onDeleteItem(item.id)}>❌</button>
     </li>
   );
 }
