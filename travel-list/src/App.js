@@ -39,6 +39,16 @@ const initialItems = [
 export default function App() {
   //here we're adding the items as part of the App components state so we can pass it around through Props
   const [itemsToPack, setItemsToPack] = useState(initialItems);
+  //For the Stats component I'll use the reduce method to extract the quantity of each element
+  const numberOfItemsToPack = itemsToPack.reduce(
+    (acc, item) => acc + item.quantity,
+    0
+  );
+  //For the Stats component I'll use the reduce method to extract the quantity of each element that has a packed property set to true...let's see if this is how the course does it....
+  const numberOfItemsPacked = itemsToPack.reduce(
+    (acc, item) => (item.packed ? acc + item.quantity : acc),
+    0
+  );
 
   function addItemsToPack(newItem) {
     //remember that we cannot mutate within react so itemsToPack.push(newItem) is not
@@ -65,10 +75,9 @@ export default function App() {
   */
   function packItems(itemId, isItemPacked) {
     setItemsToPack((items) =>
-      items.map((item) => {
-        if (item.id === itemId) return { ...item, packed: isItemPacked };
-        else return item;
-      })
+      items.map((item) =>
+        item.id === itemId ? { ...item, packed: isItemPacked } : item
+      )
     );
   }
 
@@ -85,7 +94,7 @@ export default function App() {
         onDeleteItem={deleteItemToPack}
         onPackItem={packItems}
       />
-      <Stats />
+      <Stats packed={numberOfItemsPacked} totalItems={numberOfItemsToPack} />
     </div>
   );
 }
@@ -206,10 +215,13 @@ function Item({ item, onDeleteItem, onPackItem }) {
   );
 }
 
-function Stats() {
+function Stats({ packed, totalItems }) {
   return (
     <footer className="stats">
-      <em>You have x items on your list and you've packed x (X%)</em>
+      <em>
+        You have {totalItems} items on your list and you've packed {packed} (
+        {Math.round((packed / totalItems) * 100)}%)
+      </em>
     </footer>
   );
 }
