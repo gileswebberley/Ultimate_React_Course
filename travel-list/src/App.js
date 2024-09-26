@@ -72,6 +72,17 @@ export default function App() {
     );
   }
 
+  //As this method clears all of the information from our array then double check with a confirm box
+  function clearItemsFromList() {
+    if (
+      window.confirm(
+        'Are you sure you wish to clear your packing list? This action cannot be undone!'
+      )
+    ) {
+      setItemsToPack([]);
+    }
+  }
+
   //---------------------------------------------------------------------------------
 
   console.log(itemsToPack);
@@ -86,6 +97,7 @@ export default function App() {
         itemList={itemsToPack}
         onDeleteItem={deleteItemToPack}
         onPackItem={packItems}
+        onClearList={clearItemsFromList}
       />
       <Stats itemsToPack={itemsToPack} />
     </div>
@@ -162,12 +174,22 @@ function Form({ onAddItems }) {
     </form>
   );
 }
-function PackingList({ itemList, onDeleteItem, onPackItem }) {
+function PackingList({ itemList, onDeleteItem, onPackItem, onClearList }) {
   //with the items now being sent as a prop from the App (which holds it as state)
   //it will always be current as new items are added
 
   //to implement the sorting functionality we'll use a State variable
   const [sortBy, setSortBy] = useState('input');
+
+  //if there's nothing on the list then simply show a message
+  if (!itemList.length) {
+    return (
+      <div className="list">
+        <p>You Have No Items To Pack Yet</p>
+      </div>
+    );
+  }
+  //otherwise, we have not returned and so let's do all of this
 
   //keeping in mind that we must use the slice() method to avoid mutating the original array, we'll sort our list according to the newly added sortBy state. Note we use let as it allows us to name a variable as a placeholder and then assign it's value unlike const
 
@@ -217,6 +239,7 @@ function PackingList({ itemList, onDeleteItem, onPackItem }) {
           <option value="description">Sort by Description</option>
           <option value="packed">Sort by Packed Status</option>
         </select>
+        <button onClick={onClearList}>Clear List</button>
       </div>
     </div>
   );
