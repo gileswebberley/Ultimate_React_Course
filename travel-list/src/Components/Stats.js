@@ -26,7 +26,11 @@ export function Stats({ itemsToPack }) {
     <footer className="stats">
       <em>
         {percentagePacked < 100
-          ? `You have ${numberOfItemsToPack} items (from ${itemsToPack.length} categories) on your list and you've packed ${numberOfItemsPacked} (${percentagePacked}%)`
+          ? `You have ${numberOfItemsToPack} items (from ${
+              itemsToPack.length
+            } categories) on your list and you've packed ${
+              numberOfItemsPacked === 0 ? 'nothing yet' : numberOfItemsPacked
+            } (${percentagePacked}%)`
           : `Well done, you've packed all ${numberOfItemsToPack} items from ${itemsToPack.length} categories`}
       </em>
     </footer>

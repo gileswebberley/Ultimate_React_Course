@@ -1,3 +1,3 @@
 export function Logo() {
-  return <h1>Far Away</h1>;
+  return <h1>pack man</h1>;
 }
