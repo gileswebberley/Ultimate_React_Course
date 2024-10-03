@@ -21,14 +21,39 @@ const initialFriends = [
   },
 ];
 
+//Utility function to create a friend object
+//Notice the use of the built in browser crypto object (not available in older browsers) to produce a unique id for a new friend
+function createFriend(name, image) {
+  const tmpId = crypto.randomUUID();
+  image = image === '' ? `https://i.pravatar.cc/48?u=${tmpId}` : image;
+  return { id: tmpId, name: name, image: image, balance: 0 };
+}
+
 export default function App() {
+  //State variable for the list of friends
   const [friends, setFriends] = useState(initialFriends);
+  //State variable used to show/hide the add friend form
+  const [addingFriend, setAddingFriend] = useState(false);
+
+  //Handler function to wrap setFriends() State method
+  function handleAddFriend(name, image) {
+    alert('adding friend: ' + name);
+    setFriends([...friends, createFriend(name, image)]);
+  }
+
+  //Handler function to wrap setAddingFriends() State method
+  function handleShowFriendForm() {
+    setAddingFriend((show) => !show);
+  }
+
   return (
     <div className="app">
       <div className="sidebar">
         <FriendsList friends={friends} />
-        <AddFriendForm />
-        <Button>Add Friend</Button>
+        {addingFriend && <AddFriendForm onAddFriend={handleAddFriend} />}
+        <Button onClick={handleShowFriendForm}>
+          {addingFriend ? 'Close' : 'Add Friend'}
+        </Button>
       </div>
       <FormSplitBill />
     </div>
@@ -79,21 +104,42 @@ function Friend({ friend }) {
   );
 }
 
-function Button({ children }) {
-  return <button className="button">{children}</button>;
+function Button({ children, onClick }) {
+  return (
+    <button className="button" onClick={onClick}>
+      {children}
+    </button>
+  );
 }
 
-function AddFriendForm() {
+function AddFriendForm({ onAddFriend }) {
+  const [name, setName] = useState('');
+  const [image, setImage] = useState('');
+
+  function submitFriendForm(e) {
+    //onSubmit always passes the event and whenever we are using forms in React we must remember to stop it reloading the page with the preventDefault method
+    e.preventDefault();
+    onAddFriend(name, image);
+  }
+
   return (
-    <form className="form-add-friend">
+    <form className="form-add-friend" onSubmit={submitFriendForm}>
       <label>Friend's Name</label>
       <input
         type="text"
         placeholder="Enter new friends name"
         name="friendName"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
       <label>Friend's Image</label>
-      <input type="text" placeholder="Enter Url" name="friendImage" />
+      <input
+        type="text"
+        placeholder="Random Provided If None"
+        name="friendImage"
+        value={image}
+        onChange={(e) => setImage(e.target.value)}
+      />
       <Button>Add Friend</Button>
     </form>
   );
@@ -114,6 +160,7 @@ function FormSplitBill() {
         <option value="user">You</option>
         <option value="friend">X</option>
       </select>
+      <Button>Split Bill</Button>
     </form>
   );
 }
