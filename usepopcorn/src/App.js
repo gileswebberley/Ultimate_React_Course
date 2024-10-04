@@ -47,16 +47,55 @@ const tempWatchedData = [
   },
 ];
 
-const average = (arr) =>
-  arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
+/**
+ * Tutorial: Most components fit into one of three categories -
+ * Stateless (Presentational) - see Logo, MovieListing etc
+ * These components have no State variables but instead can recieve and present data via props
+ * They tend to be small and reusable
+ *
+ * Stateful - see WatchedBox
+ * These components obviously have state but they can also still be reusable
+ *
+ * Structural - see Main, NavBar, and App
+ * These components are generally for 'pages'/'layouts'/'screens' and are the result of composition (as in the oop idea of composition) to provide structure
+ * They can end up being fairly large and tend not to be intended for reuse
+ *
+ *Component Composition is achieved by using the children property making the parent components more reusable so rather than eg 
+ function Main({ movies }) {
+  return (
+    <main className="main">
+      <MovieBox movies={movies} />
+      <WatchedBox />
+    </main>
+  );
+}
+  we could instead have
+  function Main({children }) {
+  return (
+    <main className="main">
+      {children}
+    </main>
+  );
+}
+  and then use it like this
+  <Main>
+    <MovieBox movies={movies} />
+    <WatchedBox />
+  </Main>
+
+      which saves us having to use prop drilling via the Main component
+ */
 
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
-
+  //passing the movies prop down through the levels of components is called Prop Drilling
   return (
     <>
       <NavBar movies={movies} />
-      <Main movies={movies} />
+      <Main>
+        <MovieBox movies={movies} />
+        <WatchedBox />
+      </Main>
     </>
   );
 }
@@ -73,13 +112,8 @@ function ToggleButton({ toggleFunction, toggleVariable }) {
 }
 
 //MAIN WINDOW -------------------------------------------------------------------
-function Main({ movies }) {
-  return (
-    <main className="main">
-      <ListBox movies={movies} />
-      <WatchedBox />
-    </main>
-  );
+function Main({ children }) {
+  return <main className="main">{children}</main>;
 }
 
 //WATCHED MOVIES -----------------------------------------------------------------
@@ -89,12 +123,6 @@ function WatchedBox() {
 
   return (
     <div className="box">
-      {/* <button
-        className="btn-toggle"
-        onClick={() => setIsOpen2((open) => !open)}
-      >
-        {isOpen2 ? '–' : '+'}
-      </button> */}
       <ToggleButton toggleFunction={setIsOpen2} toggleVariable={isOpen2} />
       {isOpen2 && (
         <>
@@ -140,6 +168,8 @@ function WatchedListing({ movie }) {
 }
 
 function WatchedSummary({ watched }) {
+  const average = (arr) =>
+    arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
   const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
   const avgUserRating = average(watched.map((movie) => movie.userRating));
   const avgRuntime = average(watched.map((movie) => movie.runtime));
@@ -169,16 +199,10 @@ function WatchedSummary({ watched }) {
 }
 
 //MOVIE LISTING -------------------------------------------------------------
-function ListBox({ movies }) {
+function MovieBox({ movies }) {
   const [isOpen1, setIsOpen1] = useState(true);
   return (
     <div className="box">
-      {/* <button
-        className="btn-toggle"
-        onClick={() => setIsOpen1((open) => !open)}
-      >
-        {isOpen1 ? '–' : '+'}
-      </button> */}
       <ToggleButton toggleFunction={setIsOpen1} toggleVariable={isOpen1} />
       {isOpen1 && <MovieList movies={movies} />}
     </div>
