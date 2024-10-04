@@ -1,4 +1,8 @@
 import { useState } from 'react';
+import { FriendsList } from './FriendsList';
+import { AddFriendForm } from './AddFriendForm';
+import { FormSplitBill } from './FormSplitBill';
+import { Button } from './Button';
 
 const initialFriends = [
   {
@@ -23,12 +27,14 @@ const initialFriends = [
 
 //Utility function to create a friend object
 //Notice the use of the built in browser crypto object (not available in older browsers) to produce a unique id for a new friend
+//also, if an image url is not provided create a random one using the supplied link
 function createFriend(name, image) {
   const tmpId = crypto.randomUUID();
   image = image === '' ? `https://i.pravatar.cc/48?u=${tmpId}` : image;
   return { id: tmpId, name: name, image: image, balance: 0 };
 }
 
+//The root App component
 export default function App() {
   //State variable for the list of friends
   const [friends, setFriends] = useState(initialFriends);
@@ -41,20 +47,27 @@ export default function App() {
 
   //Handler function to wrap setFriends() State method
   function handleAddFriend(name, image) {
-    //alert('adding friend: ' + name);
     //oh and don't forget to pass an anonymous function to the State Set Method!!
     setFriends((friends) => [...friends, createFriend(name, image)]);
+    //then hide the add friend form component by toggling the addingFriend state
     handleShowFriendForm();
   }
 
   //Handler function to wrap setCurrentFriend() State Method
   function handleSelectFriend(id) {
+    //check whether it is the friend who is currently selected and if so the button
+    //we just clicked had the label 'Close' and so we reset the state and close
+    //the split bill component
     if (currentFriend?.id === id) {
       setCurrentFriend(null);
       setSplittingBill(false);
-    } else {
+    }
+    //otherwise return the friend with the specified id by filtering the friends array
+    //and selecting the first entry of the array produced, then open the split bill form
+    //also tidy up by closing the add friend component if it is still open
+    else {
       setCurrentFriend(() => friends.filter((el) => el.id === id)[0]);
-      setSplittingBill((splittingBill) => (splittingBill = true));
+      setSplittingBill(true);
       setAddingFriend(false);
     }
   }
@@ -62,8 +75,13 @@ export default function App() {
   //Handler function to wrap setAddingFriends() State method
   function handleShowFriendForm() {
     setAddingFriend((show) => !show);
+    //close the split bill component whilst adding a friend
+    handleSelectFriend(currentFriend?.id);
   }
 
+  //Handler function to adjust the balance of a friend who you split a bill with
+  //(Done before watching tutorial but other than me passing the friend it is the same
+  //as the solution provided)
   function handleSplitBill(friend, balanceChange) {
     setFriends((friends) =>
       friends.map((el) =>
@@ -72,6 +90,7 @@ export default function App() {
           : el
       )
     );
+    handleSelectFriend(friend.id);
   }
 
   //Component JSX ------------------------------------------
@@ -92,148 +111,5 @@ export default function App() {
         <FormSplitBill friend={currentFriend} onSplitBill={handleSplitBill} />
       )}
     </div>
-  );
-}
-
-function FriendsList({ friends, onSelectFriend, selectedFriend }) {
-  //Component JSX ------------------------------------------
-  return (
-    <ul>
-      {friends.map((el) => (
-        <Friend
-          friend={el}
-          onSelectFriend={onSelectFriend}
-          key={el.id}
-          selectedFriend={selectedFriend}
-        />
-      ))}
-    </ul>
-  );
-}
-
-function Friend({ friend, onSelectFriend, selectedFriend }) {
-  //this could be done with 3 if && output statements but I think this is neater
-  function balanceText() {
-    let balanceString;
-    if (friend.balance > 0) {
-      balanceString = (
-        <p className="green">
-          {friend.name} owes you £{friend.balance}
-        </p>
-      );
-    }
-    if (friend.balance < 0) {
-      balanceString = (
-        <p className="red">
-          You owe {friend.name} £{-friend.balance}
-        </p>
-      );
-    }
-    if (friend.balance === 0) {
-      balanceString = <p>You and {friend.name} are even</p>;
-    }
-    return balanceString;
-  }
-
-  //Component JSX ------------------------------------------
-  return (
-    <li className={selectedFriend?.id === friend.id ? 'selected' : ''}>
-      <img src={friend.image} alt={friend.name} />
-      <h3>{friend.name}</h3>
-      {balanceText()}
-      <Button onClick={() => onSelectFriend(friend.id)}>
-        {selectedFriend?.id === friend.id ? 'Close' : 'Select'}
-      </Button>
-    </li>
-  );
-}
-
-function Button({ children, onClick }) {
-  //Component JSX ------------------------------------------
-  return (
-    <button className="button" onClick={onClick}>
-      {children}
-    </button>
-  );
-}
-
-function AddFriendForm({ onAddFriend }) {
-  const [name, setName] = useState('');
-  const [image, setImage] = useState('');
-
-  function submitFriendForm(e) {
-    //onSubmit always passes the event and whenever we are using forms in React we must remember to stop it reloading the page with the preventDefault method
-    e.preventDefault();
-    //little guard statement
-    if (name === '') return;
-    onAddFriend(name, image);
-    //and reset the values...
-    setName('');
-    setImage('');
-  }
-
-  //Component JSX ------------------------------------------
-  return (
-    <form className="form-add-friend" onSubmit={submitFriendForm}>
-      <label>Friend's Name</label>
-      <input
-        type="text"
-        placeholder="Enter new friends name"
-        name="friendName"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <label>Friend's Image</label>
-      <input
-        type="text"
-        placeholder="Random Provided If None"
-        name="friendImage"
-        value={image}
-        onChange={(e) => setImage(e.target.value)}
-      />
-      <Button>Add Friend</Button>
-    </form>
-  );
-}
-
-function FormSplitBill({ friend, onSplitBill }) {
-  const [billValue, setBillValue] = useState('');
-  const [userCut, setUserCut] = useState('');
-  const [payer, setPayer] = useState('user');
-  const friendsCut = billValue === '' ? '' : billValue - userCut;
-
-  function submitSplitBill(e) {
-    e.preventDefault();
-    if (billValue === '') return;
-    onSplitBill(friend, payer === 'friend' ? userCut * -1 : friendsCut);
-    setBillValue('');
-    setUserCut('');
-    setPayer('user');
-  }
-  //Component JSX ------------------------------------------
-  return (
-    <form className="form-split-bill" onSubmit={submitSplitBill}>
-      <h2>Split a bill with {friend.name}</h2>
-      <label>Bill Value</label>
-      <input
-        type="text"
-        value={billValue}
-        onChange={(e) => setBillValue(e.target.value)}
-      />
-      <label>Your Cut</label>
-      <input
-        type="text"
-        value={userCut}
-        onChange={(e) => setUserCut(e.target.value)}
-      />
-      <label>{friend.name}'s Cut</label>
-      <input type="text" disabled value={friendsCut} />
-      <label>Who's paying the bill?</label>
-      <select value={payer} onChange={(e) => setPayer(e.target.value)}>
-        <option value="user">You</option>
-        <option value="friend">{friend.name}</option>
-      </select>
-      <Button>Split Bill</Button>
-    </form>
   );
 }
