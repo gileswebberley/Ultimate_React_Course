@@ -88,23 +88,37 @@ const tempWatchedData = [
 
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
+  const [watched, setWatched] = useState(tempWatchedData);
   //passing the movies prop down through the levels of components is called Prop
   // Drilling - this can be avoided by the use of component composition as we are
   //doing here with the NavBar and SearchResultNumber (NavBar no longer needs the
   //movies prop which it was simply passing down to it's child before using this technique)
+  //Taking the technique further we end up with a nice component tree view in the App
+  //Note that components can also be passed as explicit props (ie not the in-built children)
   return (
     <>
       <NavBar>
+        <Logo divClass="logo" imageString="🍿" title="usePopcorn" />
+        <Search />
         <SearchResultNumber movies={movies} />
       </NavBar>
+
       <Main>
-        <MovieBox movies={movies} />
-        <WatchedBox />
+        <ToggleBox>
+          <MovieList movies={movies} />
+        </ToggleBox>
+        <ToggleBox>
+          <WatchedSummary watched={watched} />
+          <WatchedList watched={watched} />
+        </ToggleBox>
       </Main>
     </>
   );
 }
 
+//Slowly creating some reuseable components as we notice similarities in functionality
+
+//A simple button that toggles an isOpen functionality
 function ToggleButton({ toggleFunction, toggleVariable }) {
   return (
     <button
@@ -116,28 +130,24 @@ function ToggleButton({ toggleFunction, toggleVariable }) {
   );
 }
 
+//The box component that utilises the ToggleButton functionality to show/hide it's children
+function ToggleBox({ children }) {
+  const [isOpen, setIsOpen] = useState(true);
+  return (
+    <div className="box">
+      <ToggleButton toggleFunction={setIsOpen} toggleVariable={isOpen} />
+      {/* Notice that we have not stated {children} as we are already in 'js-mode' */}
+      {isOpen && children}
+    </div>
+  );
+}
+
 //MAIN WINDOW -------------------------------------------------------------------
 function Main({ children }) {
   return <main className="main">{children}</main>;
 }
 
 //WATCHED MOVIES -----------------------------------------------------------------
-function WatchedBox() {
-  const [isOpen2, setIsOpen2] = useState(true);
-  const [watched, setWatched] = useState(tempWatchedData);
-
-  return (
-    <div className="box">
-      <ToggleButton toggleFunction={setIsOpen2} toggleVariable={isOpen2} />
-      {isOpen2 && (
-        <>
-          <WatchedSummary watched={watched} />
-          <WatchedList watched={watched} />
-        </>
-      )}
-    </div>
-  );
-}
 
 function WatchedList({ watched }) {
   return (
@@ -204,15 +214,6 @@ function WatchedSummary({ watched }) {
 }
 
 //MOVIE LISTING -------------------------------------------------------------
-function MovieBox({ movies }) {
-  const [isOpen1, setIsOpen1] = useState(true);
-  return (
-    <div className="box">
-      <ToggleButton toggleFunction={setIsOpen1} toggleVariable={isOpen1} />
-      {isOpen1 && <MovieList movies={movies} />}
-    </div>
-  );
-}
 
 function MovieList({ movies }) {
   return (
@@ -243,11 +244,7 @@ function MovieListing({ movie }) {
 function NavBar({ children }) {
   return (
     <nav className="nav-bar">
-      <Logo divClass="logo" imageString="🍿" title="usePopcorn" />
-      <Search />
-      {/*
-      this is a example of how to avoid prop drilling by using component composition
-      <SearchResultNumber movies={movies} /> */}
+      {/* this is the example of how to avoid prop drilling by using component composition*/}
       {children}
     </nav>
   );
