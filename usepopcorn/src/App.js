@@ -88,10 +88,15 @@ const tempWatchedData = [
 
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
-  //passing the movies prop down through the levels of components is called Prop Drilling
+  //passing the movies prop down through the levels of components is called Prop
+  // Drilling - this can be avoided by the use of component composition as we are
+  //doing here with the NavBar and SearchResultNumber (NavBar no longer needs the
+  //movies prop which it was simply passing down to it's child before using this technique)
   return (
     <>
-      <NavBar movies={movies} />
+      <NavBar>
+        <SearchResultNumber movies={movies} />
+      </NavBar>
       <Main>
         <MovieBox movies={movies} />
         <WatchedBox />
@@ -235,12 +240,15 @@ function MovieListing({ movie }) {
 }
 
 //NAVIGATION AREA --------------------------------------------------------
-function NavBar({ movies }) {
+function NavBar({ children }) {
   return (
     <nav className="nav-bar">
       <Logo divClass="logo" imageString="🍿" title="usePopcorn" />
       <Search />
-      <SearchResultNumber movies={movies} />
+      {/*
+      this is a example of how to avoid prop drilling by using component composition
+      <SearchResultNumber movies={movies} /> */}
+      {children}
     </nav>
   );
 }
