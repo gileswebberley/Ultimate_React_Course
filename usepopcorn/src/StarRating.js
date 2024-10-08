@@ -18,8 +18,12 @@ const starContainerStyling = {
   //gap: '2px',
 };
 
+//This is a bit old fashioned and it might be worth looking into typescript but,
+//here's how to type check the properties that you leave open
 StarRating.propTypes = {
-  maxRating: PropTypes.number,
+  //isRequired as an example, therefore you could forgoe the need for a default?
+  //best practice to set a default apparently
+  maxRating: PropTypes.number.isRequired,
   color: PropTypes.string,
   size: PropTypes.number,
   onSetRating: PropTypes.func,
@@ -27,7 +31,7 @@ StarRating.propTypes = {
 
 //we can set a default value to a property as shown here, very important when building the props based API
 export default function StarRating({
-  maxRating = 10,
+  maxRating,
   colour = '#000',
   size = 16,
   onSetRating,
