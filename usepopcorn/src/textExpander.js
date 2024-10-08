@@ -47,9 +47,11 @@ function TextExpander({
   const [isExpanded, setIsExpanded] = useState(expanded);
 
   const textContent = children;
+  //handy bit of simple string manipulation to count the number of words using
+  //split() to create an array of the words, then slice() to create a new array
+  //with the desired number of words, and then join() to convert it back into a string
   const splitText = children.split(' ');
-  const shortText =
-    splitText.slice(0, collapsedNumWords, ' ').join(' ') + '...';
+  const shortText = splitText.slice(0, collapsedNumWords).join(' ') + '...';
   return (
     <div className={className}>
       <span>{isExpanded ? textContent : shortText}</span>
