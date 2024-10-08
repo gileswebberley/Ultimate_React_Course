@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './styles.css';
+import { shiftColor } from './hexColourShift';
 
 export default function TextExpanderApp() {
   return (
@@ -52,11 +53,30 @@ function TextExpander({
   //with the desired number of words, and then join() to convert it back into a string
   const splitText = children.split(' ');
   const shortText = splitText.slice(0, collapsedNumWords).join(' ') + '...';
+
+  //some styling for the button as we want it to be a standalone component
+  const buttonStyle = {
+    background: 'none',
+    cursor: 'pointer',
+    font: 'inherit',
+    border: 'none',
+    marginLeft: '5px',
+    color: buttonColor,
+  };
+  const openButtonTextColour = shiftColor('#ffffff', buttonColor, 'sub');
+
   return (
     <div className={className}>
       <span>{isExpanded ? textContent : shortText}</span>
       <button
-        style={isExpanded ? {} : { backgroundColor: buttonColor }}
+        style={
+          isExpanded
+            ? buttonStyle
+            : {
+                ...buttonStyle,
+                color: openButtonTextColour,
+              }
+        }
         onClick={() => setIsExpanded((exp) => (exp = !exp))}
       >
         {isExpanded ? collapseButtonText : expandButtonText}
