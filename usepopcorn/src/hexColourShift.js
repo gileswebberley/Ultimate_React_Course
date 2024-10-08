@@ -1,5 +1,5 @@
 /**
- *
+ * Lovely little function from kfox112 on stackoverflow
  * @param {string eg '#ff6622'} base
  * @param {string eg '#ff6622} change
  * @param {string either 'add' or 'sub'} direction
@@ -31,11 +31,13 @@ export function shiftColor(base, change, direction) {
 
     if (direction === 'add') {
       newPiece = basePiece + changePiece;
-      newPiece = newPiece > 255 ? 255 : newPiece;
+      //slight alteration to make it cycle round
+      newPiece = newPiece > 255 ? newPiece - 255 : newPiece;
     }
     if (direction === 'sub') {
       newPiece = basePiece - changePiece;
-      newPiece = newPiece < 0 ? 0 : newPiece;
+      //slight alteration to make it cycle round
+      newPiece = newPiece < 0 ? 255 + newPiece : newPiece;
     }
 
     newPiece = newPiece.toString(16);

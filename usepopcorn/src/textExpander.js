@@ -63,7 +63,7 @@ function TextExpander({
     marginLeft: '5px',
     color: buttonColor,
   };
-  const openButtonTextColour = shiftColor('#ffffff', buttonColor, 'sub');
+  const openButtonTextColour = shiftColor('#000000', buttonColor, 'sub');
 
   return (
     <div className={className}>
