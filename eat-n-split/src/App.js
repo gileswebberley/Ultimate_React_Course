@@ -107,8 +107,18 @@ export default function App() {
           {addingFriend ? 'Close' : 'Add Friend'}
         </Button>
       </div>
+      {/* In section 11 we have learnt about the importance of the key prop to
+      force a re-render of a component that has only had other props changed but
+      has remained in the same place on the component tree. In the original version
+      when you filled out the split bill form and then changed which friend you had
+      selected the form would not reset as you might expect due to the FormSplitBill
+      component not being re-rendered and so now we will add a unique key prop to fix it */}
       {splittingBill && (
-        <FormSplitBill friend={currentFriend} onSplitBill={handleSplitBill} />
+        <FormSplitBill
+          friend={currentFriend}
+          onSplitBill={handleSplitBill}
+          key={currentFriend.id}
+        />
       )}
     </div>
   );
