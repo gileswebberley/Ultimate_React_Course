@@ -41,9 +41,19 @@ function Tabbed({ content }) {
       changes to the state of TabContent is reset because of the diffing proccess -
       try clicking the like button and then clicking on the various tabs and you will
       notice that it stays the same until clicking on tab 4 at which point it is reset
-      when you return */}
+      when you return.
+      To make the state reset on every tab rather than just changing the content we
+      can change the key prop to be unique too - now when you go between tabs the 
+      show/hide and likes that are stored in the component's state will be reset 
+      (obviously we do not want to lose the likes but it's just an example of changing the key forces a re-render of the component during the diffing process in the render phase of updating)
+      By having stable keys (for example when we create lists of items) it means that
+      the component can move in the tree but it will not be re-rendered and therefore
+      will not have it's state reset*/}
       {activeTab <= 2 ? (
-        <TabContent item={content.at(activeTab)} />
+        <TabContent
+          item={content.at(activeTab)}
+          key={content.at(activeTab).summary}
+        />
       ) : (
         <DifferentContent />
       )}
