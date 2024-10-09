@@ -37,7 +37,11 @@ function Tabbed({ content }) {
         <Tab num={2} activeTab={activeTab} onClick={setActiveTab} />
         <Tab num={3} activeTab={activeTab} onClick={setActiveTab} />
       </div>
-
+      {/* When the active tab changes to the different element DifferentContent any
+      changes to the state of TabContent is reset because of the diffing proccess -
+      try clicking the like button and then clicking on the various tabs and you will
+      notice that it stays the same until clicking on tab 4 at which point it is reset
+      when you return */}
       {activeTab <= 2 ? (
         <TabContent item={content.at(activeTab)} />
       ) : (
