@@ -125,22 +125,31 @@ export default function App() {
       try {
         //we are loading asynchronous data so we'll use our loader functionality
         setIsLoading(true);
-        const res = await fetch(`${OMDbURL}${OMDbKEY}&s=beautiful`);
+        //to overcome the problem with res.ok never being evaluated I'm going to try to chain a catch function and throw a new error - didn't work until I threw a TypeError rather than generic Error
+        const res = await fetch(`${OMDbURL}${OMDbKEY}&s=qunskk`).catch(
+          function (err) {
+            throw new TypeError(
+              'something went wrong when trying to fetch the movies for you'
+            );
+          }
+        );
         //check this has resolved by testing the ok property - no this is wrong..
         // if (!res.ok) {
-        //   //this does not replace the fetch Response error message??
-        //   throw new Error(
+        //   throw new TypeError(
         //     'something went wrong when trying to fetch the movies for you'
         //   );
-        // } This never runs as fetch throws it's own error
+        // } //This never runs as fetch throws it's own error
         const data = await res.json();
+        //check if there's any results before trying to display them
+        if (!data.Search) {
+          throw new SyntaxError(
+            'Cannot find any movies that match your search'
+          );
+        }
         setMovies(data.Search);
       } catch (err) {
-        //Had to add this as the fetch function throws it's own error which is
-        // then caught here and so checking the ok status never happens
-        if (err.message === 'Failed to fetch')
-          err.message =
-            'something went wrong when trying to fetch the movies for you';
+        console.log('The name of the ERROR thrown by fetch is: ' + err.name);
+        console.log('The message attached to the Error is:' + err.message);
         setIsError(err.message);
       } finally {
         //and now we've finished waiting so replace the loader with the data presentation or an error message
