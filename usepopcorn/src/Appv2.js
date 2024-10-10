@@ -94,6 +94,8 @@ export default function App() {
   //here we'll implement some 'loading' feature for the asyncrounous data from an api
   //which we'll utilise in our first useEffect() ps. use throtle in dev-tools to emulate a slow connection
   const [isLoading, setIsLoading] = useState(false);
+  //in case loading fails for some reason we'll throw an error (which will be a string)
+  const [isError, setIsError] = useState('');
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(tempWatchedData);
   //passing the movies prop down through the levels of components is called Prop
@@ -117,14 +119,33 @@ export default function App() {
   // }, []);
   //as useEffect cannot return a Promise here is the async version of the above useEffect
   useEffect(function () {
+    //now we'll add error handling with a try/catch/finally block and throw an error
+    //if the fetch doesn't succeed...
     async function setMoviesEffect() {
-      //we are loading asynchronous data so we'll use our loader functionality
-      setIsLoading(true);
-      const res = await fetch(`${OMDbURL}${OMDbKEY}&s=beautiful`);
-      const data = await res.json();
-      setMovies(data.Search);
-      //and now we've finished waiting so replace the loader with the data presentation
-      setIsLoading(false);
+      try {
+        //we are loading asynchronous data so we'll use our loader functionality
+        setIsLoading(true);
+        const res = await fetch(`${OMDbURL}${OMDbKEY}&s=beautiful`);
+        //check this has resolved by testing the ok property - no this is wrong..
+        // if (!res.ok) {
+        //   //this does not replace the fetch Response error message??
+        //   throw new Error(
+        //     'something went wrong when trying to fetch the movies for you'
+        //   );
+        // } This never runs as fetch throws it's own error
+        const data = await res.json();
+        setMovies(data.Search);
+      } catch (err) {
+        //Had to add this as the fetch function throws it's own error which is
+        // then caught here and so checking the ok status never happens
+        if (err.message === 'Failed to fetch')
+          err.message =
+            'something went wrong when trying to fetch the movies for you';
+        setIsError(err.message);
+      } finally {
+        //and now we've finished waiting so replace the loader with the data presentation or an error message
+        setIsLoading(false);
+      }
     }
     setMoviesEffect();
   }, []);
@@ -139,7 +160,10 @@ export default function App() {
 
       <Main>
         <ToggleBox>
-          {isLoading ? <Loader /> : <MovieList movies={movies} />}
+          {/* We now have to add more conditions for error handling */}
+          {isLoading && <Loader />}
+          {!isLoading && !isError && <MovieList movies={movies} />}
+          {isError && <Error message={isError} />}
         </ToggleBox>
         <ToggleBox>
           <WatchedSummary watched={watched} />
@@ -179,6 +203,15 @@ function ToggleBox({ children }) {
 //a very simple loading icon
 function Loader() {
   return <p className="loader">Loading...</p>;
+}
+
+//and another presentational component to handle any errors
+function Error({ message }) {
+  return (
+    <p className="error">
+      <span>OH NO 😯 {message}</span>
+    </p>
+  );
 }
 
 //MAIN WINDOW -------------------------------------------------------------------
