@@ -82,7 +82,6 @@ const tempWatchedData = [
     <MovieBox movies={movies} />
     <WatchedBox />
   </Main>
-
       which saves us having to use prop drilling via the Main component
  */
 
@@ -92,6 +91,9 @@ const OMDbURL = 'http://www.omdbapi.com/?i=tt3896198&apikey=';
 const OMDbKEY = '841c6d87';
 
 export default function App() {
+  //here we'll implement some 'loading' feature for the asyncrounous data from an api
+  //which we'll utilise in our first useEffect() ps. use throtle in dev-tools to emulate a slow connection
+  const [isLoading, setIsLoading] = useState(false);
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(tempWatchedData);
   //passing the movies prop down through the levels of components is called Prop
@@ -108,10 +110,23 @@ export default function App() {
    */
   //let's load the results of a search from the OMDb api into the movies state
   //This involves the chaining of then() expressions to deal with the Promises created by asynchronous functions
+  // useEffect(function () {
+  //   fetch(`${OMDbURL}${OMDbKEY}&s=beautiful`)
+  //     .then((res) => res.json())
+  //     .then((data) => setMovies(data.Search));
+  // }, []);
+  //as useEffect cannot return a Promise here is the async version of the above useEffect
   useEffect(function () {
-    fetch(`${OMDbURL}${OMDbKEY}&s=beautiful`)
-      .then((res) => res.json())
-      .then((data) => setMovies(data.Search));
+    async function setMoviesEffect() {
+      //we are loading asynchronous data so we'll use our loader functionality
+      setIsLoading(true);
+      const res = await fetch(`${OMDbURL}${OMDbKEY}&s=beautiful`);
+      const data = await res.json();
+      setMovies(data.Search);
+      //and now we've finished waiting so replace the loader with the data presentation
+      setIsLoading(false);
+    }
+    setMoviesEffect();
   }, []);
 
   return (
@@ -124,7 +139,7 @@ export default function App() {
 
       <Main>
         <ToggleBox>
-          <MovieList movies={movies} />
+          {isLoading ? <Loader /> : <MovieList movies={movies} />}
         </ToggleBox>
         <ToggleBox>
           <WatchedSummary watched={watched} />
@@ -159,6 +174,11 @@ function ToggleBox({ children }) {
       {isOpen && children}
     </div>
   );
+}
+
+//a very simple loading icon
+function Loader() {
+  return <p className="loader">Loading...</p>;
 }
 
 //MAIN WINDOW -------------------------------------------------------------------
