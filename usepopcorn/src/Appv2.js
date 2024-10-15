@@ -1,29 +1,5 @@
 import { useEffect, useState } from 'react';
 
-const tempMovieData = [
-  {
-    imdbID: 'tt1375666',
-    Title: 'Inception',
-    Year: '2010',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg',
-  },
-  {
-    imdbID: 'tt0133093',
-    Title: 'The Matrix',
-    Year: '1999',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg',
-  },
-  {
-    imdbID: 'tt6751668',
-    Title: 'Parasite',
-    Year: '2019',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg',
-  },
-];
-
 const tempWatchedData = [
   {
     imdbID: 'tt1375666',
@@ -82,7 +58,7 @@ const tempWatchedData = [
     <MovieBox movies={movies} />
     <WatchedBox />
   </Main>
-      which saves us having to use prop drilling via the Main component
+  which saves us having to use prop drilling via the Main component
  */
 
 //Onto section 12 of the course we are going to collect data from an api
@@ -94,10 +70,16 @@ export default function App() {
   //here we'll implement some 'loading' feature for the asyncrounous data from an api
   //which we'll utilise in our first useEffect() ps. use throtle in dev-tools to emulate a slow connection
   const [isLoading, setIsLoading] = useState(false);
-  //in case loading fails for some reason we'll throw an error (which will be a string)
+  //in case loading fails for some reason we'll throw an error and pass it's message in here
   const [isError, setIsError] = useState('');
+  //now we'll move the search query up to this level to get it all loading
+  const [query, setQuery] = useState('');
+
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(tempWatchedData);
+  //implement further details being displayed
+  const [selctedMovieId, setSelectedMovieId] = useState('tt1375666');
+
   //passing the movies prop down through the levels of components is called Prop
   // Drilling - this can be avoided by the use of component composition as we are
   //doing here with the NavBar and SearchResultNumber (NavBar no longer needs the
@@ -117,66 +99,84 @@ export default function App() {
   //     .then((res) => res.json())
   //     .then((data) => setMovies(data.Search));
   // }, []);
+
   //as useEffect cannot return a Promise here is the async version of the above useEffect
-  useEffect(function () {
-    //now we'll add error handling with a try/catch/finally block and throw an error
-    //if the fetch doesn't succeed...
-    async function setMoviesEffect() {
-      try {
-        //we are loading asynchronous data so we'll use our loader functionality
-        setIsLoading(true);
-        //to overcome the problem with res.ok never being evaluated I'm going to try to chain a catch function and throw a new error - didn't work until I threw a TypeError rather than generic Error
-        const res = await fetch(`${OMDbURL}${OMDbKEY}&s=qunskk`).catch(
-          function (err) {
-            throw new TypeError(
-              'something went wrong when trying to fetch the movies for you'
+  useEffect(
+    function () {
+      //now we'll add error handling with a try/catch/finally block and throw an error
+      //if the fetch doesn't succeed...
+      async function setMoviesEffect() {
+        try {
+          //we are loading asynchronous data so we'll use our loader functionality
+          setIsLoading(true);
+          setIsError('');
+          //to overcome the problem with res.ok never being evaluated I'm going to try to chain a catch function and throw a new error - didn't work until I threw a TypeError rather than generic Error
+          const res = await fetch(`${OMDbURL}${OMDbKEY}&s=${query}`).catch(
+            function (err) {
+              throw new TypeError(
+                'something went wrong when trying to fetch the movies for you'
+              );
+            }
+          );
+          //check this has resolved by testing the ok property - no this is wrong..
+          // if (!res.ok) {
+          //   throw new TypeError(
+          //     'something went wrong when trying to fetch the movies for you'
+          //   );
+          // } //This never runs as fetch throws it's own error
+          const data = await res.json();
+          //check if there's any results before trying to display them
+          if (!data.Search) {
+            throw new SyntaxError(
+              'Cannot find any movies that match your search'
             );
           }
-        );
-        //check this has resolved by testing the ok property - no this is wrong..
-        // if (!res.ok) {
-        //   throw new TypeError(
-        //     'something went wrong when trying to fetch the movies for you'
-        //   );
-        // } //This never runs as fetch throws it's own error
-        const data = await res.json();
-        //check if there's any results before trying to display them
-        if (!data.Search) {
-          throw new SyntaxError(
-            'Cannot find any movies that match your search'
-          );
+          setMovies(data.Search);
+        } catch (err) {
+          console.log('The name of the ERROR thrown by fetch is: ' + err.name);
+          console.log('The message attached to the Error is:' + err.message);
+          setIsError(err.message);
+        } finally {
+          //and now we've finished waiting so replace the loader with the data presentation or an error message
+          setIsLoading(false);
         }
-        setMovies(data.Search);
-      } catch (err) {
-        console.log('The name of the ERROR thrown by fetch is: ' + err.name);
-        console.log('The message attached to the Error is:' + err.message);
-        setIsError(err.message);
-      } finally {
-        //and now we've finished waiting so replace the loader with the data presentation or an error message
-        setIsLoading(false);
       }
-    }
-    setMoviesEffect();
-  }, []);
+      //don't run if the query is too short
+      if (query.length < 3) {
+        //I'll leave the last search rather than reset with setMovies([])
+        setIsError('');
+        return;
+      }
+      setMoviesEffect();
+    },
+    //now we are reacting to changes of the state variable 'query' we add it to the dependency array
+    [query]
+  );
 
   return (
     <>
       <NavBar>
         <Logo divClass="logo" imageString="🍿" title="usePopcorn" />
-        <Search />
+        <Search query={query} onSetQuery={setQuery} />
         <SearchResultNumber movies={movies} />
       </NavBar>
 
       <Main>
         <ToggleBox>
-          {/* We now have to add more conditions for error handling */}
+          {/* We now have to add more conditions for loading and error handling */}
           {isLoading && <Loader />}
           {!isLoading && !isError && <MovieList movies={movies} />}
           {isError && <Error message={isError} />}
         </ToggleBox>
         <ToggleBox>
-          <WatchedSummary watched={watched} />
-          <WatchedList watched={watched} />
+          {selctedMovieId ? (
+            <MovieDetails selectedId={selctedMovieId} />
+          ) : (
+            <>
+              <WatchedSummary watched={watched} />
+              <WatchedList watched={watched} />
+            </>
+          )}
         </ToggleBox>
       </Main>
     </>
@@ -321,6 +321,10 @@ function MovieListing({ movie }) {
   );
 }
 
+function MovieDetails({ selectedId }) {
+  return <p>The selected movie imdb ID is {selectedId}</p>;
+}
+
 //NAVIGATION AREA --------------------------------------------------------
 function NavBar({ children }) {
   return (
@@ -348,15 +352,14 @@ function SearchResultNumber({ movies }) {
   );
 }
 
-function Search() {
-  const [query, setQuery] = useState('');
+function Search({ query, onSetQuery }) {
   return (
     <input
       className="search"
       type="text"
       placeholder="Search movies..."
       value={query}
-      onChange={(e) => setQuery(e.target.value)}
+      onChange={(e) => onSetQuery(e.target.value)}
     />
   );
 }
