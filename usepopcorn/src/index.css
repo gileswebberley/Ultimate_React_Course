@@ -54,8 +54,10 @@ body {
   max-width: 42rem;
   background-color: var(--color-background-500);
   border-radius: 0.9rem;
-  overflow: auto;
-  overflow-y: visible;
+  /* allow content in box to scroll up and down but block across with a word wrap */
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
   position: relative;
 }
 

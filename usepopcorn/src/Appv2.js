@@ -63,7 +63,7 @@ const tempWatchedData = [
 
 //Onto section 12 of the course we are going to collect data from an api
 //Set these constants outside the component so it isn't recreated on re-render etc
-const OMDbURL = 'http://www.omdbapi.com/?i=tt3896198&apikey=';
+const OMDbURL = 'http://www.omdbapi.com/?apikey=';
 const OMDbKEY = '841c6d87';
 
 export default function App() {
@@ -77,8 +77,18 @@ export default function App() {
 
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(tempWatchedData);
+
   //implement further details being displayed
-  const [selctedMovieId, setSelectedMovieId] = useState('tt1375666');
+  const [selctedMovieId, setSelectedMovieId] = useState(null);
+
+  function handleSelectMovie(id) {
+    //implement it closing on second click of the same MovieListing
+    setSelectedMovieId((selected) => (selected === id ? null : id));
+  }
+
+  function handleCloseDetails() {
+    setSelectedMovieId(null);
+  }
 
   //passing the movies prop down through the levels of components is called Prop
   // Drilling - this can be avoided by the use of component composition as we are
@@ -133,8 +143,8 @@ export default function App() {
           }
           setMovies(data.Search);
         } catch (err) {
-          console.log('The name of the ERROR thrown by fetch is: ' + err.name);
-          console.log('The message attached to the Error is:' + err.message);
+          // console.log('The name of the ERROR thrown by fetch is: ' + err.name);
+          // console.log('The message attached to the Error is:' + err.message);
           setIsError(err.message);
         } finally {
           //and now we've finished waiting so replace the loader with the data presentation or an error message
@@ -165,12 +175,17 @@ export default function App() {
         <ToggleBox>
           {/* We now have to add more conditions for loading and error handling */}
           {isLoading && <Loader />}
-          {!isLoading && !isError && <MovieList movies={movies} />}
+          {!isLoading && !isError && (
+            <MovieList movies={movies} onSelectMovie={handleSelectMovie} />
+          )}
           {isError && <Error message={isError} />}
         </ToggleBox>
         <ToggleBox>
           {selctedMovieId ? (
-            <MovieDetails selectedId={selctedMovieId} />
+            <MovieDetails
+              selectedId={selctedMovieId}
+              onCloseDetails={handleCloseDetails}
+            />
           ) : (
             <>
               <WatchedSummary watched={watched} />
@@ -296,24 +311,28 @@ function WatchedSummary({ watched }) {
 
 //MOVIE LISTING -------------------------------------------------------------
 
-function MovieList({ movies }) {
+function MovieList({ movies, onSelectMovie }) {
   return (
-    <ul className="list">
+    <ul className="list list-movies">
       {movies?.map((movie) => (
-        <MovieListing movie={movie} key={movie.imdbID} />
+        <MovieListing
+          movie={movie}
+          key={movie.imdbID}
+          onSelectMovie={onSelectMovie}
+        />
       ))}
     </ul>
   );
 }
 
-function MovieListing({ movie }) {
+function MovieListing({ movie, onSelectMovie }) {
   return (
-    <li>
+    <li onClick={() => onSelectMovie(movie.imdbID)}>
       <img src={movie.Poster} alt={`${movie.Title} poster`} />
       <h3>{movie.Title}</h3>
       <div>
         <p>
-          <span>🗓</span>
+          <span>📆</span>
           <span>{movie.Year}</span>
         </p>
       </div>
@@ -321,8 +340,73 @@ function MovieListing({ movie }) {
   );
 }
 
-function MovieDetails({ selectedId }) {
-  return <p>The selected movie imdb ID is {selectedId}</p>;
+function MovieDetails({ selectedId, onCloseDetails }) {
+  const [currentMovie, setCurrentMovie] = useState({});
+  //destructure the movie data
+  const {
+    Title,
+    Year,
+    Poster,
+    Runtime,
+    imdbRating,
+    Plot,
+    Realeased,
+    Actors,
+    Director,
+    Genre,
+  } = currentMovie;
+  //some async functionality...
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState('');
+  //each time this loads we will get the movie details of the selected id
+  //this will run on mount due to the empty dependency array remember...
+  useEffect(
+    function () {
+      async function getMovieDetails() {
+        try {
+          setIsLoading(true);
+          setIsError('');
+          const res = await fetch(`${OMDbURL}${OMDbKEY}&i=${selectedId}`).catch(
+            function (err) {
+              throw new TypeError(
+                'something went wrong when trying to fetch the movies for you'
+              );
+            }
+          );
+          //data should always be passable as we have the id from the search
+          const data = await res.json();
+          setCurrentMovie(data);
+        } catch (error) {
+          setIsError(error.message);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      getMovieDetails();
+    },
+    [selectedId]
+  );
+
+  //then return the details or error or loading....
+  return (
+    <div className="details">
+      {isLoading && <Loader />}
+      {!isLoading && !isError && (
+        <header>
+          <button className="btn-back" onClick={onCloseDetails}>
+            &larr;
+          </button>
+          <img src={Poster} alt={`Poster for ${Title}`} />
+          <section>
+            <h2>{Title}</h2>
+          </section>
+          {/* The selected movie imdb ID is {selectedId}{' '}
+          {JSON.stringify(currentMovie)} */}
+        </header>
+      )}
+      {isError && <Error message={isError} />}
+    </div>
+  );
 }
 
 //NAVIGATION AREA --------------------------------------------------------
