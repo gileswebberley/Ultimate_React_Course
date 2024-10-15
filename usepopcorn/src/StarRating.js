@@ -71,7 +71,7 @@ export default function StarRating({
           />
         ))}
       </div>
-      <p>Rating: {hoverRating || rating || ''}</p>
+      <p>{hoverRating || rating || ' '}</p>
     </div>
   );
 }
@@ -81,7 +81,7 @@ function Star({
   onHoverIn,
   onHoverOut,
   full,
-  size = '20',
+  size = 16,
   colour = '#000',
 }) {
   //For the stars the course provides an svg component which simply needs styling
@@ -97,7 +97,7 @@ function Star({
       xmlns="http://www.w3.org/2000/svg"
       fill={full ? colour : 'none'}
       viewBox="0 0 24 24"
-      stroke={colour}
+      stroke={full ? 'none' : colour}
       style={starStyle}
       onClick={onRating}
       onMouseEnter={onHoverIn}
