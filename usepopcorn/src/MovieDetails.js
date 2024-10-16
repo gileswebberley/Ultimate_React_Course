@@ -79,6 +79,27 @@ export function MovieDetails({
     [selectedId, watchedUserRating]
   );
 
+  //we'll add another effect to change the title of the document to the name of the film
+  useEffect(
+    function () {
+      //we wait for the Title dependency to be not undefined and then set it
+      document.title = `Movie | ${!Title ? 'Loading...' : Title}`;
+      //This is the useEffect Clean-Up function which runs when this component unmounts and before it executes on re-render
+      return () => {
+        document.title = 'usePopcorn';
+        //to give an example of a Closure we'll log the title to the console...
+        console.log(
+          `Clean Up for title effect has the value ${Title} when it runs because of the concept of Closure`
+        );
+        //so even though this component has unmounted by the time this function executes,
+        //and so Title no longer exists, due to closure it has the value from when
+        //it is defined because, I think, it's scope is within the scope of another function.
+        //This is an important JavaScript concept which is useful to understand when working within React.
+      };
+    },
+    [Title]
+  );
+
   //then return the details or error or loading....
   return (
     <div className="details">
