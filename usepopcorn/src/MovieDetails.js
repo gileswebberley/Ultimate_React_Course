@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { OMDbURL, OMDbKEY, Loader, Error } from './App';
+import { OMDbURL, OMDbKEY } from './App';
+import { Error } from './Error';
+import { Loader } from './Loader';
 import StarRating from './StarRating';
 
 export function MovieDetails({

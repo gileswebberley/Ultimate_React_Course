@@ -1,5 +1,15 @@
 import { useEffect, useState } from 'react';
 import { MovieDetails } from './MovieDetails';
+import { ToggleBox } from './ToggleBox';
+import { Loader } from './Loader';
+import { Error } from './Error';
+import { WatchedList } from './WatchedList';
+import { WatchedSummary } from './WatchedSummary';
+import { MovieList } from './MovieList';
+import { NavBar } from './NavBar';
+import { Logo } from './Logo';
+import { SearchResultNumber } from './SearchResultNumber';
+import { Search } from './Search';
 
 /**
  * Tutorial: Most components fit into one of three categories -
@@ -86,6 +96,10 @@ export default function App() {
     }
   }
 
+  function handleDeleteWatched(id) {
+    setWatched((wArr) => wArr.filter((w) => w.imdbID !== id));
+  }
+
   /**
    * Let's learn about the useEffect hook to stop infinite loops when collecting the data from an api
    * useEffect does not return any value but instead takes a function and a 'dependency array' which if it is an empty array will only run the function on Mount (ie initial load of the component)
@@ -135,6 +149,7 @@ export default function App() {
           // console.log('The name of the ERROR thrown by fetch is: ' + err.name);
           // console.log('The message attached to the Error is:' + err.message);
           setIsError(err.message);
+          setMovies(() => []);
         } finally {
           //and now we've finished waiting so replace the loader with the data presentation or an error message
           setIsLoading(false);
@@ -186,7 +201,10 @@ export default function App() {
           ) : (
             <>
               <WatchedSummary watched={watched} />
-              <WatchedList watched={watched} />
+              <WatchedList
+                watched={watched}
+                onDeleteWatched={handleDeleteWatched}
+              />
             </>
           )}
         </ToggleBox>
@@ -195,184 +213,7 @@ export default function App() {
   );
 }
 
-//Slowly creating some reuseable components as we notice similarities in functionality
-
-//A simple button that toggles an isOpen functionality
-function ToggleButton({ toggleFunction, toggleVariable }) {
-  return (
-    <button
-      className="btn-toggle"
-      onClick={() => toggleFunction((open) => !open)}
-    >
-      {toggleVariable ? '–' : '+'}
-    </button>
-  );
-}
-
-//The box component that utilises the ToggleButton functionality to show/hide it's children
-function ToggleBox({ children }) {
-  const [isOpen, setIsOpen] = useState(true);
-  return (
-    <div className="box">
-      <ToggleButton toggleFunction={setIsOpen} toggleVariable={isOpen} />
-      {/* Notice that we have not stated {children} as we are already in 'js-mode' */}
-      {isOpen && children}
-    </div>
-  );
-}
-
-//a very simple loading icon
-export function Loader() {
-  return <p className="loader">Loading...</p>;
-}
-
-//and another presentational component to handle any errors
-export function Error({ message }) {
-  return (
-    <p className="error">
-      <span>OH NO 😯 {message}</span>
-    </p>
-  );
-}
-
 //MAIN WINDOW -------------------------------------------------------------------
 function Main({ children }) {
   return <main className="main">{children}</main>;
-}
-
-//WATCHED MOVIES -----------------------------------------------------------------
-
-function WatchedList({ watched }) {
-  return (
-    <ul className="list">
-      {watched.map((movie) => (
-        <WatchedListing movie={movie} key={movie.imdbID} />
-      ))}
-    </ul>
-  );
-}
-
-function WatchedListing({ movie }) {
-  return (
-    <li>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
-      <div>
-        <p>
-          <span>⭐️</span>
-          <span>{movie.imdbRating}</span>
-        </p>
-        <p>
-          <span>🌟</span>
-          <span>{movie.userRating}</span>
-        </p>
-        <p>
-          <span>⏳</span>
-          <span>{movie.runtime} min</span>
-        </p>
-      </div>
-    </li>
-  );
-}
-
-function WatchedSummary({ watched }) {
-  const average = (arr) =>
-    arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
-  const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
-  const avgUserRating = average(watched.map((movie) => movie.userRating));
-  const avgRuntime = average(watched.map((movie) => movie.runtime));
-  return (
-    <div className="summary">
-      <h2>Movies you watched</h2>
-
-      <div>
-        <p>
-          <span>#️⃣</span>
-          <span>{watched.length} movies</span>
-        </p>
-        <p>
-          <span>⭐️</span>
-          <span>{avgImdbRating.toFixed(1)}</span>
-        </p>
-        <p>
-          <span>🌟</span>
-          <span>{avgUserRating.toFixed(1)}</span>
-        </p>
-        <p>
-          <span>⏳</span>
-          <span>{Math.round(avgRuntime)} min</span>
-        </p>
-      </div>
-    </div>
-  );
-}
-
-//MOVIE LISTING -------------------------------------------------------------
-
-function MovieList({ movies, onSelectMovie }) {
-  return (
-    <ul className="list list-movies">
-      {movies?.map((movie) => (
-        <MovieListing
-          movie={movie}
-          key={movie.imdbID}
-          onSelectMovie={onSelectMovie}
-        />
-      ))}
-    </ul>
-  );
-}
-
-function MovieListing({ movie, onSelectMovie }) {
-  return (
-    <li onClick={() => onSelectMovie(movie.imdbID)}>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
-      <div>
-        <p>
-          <span>📆</span>
-          <span>{movie.Year}</span>
-        </p>
-      </div>
-    </li>
-  );
-}
-
-//NAVIGATION AREA --------------------------------------------------------
-function NavBar({ children }) {
-  return (
-    <nav className="nav-bar">
-      {/* this is the example of how to avoid prop drilling by using component composition*/}
-      {children}
-    </nav>
-  );
-}
-
-function Logo({ divClass, imageString, title }) {
-  return (
-    <div className={divClass}>
-      <span role="img">{imageString}</span>
-      <h1>{title}</h1>
-    </div>
-  );
-}
-
-function SearchResultNumber({ movies }) {
-  return (
-    <p className="num-results">
-      Found <strong>{movies.length}</strong> results
-    </p>
-  );
-}
-
-function Search({ query, onSetQuery }) {
-  return (
-    <input
-      className="search"
-      type="text"
-      placeholder="Search movies..."
-      value={query}
-      onChange={(e) => onSetQuery(e.target.value)}
-    />
-  );
 }
