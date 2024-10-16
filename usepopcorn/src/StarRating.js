@@ -24,6 +24,7 @@ StarRating.propTypes = {
   //isRequired as an example, therefore you could forgoe the need for a default?
   //best practice to set a default apparently
   maxRating: PropTypes.number.isRequired,
+  currentRating: PropTypes.number,
   color: PropTypes.string,
   size: PropTypes.number,
   onSetRating: PropTypes.func,
@@ -32,12 +33,13 @@ StarRating.propTypes = {
 //we can set a default value to a property as shown here, very important when building the props based API
 export default function StarRating({
   maxRating,
+  currentRating = 0,
   colour = '#000',
   size = 16,
   onSetRating,
 }) {
   //state for the star click functionality
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(currentRating);
   //state for the star mouse over functionality
   const [hoverRating, setHoverRating] = useState(0);
   //styling in here now because we've opened them up to the 'api'

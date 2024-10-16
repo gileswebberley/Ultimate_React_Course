@@ -2,8 +2,19 @@ import { useState, useEffect } from 'react';
 import { OMDbURL, OMDbKEY, Loader, Error } from './App';
 import StarRating from './StarRating';
 
-export function MovieDetails({ selectedId, onCloseDetails }) {
+export function MovieDetails({
+  selectedId,
+  onCloseDetails,
+  onAddWatched,
+  watched,
+}) {
+  const checkWatched = watched.map((w) => w.imdbID).includes(selectedId);
+  const watchedUserRating = Number(
+    watched.find((w) => w.imdbID === selectedId)?.userRating ?? 0
+  );
+  console.log(`watchedUserRating: ${watchedUserRating}`);
   const [currentMovie, setCurrentMovie] = useState({});
+  const [currentRating, setCurrentRating] = useState(0);
   //destructure the movie data
   const {
     Title,
@@ -20,6 +31,22 @@ export function MovieDetails({ selectedId, onCloseDetails }) {
   //some async functionality...
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState('');
+
+  function addWatched() {
+    //create a new watched movie object to add to the watched state variable in App
+    const watchedMovie = {
+      imdbID: selectedId,
+      Title,
+      Year,
+      Poster,
+      imdbRating: Number(imdbRating),
+      userRating: currentRating,
+      runtime: Number(Runtime.split(' ').at(0)),
+    };
+    onAddWatched(watchedMovie);
+    onCloseDetails();
+  }
+
   //each time this loads we will get the movie details of the selected id
   //this will run on mount due to the empty dependency array remember...
   useEffect(
@@ -37,16 +64,17 @@ export function MovieDetails({ selectedId, onCloseDetails }) {
           );
           //data should always be passable as we have the id from the search
           const data = await res.json();
-          setCurrentMovie(data);
+          setCurrentMovie(() => data);
         } catch (error) {
           setIsError(error.message);
         } finally {
           setIsLoading(false);
+          setCurrentRating(watchedUserRating);
         }
       }
       getMovieDetails();
     },
-    [selectedId]
+    [selectedId, watchedUserRating]
   );
 
   //then return the details or error or loading....
@@ -76,7 +104,19 @@ export function MovieDetails({ selectedId, onCloseDetails }) {
           </header>
           <section>
             <div className="rating">
-              <StarRating maxRating={10} colour="#dd910e" size={20} />
+              <StarRating
+                maxRating={10}
+                currentRating={watchedUserRating}
+                colour="#dd910e"
+                size={20}
+                onSetRating={setCurrentRating}
+              />
+              {currentRating > 0 &&
+                (currentRating !== watchedUserRating || !checkWatched) && (
+                  <button className="btn-add" onClick={addWatched}>
+                    Add to watched list
+                  </button>
+                )}
             </div>
             <p>
               <em>{Plot}</em>

@@ -1,29 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MovieDetails } from './MovieDetails';
 
-const tempWatchedData = [
-  {
-    imdbID: 'tt1375666',
-    Title: 'Inception',
-    Year: '2010',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg',
-    runtime: 148,
-    imdbRating: 8.8,
-    userRating: 10,
-  },
-  {
-    imdbID: 'tt0088763',
-    Title: 'Back to the Future',
-    Year: '1985',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg',
-    runtime: 116,
-    imdbRating: 8.5,
-    userRating: 9,
-  },
-];
-
 /**
  * Tutorial: Most components fit into one of three categories -
  * Stateless (Presentational) - see Logo, MovieListing etc
@@ -91,12 +68,23 @@ export default function App() {
     setSelectedMovieId(null);
   }
 
-  //passing the movies prop down through the levels of components is called Prop
-  // Drilling - this can be avoided by the use of component composition as we are
-  //doing here with the NavBar and SearchResultNumber (NavBar no longer needs the
-  //movies prop which it was simply passing down to it's child before using this technique)
-  //Taking the technique further we end up with a nice component tree view in the App
-  //Note that components can also be passed as explicit props (ie not the in-built children)
+  function handleAddWatchedMovie(movie) {
+    //check whether it's already in the list and if it is it must have had it's user
+    //rating changed to have made it up to this point (it seems a waste to have to
+    //check here as well as in the MovieDetails component but I can't work out if
+    //there's a more efficient way to do it? Alternative would be to do the working
+    //out in handleSelectMovie and pass down those variables instead of the watched state?)
+    if (watched.map((w) => w.imdbID).includes(movie.imdbID)) {
+      //remove it and readd it, or alter the entry? Alter, works nicely
+      setWatched((wArr) =>
+        wArr.map((w) =>
+          w.imdbID === movie.imdbID ? { ...w, userRating: movie.userRating } : w
+        )
+      );
+    } else {
+      setWatched((w) => [...w, movie]);
+    }
+  }
 
   /**
    * Let's learn about the useEffect hook to stop infinite loops when collecting the data from an api
@@ -164,6 +152,12 @@ export default function App() {
     [query]
   );
 
+  //passing the movies prop down through the levels of components is called Prop
+  // Drilling - this can be avoided by the use of component composition as we are
+  //doing here with the NavBar and SearchResultNumber (NavBar no longer needs the
+  //movies prop which it was simply passing down to it's child before using this technique)
+  //Taking the technique further we end up with a nice component tree view in the App
+  //Note that components can also be passed as explicit props (ie not the in-built children)
   return (
     <>
       <NavBar>
@@ -186,6 +180,8 @@ export default function App() {
             <MovieDetails
               selectedId={selctedMovieId}
               onCloseDetails={handleCloseDetails}
+              onAddWatched={handleAddWatchedMovie}
+              watched={watched}
             />
           ) : (
             <>
@@ -288,6 +284,7 @@ function WatchedSummary({ watched }) {
   return (
     <div className="summary">
       <h2>Movies you watched</h2>
+
       <div>
         <p>
           <span>#️⃣</span>
@@ -295,15 +292,15 @@ function WatchedSummary({ watched }) {
         </p>
         <p>
           <span>⭐️</span>
-          <span>{avgImdbRating}</span>
+          <span>{avgImdbRating.toFixed(1)}</span>
         </p>
         <p>
           <span>🌟</span>
-          <span>{avgUserRating}</span>
+          <span>{avgUserRating.toFixed(1)}</span>
         </p>
         <p>
           <span>⏳</span>
-          <span>{avgRuntime} min</span>
+          <span>{Math.round(avgRuntime)} min</span>
         </p>
       </div>
     </div>
