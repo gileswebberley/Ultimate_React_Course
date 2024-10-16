@@ -116,6 +116,8 @@ export default function App() {
   //as useEffect cannot return a Promise here is the async version of the above useEffect
   useEffect(
     function () {
+      //due to the race condition that becomes apparent when using this we use this as a second parameter for the fetch function
+      const fetchController = new AbortController();
       //now we'll add error handling with a try/catch/finally block and throw an error
       //if the fetch doesn't succeed...
       async function setMoviesEffect() {
@@ -123,21 +125,26 @@ export default function App() {
           //we are loading asynchronous data so we'll use our loader functionality
           setIsLoading(true);
           setIsError('');
-          //to overcome the problem with res.ok never being evaluated I'm going to try to chain a catch function and throw a new error - didn't work until I threw a TypeError rather than generic Error
-          const res = await fetch(`${OMDbURL}${OMDbKEY}&s=${query}`).catch(
-            function (err) {
-              throw new TypeError(
-                'something went wrong when trying to fetch the movies for you'
-              );
+          //to overcome the problem with res.ok never being evaluated I'm going to try to chain a catch function and throw a new error so I control the message - didn't work until I threw a TypeError rather than generic Error
+          const res = await fetch(`${OMDbURL}${OMDbKEY}&s=${query}`, {
+            signal: fetchController.signal,
+          }).catch(function (err) {
+            console.log(
+              'The name of the ERROR thrown within fetch is: ' + err.name
+            );
+            if (err.name !== 'AbortError') {
+              throw new TypeError('unable to fetch the movie list for you');
             }
-          );
+          });
           //check this has resolved by testing the ok property - no this is wrong..
           // if (!res.ok) {
           //   throw new TypeError(
           //     'something went wrong when trying to fetch the movies for you'
           //   );
           // } //This never runs as fetch throws it's own error
-          const data = await res.json();
+
+          //because of the abort mechanism this became fragile so added this ternary
+          const data = res?.ok ? await res.json() : {};
           //check if there's any results before trying to display them
           if (!data.Search) {
             throw new SyntaxError(
@@ -145,10 +152,11 @@ export default function App() {
             );
           }
           setMovies(data.Search);
+          setIsError('');
         } catch (err) {
-          // console.log('The name of the ERROR thrown by fetch is: ' + err.name);
-          // console.log('The message attached to the Error is:' + err.message);
-          setIsError(err.message);
+          console.log('The name of the ERROR thrown by fetch is: ' + err.name);
+          console.log('The message attached to the Error is:' + err.message);
+          if (err.name !== 'AbortError') setIsError(err.message);
           setMovies(() => []);
         } finally {
           //and now we've finished waiting so replace the loader with the data presentation or an error message
@@ -156,12 +164,18 @@ export default function App() {
         }
       }
       //don't run if the query is too short
-      if (query.length < 3) {
+      if (query.length < 2) {
         //I'll leave the last search rather than reset with setMovies([])
+        //but then clear up any error messages that still exist from the last search
         setIsError('');
         return;
       }
       setMoviesEffect();
+      //This whole process is causing a race condition when typing in a search term
+      //let's see if we can fix that with a CleanUp function (see AbortController above)
+      return () => {
+        fetchController.abort();
+      };
     },
     //now we are reacting to changes of the state variable 'query' we add it to the dependency array
     [query]

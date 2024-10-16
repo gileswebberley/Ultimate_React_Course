@@ -3,7 +3,7 @@
 export function Error({ message }) {
   return (
     <p className="error">
-      <span>OH NO 😯 {message}</span>
+      <span>oops 😯 {message}</span>
     </p>
   );
 }

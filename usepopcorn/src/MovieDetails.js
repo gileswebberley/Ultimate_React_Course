@@ -59,9 +59,7 @@ export function MovieDetails({
           setIsError('');
           const res = await fetch(`${OMDbURL}${OMDbKEY}&i=${selectedId}`).catch(
             function (err) {
-              throw new TypeError(
-                'something went wrong when trying to fetch the movies for you'
-              );
+              throw new TypeError('failed to fetch the movie details for you');
             }
           );
           //data should always be passable as we have the id from the search
