@@ -129,19 +129,13 @@ export default function App() {
           const res = await fetch(`${OMDbURL}${OMDbKEY}&s=${query}`, {
             signal: fetchController.signal,
           }).catch(function (err) {
-            console.log(
-              'The name of the ERROR thrown within fetch is: ' + err.name
-            );
             if (err.name !== 'AbortError') {
               throw new TypeError('unable to fetch the movie list for you');
             }
           });
           //check this has resolved by testing the ok property - no this is wrong..
-          // if (!res.ok) {
-          //   throw new TypeError(
-          //     'something went wrong when trying to fetch the movies for you'
-          //   );
-          // } //This never runs as fetch throws it's own error
+          // if (!res.ok) {}
+          //This never runs as fetch throws it's own error hence the catch chain on fetch
 
           //because of the abort mechanism this became fragile so added this ternary
           const data = res?.ok ? await res.json() : {};
@@ -151,11 +145,13 @@ export default function App() {
               'Cannot find any movies that match your search'
             );
           }
+          //if all has gone well we create the movies list from the api search results
           setMovies(data.Search);
+          //and obviously reset any error messages
           setIsError('');
         } catch (err) {
-          console.log('The name of the ERROR thrown by fetch is: ' + err.name);
-          console.log('The message attached to the Error is:' + err.message);
+          // console.log('The name of the ERROR thrown by fetch is: ' + err.name);
+          // console.log('The message attached to the Error is:' + err.message);
           if (err.name !== 'AbortError') setIsError(err.message);
           setMovies(() => []);
         } finally {
@@ -172,7 +168,7 @@ export default function App() {
       }
       setMoviesEffect();
       //This whole process is causing a race condition when typing in a search term
-      //let's see if we can fix that with a CleanUp function (see AbortController above)
+      //let's fix that with a CleanUp function (see AbortController usage above)
       return () => {
         fetchController.abort();
       };

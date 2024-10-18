@@ -10,11 +10,18 @@ export function MovieDetails({
   onAddWatched,
   watched,
 }) {
+  //bool to indicate if this movie is already on the watchlist
   const checkWatched = watched.map((w) => w.imdbID).includes(selectedId);
-  const watchedUserRating = Number(
-    watched.find((w) => w.imdbID === selectedId)?.userRating ?? 0
-  );
-  console.log(`watchedUserRating: ${watchedUserRating}`);
+  //quickly grab any user rating that has already been assigned to this film
+  //a good example of using the 'nullish coalescing operator' (??) and the optional chaining operator (?.) when unsure of accessing properties that may not exist
+  // const watchedUserRating = Number(
+  //   watched.find((w) => w.imdbID === selectedId)?.userRating ?? 0
+  // );
+  //Realised that I can place the above in an if statement so it doesn't bother if it's not on the watched list
+  const watchedUserRating = checkWatched
+    ? Number(watched.find((w) => w.imdbID === selectedId)?.userRating)
+    : 0;
+  // console.log(`watchedUserRating: ${watchedUserRating}`);
   const [currentMovie, setCurrentMovie] = useState({});
   const [currentRating, setCurrentRating] = useState(0);
   //destructure the movie data
@@ -36,6 +43,7 @@ export function MovieDetails({
 
   function addWatched() {
     //create a new watched movie object to add to the watched state variable in App
+    //if it already exists and only the user rating has changed it will be updated rather than added in the App handleAddWatchedMovie function
     const watchedMovie = {
       imdbID: selectedId,
       Title,
@@ -69,6 +77,7 @@ export function MovieDetails({
           setIsError(error.message);
         } finally {
           setIsLoading(false);
+          //if it's already rated then set that here
           setCurrentRating(watchedUserRating);
         }
       }
@@ -120,7 +129,7 @@ export function MovieDetails({
                 {imdbRating} IMDb Rating
               </p>
             </section>
-            {/* The selected movie imdb ID is {selectedId}{' '}
+            {/* Finding a bug - The selected movie imdb ID is {selectedId}{' '}
                   {JSON.stringify(currentMovie)} */}
           </header>
           <section>
