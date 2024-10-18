@@ -1,51 +1,15 @@
-import { useState } from 'react';
-
-const tempMovieData = [
-  {
-    imdbID: 'tt1375666',
-    Title: 'Inception',
-    Year: '2010',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg',
-  },
-  {
-    imdbID: 'tt0133093',
-    Title: 'The Matrix',
-    Year: '1999',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg',
-  },
-  {
-    imdbID: 'tt6751668',
-    Title: 'Parasite',
-    Year: '2019',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg',
-  },
-];
-
-const tempWatchedData = [
-  {
-    imdbID: 'tt1375666',
-    Title: 'Inception',
-    Year: '2010',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg',
-    runtime: 148,
-    imdbRating: 8.8,
-    userRating: 10,
-  },
-  {
-    imdbID: 'tt0088763',
-    Title: 'Back to the Future',
-    Year: '1985',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg',
-    runtime: 116,
-    imdbRating: 8.5,
-    userRating: 9,
-  },
-];
+import { useEffect, useState } from 'react';
+import { MovieDetails } from './MovieDetails';
+import { ToggleBox } from './ToggleBox';
+import { Loader } from './Loader';
+import { Error } from './Error';
+import { WatchedList } from './WatchedList';
+import { WatchedSummary } from './WatchedSummary';
+import { MovieList } from './MovieList';
+import { NavBar } from './NavBar';
+import { Logo } from './Logo';
+import { SearchResultNumber } from './SearchResultNumber';
+import { Search } from './Search';
 
 /**
  * Tutorial: Most components fit into one of three categories -
@@ -82,13 +46,137 @@ const tempWatchedData = [
     <MovieBox movies={movies} />
     <WatchedBox />
   </Main>
-
-      which saves us having to use prop drilling via the Main component
+  which saves us having to use prop drilling via the Main component
  */
 
+//Onto section 12 of the course we are going to collect data from an api
+//Set these constants outside the component so it isn't recreated on re-render etc
+export const OMDbURL = 'http://www.omdbapi.com/?apikey=';
+export const OMDbKEY = '841c6d87';
+
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
+  //here we'll implement some 'loading' feature for the asyncrounous data from an api
+  //which we'll utilise in our first useEffect() ps. use throtle in dev-tools to emulate a slow connection
+  const [isLoading, setIsLoading] = useState(false);
+  //in case loading fails for some reason we'll throw an error and pass it's message in here
+  const [isError, setIsError] = useState('');
+  //now we'll move the search query up to this level to get it all loading
+  const [query, setQuery] = useState('');
+
+  const [movies, setMovies] = useState([]);
+  const [watched, setWatched] = useState([]);
+
+  //implement further details being displayed
+  const [selctedMovieId, setSelectedMovieId] = useState(null);
+
+  function handleSelectMovie(id) {
+    //implement it closing on second click of the same MovieListing
+    setSelectedMovieId((selected) => (selected === id ? null : id));
+  }
+
+  function handleCloseDetails() {
+    setSelectedMovieId(null);
+  }
+
+  function handleAddWatchedMovie(movie) {
+    //check whether it's already in the list and if it is it must have had it's user
+    //rating changed to have made it up to this point (it seems a waste to have to
+    //check here as well as in the MovieDetails component but I can't work out if
+    //there's a more efficient way to do it? Alternative would be to do the working
+    //out in handleSelectMovie and pass down those variables instead of the watched state?)
+    if (watched.map((w) => w.imdbID).includes(movie.imdbID)) {
+      //remove it and readd it, or alter the entry? Alter, works nicely
+      setWatched((wArr) =>
+        wArr.map((w) =>
+          w.imdbID === movie.imdbID ? { ...w, userRating: movie.userRating } : w
+        )
+      );
+    } else {
+      setWatched((w) => [...w, movie]);
+    }
+  }
+
+  function handleDeleteWatched(id) {
+    setWatched((wArr) => wArr.filter((w) => w.imdbID !== id));
+  }
+
+  /**
+   * Let's learn about the useEffect hook to stop infinite loops when collecting the data from an api
+   * useEffect does not return any value but instead takes a function and a 'dependency array' which if it is an empty array will only run the function on Mount (ie initial load of the component)
+   * The useEffect executes after render phase
+   */
+  //let's load the results of a search from the OMDb api into the movies state
+  //This involves the chaining of then() expressions to deal with the Promises created by asynchronous functions
+  // useEffect(function () {
+  //   fetch(`${OMDbURL}${OMDbKEY}&s=beautiful`)
+  //     .then((res) => res.json())
+  //     .then((data) => setMovies(data.Search));
+  // }, []);
+
+  //as useEffect cannot return a Promise here is the async version of the above useEffect
+  useEffect(
+    function () {
+      //due to the race condition that becomes apparent when using this we use this as a second parameter for the fetch function
+      const fetchController = new AbortController();
+      //now we'll add error handling with a try/catch/finally block and throw an error
+      //if the fetch doesn't succeed...
+      async function setMoviesEffect() {
+        try {
+          //we are loading asynchronous data so we'll use our loader functionality
+          setIsLoading(true);
+          setIsError('');
+          //to overcome the problem with res.ok never being evaluated I'm going to try to chain a catch function and throw a new error so I control the message - didn't work until I threw a TypeError rather than generic Error
+          const res = await fetch(`${OMDbURL}${OMDbKEY}&s=${query}`, {
+            signal: fetchController.signal,
+          }).catch(function (err) {
+            if (err.name !== 'AbortError') {
+              throw new TypeError('unable to fetch the movie list for you');
+            }
+          });
+          //check this has resolved by testing the ok property - no this is wrong..
+          // if (!res.ok) {}
+          //This never runs as fetch throws it's own error hence the catch chain on fetch
+
+          //because of the abort mechanism this became fragile so added this ternary
+          const data = res?.ok ? await res.json() : {};
+          //check if there's any results before trying to display them
+          if (!data.Search) {
+            throw new SyntaxError(
+              'Cannot find any movies that match your search'
+            );
+          }
+          //if all has gone well we create the movies list from the api search results
+          setMovies(data.Search);
+          //and obviously reset any error messages
+          setIsError('');
+        } catch (err) {
+          // console.log('The name of the ERROR thrown by fetch is: ' + err.name);
+          // console.log('The message attached to the Error is:' + err.message);
+          if (err.name !== 'AbortError') setIsError(err.message);
+          setMovies(() => []);
+        } finally {
+          //and now we've finished waiting so replace the loader with the data presentation or an error message
+          setIsLoading(false);
+        }
+      }
+      //don't run if the query is too short
+      if (query.length < 2) {
+        //I'll leave the last search rather than reset with setMovies([])
+        //but then clear up any error messages that still exist from the last search
+        setIsError('');
+        return;
+      }
+      setMoviesEffect();
+      //This whole process is causing a race condition when typing in a search term
+      //let's fix that with a CleanUp function (see AbortController usage above)
+      return () => {
+        fetchController.abort();
+      };
+    },
+    //now we are reacting to changes of the state variable 'query' we add it to the dependency array
+    [query]
+  );
+
   //passing the movies prop down through the levels of components is called Prop
   // Drilling - this can be avoided by the use of component composition as we are
   //doing here with the NavBar and SearchResultNumber (NavBar no longer needs the
@@ -99,183 +187,43 @@ export default function App() {
     <>
       <NavBar>
         <Logo divClass="logo" imageString="🍿" title="usePopcorn" />
-        <Search />
+        <Search query={query} onSetQuery={setQuery} />
         <SearchResultNumber movies={movies} />
       </NavBar>
 
       <Main>
         <ToggleBox>
-          <MovieList movies={movies} />
+          {/* We now have to add more conditions for loading and error handling */}
+          {isLoading && <Loader />}
+          {!isLoading && !isError && (
+            <MovieList movies={movies} onSelectMovie={handleSelectMovie} />
+          )}
+          {isError && <Error message={isError} />}
         </ToggleBox>
         <ToggleBox>
-          <WatchedSummary watched={watched} />
-          <WatchedList watched={watched} />
+          {selctedMovieId ? (
+            <MovieDetails
+              selectedId={selctedMovieId}
+              onCloseDetails={handleCloseDetails}
+              onAddWatched={handleAddWatchedMovie}
+              watched={watched}
+            />
+          ) : (
+            <>
+              <WatchedSummary watched={watched} />
+              <WatchedList
+                watched={watched}
+                onDeleteWatched={handleDeleteWatched}
+              />
+            </>
+          )}
         </ToggleBox>
       </Main>
     </>
   );
 }
 
-//Slowly creating some reuseable components as we notice similarities in functionality
-
-//A simple button that toggles an isOpen functionality
-function ToggleButton({ toggleFunction, toggleVariable }) {
-  return (
-    <button
-      className="btn-toggle"
-      onClick={() => toggleFunction((open) => !open)}
-    >
-      {toggleVariable ? '–' : '+'}
-    </button>
-  );
-}
-
-//The box component that utilises the ToggleButton functionality to show/hide it's children
-function ToggleBox({ children }) {
-  const [isOpen, setIsOpen] = useState(true);
-  return (
-    <div className="box">
-      <ToggleButton toggleFunction={setIsOpen} toggleVariable={isOpen} />
-      {/* Notice that we have not stated {children} as we are already in 'js-mode' */}
-      {isOpen && children}
-    </div>
-  );
-}
-
 //MAIN WINDOW -------------------------------------------------------------------
 function Main({ children }) {
   return <main className="main">{children}</main>;
-}
-
-//WATCHED MOVIES -----------------------------------------------------------------
-
-function WatchedList({ watched }) {
-  return (
-    <ul className="list">
-      {watched.map((movie) => (
-        <WatchedListing movie={movie} key={movie.imdbID} />
-      ))}
-    </ul>
-  );
-}
-
-function WatchedListing({ movie }) {
-  return (
-    <li>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
-      <div>
-        <p>
-          <span>⭐️</span>
-          <span>{movie.imdbRating}</span>
-        </p>
-        <p>
-          <span>🌟</span>
-          <span>{movie.userRating}</span>
-        </p>
-        <p>
-          <span>⏳</span>
-          <span>{movie.runtime} min</span>
-        </p>
-      </div>
-    </li>
-  );
-}
-
-function WatchedSummary({ watched }) {
-  const average = (arr) =>
-    arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
-  const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
-  const avgUserRating = average(watched.map((movie) => movie.userRating));
-  const avgRuntime = average(watched.map((movie) => movie.runtime));
-  return (
-    <div className="summary">
-      <h2>Movies you watched</h2>
-      <div>
-        <p>
-          <span>#️⃣</span>
-          <span>{watched.length} movies</span>
-        </p>
-        <p>
-          <span>⭐️</span>
-          <span>{avgImdbRating}</span>
-        </p>
-        <p>
-          <span>🌟</span>
-          <span>{avgUserRating}</span>
-        </p>
-        <p>
-          <span>⏳</span>
-          <span>{avgRuntime} min</span>
-        </p>
-      </div>
-    </div>
-  );
-}
-
-//MOVIE LISTING -------------------------------------------------------------
-
-function MovieList({ movies }) {
-  return (
-    <ul className="list">
-      {movies?.map((movie) => (
-        <MovieListing movie={movie} key={movie.imdbID} />
-      ))}
-    </ul>
-  );
-}
-
-function MovieListing({ movie }) {
-  return (
-    <li>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
-      <div>
-        <p>
-          <span>🗓</span>
-          <span>{movie.Year}</span>
-        </p>
-      </div>
-    </li>
-  );
-}
-
-//NAVIGATION AREA --------------------------------------------------------
-function NavBar({ children }) {
-  return (
-    <nav className="nav-bar">
-      {/* this is the example of how to avoid prop drilling by using component composition*/}
-      {children}
-    </nav>
-  );
-}
-
-function Logo({ divClass, imageString, title }) {
-  return (
-    <div className={divClass}>
-      <span role="img">{imageString}</span>
-      <h1>{title}</h1>
-    </div>
-  );
-}
-
-function SearchResultNumber({ movies }) {
-  return (
-    <p className="num-results">
-      Found <strong>{movies.length}</strong> results
-    </p>
-  );
-}
-
-function Search() {
-  const [query, setQuery] = useState('');
-  return (
-    <input
-      className="search"
-      type="text"
-      placeholder="Search movies..."
-      value={query}
-      onChange={(e) => setQuery(e.target.value)}
-    />
-  );
 }

@@ -73,7 +73,7 @@ export default function StarRating({
           />
         ))}
       </div>
-      <p>{hoverRating || rating || ' '}</p>
+      <p>{hoverRating || rating || '0'}</p>
     </div>
   );
 }
