@@ -6,6 +6,7 @@ export function Search({ query, onSetQuery }) {
       placeholder="Search movies..."
       value={query}
       onChange={(e) => onSetQuery(e.target.value)}
+      name="search movies input"
     />
   );
 }

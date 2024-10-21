@@ -64,7 +64,13 @@ export default function App() {
   const [query, setQuery] = useState('');
 
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
+  //Now we have made the watched list persistent we pass a function into useState to collect on initial render
+  const [watched, setWatched] = useState(function () {
+    //be aware that I had to run this page with the effect once before this worked
+    const storedList = localStorage.getItem('watchedMoviesList');
+    return JSON.parse(storedList);
+  });
+  // const [watched, setWatched] = useState([]);
 
   //implement further details being displayed
   const [selctedMovieId, setSelectedMovieId] = useState(null);
@@ -99,6 +105,17 @@ export default function App() {
   function handleDeleteWatched(id) {
     setWatched((wArr) => wArr.filter((w) => w.imdbID !== id));
   }
+
+  //OK, at last, let's make this persistent. It would be possible to put these calls to store locally
+  //in the add/delete event handlers but of course our state will not be updated at that point due to
+  //the asynchronous character of state (remember about stale state etc from earlier) and so we'll put
+  //it in an effect that listens for changes to the watched list
+  useEffect(
+    function () {
+      localStorage.setItem('watchedMoviesList', JSON.stringify(watched));
+    },
+    [watched]
+  );
 
   /**
    * Let's learn about the useEffect hook to stop infinite loops when collecting the data from an api
