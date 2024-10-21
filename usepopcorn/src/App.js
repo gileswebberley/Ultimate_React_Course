@@ -223,12 +223,19 @@ export default function App() {
 
       <Main>
         <ToggleBox>
+          {movies.length === 0 && !isLoading && !isError ? (
+            <p className="loader">
+              Please hit Enter to search for movies via the OMDb website
+            </p>
+          ) : (
+            ''
+          )}
           {/* We now have to add more conditions for loading and error handling */}
           {isLoading && <Loader />}
           {!isLoading && !isError && (
             <MovieList movies={movies} onSelectMovie={handleSelectMovie} />
           )}
-          {isError && <Error message={isError} />}
+          {isError && !isLoading && <Error message={isError} />}
         </ToggleBox>
         <ToggleBox>
           {selctedMovieId ? (

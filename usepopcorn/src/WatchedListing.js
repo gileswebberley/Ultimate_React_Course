@@ -22,7 +22,11 @@ export function WatchedListing({ movie, onDeleteWatched, onSelectMovie }) {
       </div>
       <button
         className="btn-delete"
-        onClick={() => onDeleteWatched(movie.imdbID)}
+        onClick={(e) => {
+          //because I added the onSelectMovie functionality to the listing I want the click to stop here
+          e.stopPropagation();
+          onDeleteWatched(movie.imdbID);
+        }}
       >
         X
       </button>
