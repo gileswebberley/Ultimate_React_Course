@@ -1,6 +1,9 @@
-export function WatchedListing({ movie, onDeleteWatched }) {
+export function WatchedListing({ movie, onDeleteWatched, onSelectMovie }) {
   return (
-    <li>
+    <li
+      onClick={() => onSelectMovie(movie.imdbID)}
+      style={{ cursor: 'pointer' }}
+    >
       <img src={movie.Poster} alt={`${movie.Title} poster`} />
       <h3>{movie.Title}</h3>
       <div>
