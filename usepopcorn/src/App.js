@@ -66,8 +66,21 @@ export default function App() {
   const [movies, setMovies] = useState([]);
   //Now we have made the watched list persistent we pass a function into useState to collect on initial render
   const [watched, setWatched] = useState(function () {
-    //be aware that I had to run this page with the effect once before this worked
-    const storedList = localStorage.getItem('watchedMoviesList');
+    //be aware that I had to run this page with the effect once before this worked so added the try-catch
+    let storedList;
+    try {
+      //catch a SecurityError if thrown by getItem()
+      storedList = localStorage.getItem('watchedMoviesList');
+      //if storedList is undefined also throw an error
+      if (!storedList) throw new ReferenceError('No Locally Stored Watch List');
+    } catch (error) {
+      //if there's been an error watched is simply set to an empty array (to avoid errors further down the tree)
+      alert(
+        'Something went wrong whilst collecting your watched list, please ensure that local storage is allowed'
+      );
+      return [];
+    }
+
     return JSON.parse(storedList);
   });
   // const [watched, setWatched] = useState([]);
