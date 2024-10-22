@@ -60,15 +60,16 @@ export default function App() {
   //now we'll move the search query up to this level to get it all loading
   const [query, setQuery] = useState('');
   //Now we have made the watched list persistent we pass a function into useState to collect on initial render
-  //Version 2, we have created a custom hook for using local storage so we'll try that instead
+  //Version 2, we have created a custom hook for using local storage called useLocalStorageState()
   const [watched, setWatched] = useLocalStorageState('watchedMoviesList');
+  //Version 2, we have also created a custom hook to look after the loading of movies
   const [movies, isError, isLoading] = useOmdbFetch(query, OMDbKEY);
 
   //implement further details being displayed
   const [selctedMovieId, setSelectedMovieId] = useState(null);
 
   function handleSelectMovie(id) {
-    //implement it closing on second click of the same MovieListing
+    //implement it closing on second click of the same MovieListing with this ternary operation
     setSelectedMovieId((selected) => (selected === id ? null : id));
   }
 
@@ -83,11 +84,9 @@ export default function App() {
     //there's a more efficient way to do it? Alternative would be to do the working
     //out in handleSelectMovie and pass down those variables instead of the watched state?)
     if (watched.map((w) => w.imdbID).includes(movie.imdbID)) {
-      //remove it and readd it, or alter the entry? Alter, works nicely
+      //remove it and readd it, or alter the entry? Alter, works nicely with {...w, userRating: movie.userRating} or simply replace as we do here
       setWatched((wArr) =>
-        wArr.map((w) =>
-          w.imdbID === movie.imdbID ? { ...w, userRating: movie.userRating } : w
-        )
+        wArr.map((w) => (w.imdbID === movie.imdbID ? movie : w))
       );
     } else {
       setWatched((w) => [...w, movie]);
@@ -112,7 +111,7 @@ export default function App() {
   // }, []);
 
   //as useEffect cannot return a Promise here is the async version of the above useEffect -----
-  //Version 2 this has been extracted into a custom hook....
+  //Version 2 this has been extracted into a custom hook....useOmdbFetch()
 
   //passing the movies prop down through the levels of components is called Prop
   // Drilling - this can be avoided by the use of component composition as we are

@@ -10,6 +10,14 @@ export function MovieDetails({
   onAddWatched,
   watched,
 }) {
+  const [currentMovie, setCurrentMovie] = useState({});
+  const [currentRating, setCurrentRating] = useState(0);
+  const [currentReview, setCurrentReview] = useState('');
+  const [editReview, setEditReview] = useState(false);
+  //some async functionality...
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState('');
+
   //bool to indicate if this movie is already on the watchlist
   const checkWatched = watched.map((w) => w.imdbID).includes(selectedId);
   //quickly grab any user rating that has already been assigned to this film
@@ -21,9 +29,10 @@ export function MovieDetails({
   const watchedUserRating = checkWatched
     ? Number(watched.find((w) => w.imdbID === selectedId)?.userRating)
     : 0;
-  // console.log(`watchedUserRating: ${watchedUserRating}`);
-  const [currentMovie, setCurrentMovie] = useState({});
-  const [currentRating, setCurrentRating] = useState(0);
+  //going to add the possibility to attach a user review/notes to a watched movie
+  const watchedUserReview = checkWatched
+    ? watched.find((w) => w.imdbID === selectedId)?.userReview ?? ''
+    : '';
   //destructure the movie data
   const {
     Title,
@@ -37,9 +46,6 @@ export function MovieDetails({
     Director,
     Genre,
   } = currentMovie;
-  //some async functionality...
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState('');
 
   function addWatched() {
     //create a new watched movie object to add to the watched state variable in App
@@ -51,10 +57,15 @@ export function MovieDetails({
       Poster,
       imdbRating: Number(imdbRating),
       userRating: currentRating,
+      userReview: String(currentReview),
       runtime: Number(Runtime.split(' ').at(0)),
     };
     onAddWatched(watchedMovie);
     onCloseDetails();
+  }
+
+  function handleEditReview() {
+    setEditReview(true);
   }
 
   //each time this loads we will get the movie details of the selected id
@@ -79,11 +90,16 @@ export function MovieDetails({
           setIsLoading(false);
           //if it's already rated then set that here
           setCurrentRating(watchedUserRating);
+          //and if it has a review set that here as well (check that it's defined first)
+          setCurrentReview(watchedUserReview);
+          if (watchedUserReview === '') {
+            setEditReview(true);
+          }
         }
       }
       getMovieDetails();
     },
-    [selectedId, watchedUserRating]
+    [selectedId, watchedUserRating, watchedUserReview]
   );
 
   //we'll add another effect to change the title of the document to the name of the film
@@ -129,8 +145,6 @@ export function MovieDetails({
                 {imdbRating} IMDb Rating
               </p>
             </section>
-            {/* Finding a bug - The selected movie imdb ID is {selectedId}{' '}
-                  {JSON.stringify(currentMovie)} */}
           </header>
           <section>
             <div className="rating">
@@ -141,11 +155,36 @@ export function MovieDetails({
                 size={20}
                 onSetRating={setCurrentRating}
               />
-              {currentRating > 0 &&
-                (currentRating !== watchedUserRating || !checkWatched) && (
-                  <button className="btn-add" onClick={addWatched}>
-                    Add to watched list
+              {/* Adding in the review functionality */}
+              {editReview ? (
+                <textarea
+                  value={currentReview}
+                  onChange={(e) => setCurrentReview(e.target.value)}
+                  name="review field"
+                  placeholder="Add a short review or notes to this movie"
+                  cols="20"
+                  rows="4"
+                ></textarea>
+              ) : (
+                <>
+                  <p>
+                    Your review says: <br />
+                    <em>{watchedUserReview}</em>
+                  </p>
+                  <button className="btn-edit" onClick={handleEditReview}>
+                    🖋️
                   </button>
+                </>
+              )}
+              {(currentRating > 0 || currentReview) &&
+                (currentRating !== watchedUserRating ||
+                  currentReview !== watchedUserReview ||
+                  !checkWatched) && (
+                  <>
+                    <button className="btn-add" onClick={addWatched}>
+                      Add to watched list
+                    </button>
+                  </>
                 )}
             </div>
             <p>
