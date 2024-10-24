@@ -4,9 +4,11 @@ import { useReducer, useState } from 'react';
 
 //first I'll put the initial state object globally so it can be used for the reset functionality
 const initialState = { count: 0, step: 1 };
-//Next we'll define our reducer function which receives the current state and the action object
+//Next we'll define our reducer function which receives the current state and action objects
 function reducer(state, action) {
-  //in here we define the switch statement so we can use different types of behaviour
+  //in here we define the switch statement so we can call different types of behaviour
+  //remember that the state arg is the current state (which in this is an object with count and step defined)
+  //the action arg is the object passed in by calls to dispatch() (which in this case is set to this function)
   switch (action.type) {
     case 'increment':
       return { ...state, count: state.count + state.step };
