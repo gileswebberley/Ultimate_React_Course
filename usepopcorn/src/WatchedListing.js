@@ -1,6 +1,9 @@
-export function WatchedListing({ movie, onDeleteWatched }) {
+export function WatchedListing({ movie, onDeleteWatched, onSelectMovie }) {
   return (
-    <li>
+    <li
+      onClick={() => onSelectMovie(movie.imdbID)}
+      style={{ cursor: 'pointer' }}
+    >
       <img src={movie.Poster} alt={`${movie.Title} poster`} />
       <h3>{movie.Title}</h3>
       <div>
@@ -19,7 +22,11 @@ export function WatchedListing({ movie, onDeleteWatched }) {
       </div>
       <button
         className="btn-delete"
-        onClick={() => onDeleteWatched(movie.imdbID)}
+        onClick={(e) => {
+          //because I added the onSelectMovie functionality to the listing I want the click to stop here
+          e.stopPropagation();
+          onDeleteWatched(movie.imdbID);
+        }}
       >
         X
       </button>

@@ -34,6 +34,7 @@ export default function App() {
         }
       }
       if (amount !== '' && toCurrency !== fromCurrency) convertCurrency();
+      else if (toCurrency === fromCurrency) setOutputAmount(amount);
       else setOutputAmount('');
       return () => {
         controller.abort();
@@ -77,7 +78,7 @@ export default function App() {
           <option value="CAD">CAD</option>
           <option value="INR">INR</option>
         </select>
-        <p>{outputAmount}</p>
+        <p>{`${amount} ${fromCurrency} = ${outputAmount} ${toCurrency}`}</p>
       </div>
 
       <div>
