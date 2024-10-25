@@ -17,6 +17,9 @@ const initialState = {
   answer: null,
   points: 0,
   highScore: 0,
+  //moved the time remaining state into the timer to avoid complete re-renders every second
+  //however I'll centralise the time per question up here so we don't have to dig around
+  secondsPerQuestion: 20,
   //status can be: 'loading', 'error','ready','active', or 'finished' to save on having isLoading etc states
   status: 'loading',
 };
@@ -76,7 +79,15 @@ function reducer(state, action) {
 export default function App() {
   //destructure the state in place
   const [
-    { questions, questionIndex, status, answer, points, highScore },
+    {
+      questions,
+      questionIndex,
+      status,
+      answer,
+      points,
+      highScore,
+      secondsPerQuestion,
+    },
     dispatch,
   ] = useReducer(reducer, initialState);
 
@@ -117,7 +128,11 @@ export default function App() {
               answer={answer}
             />
             <footer>
-              <Timer dispatch={dispatch} numQuestions={numQuestions} />
+              <Timer
+                dispatch={dispatch}
+                numQuestions={numQuestions}
+                SECS={secondsPerQuestion}
+              />
               <NextButton
                 dispatch={dispatch}
                 answer={answer}

@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react';
 
-function Timer({ dispatch, numQuestions }) {
-  const SECS = 1;
+function Timer({ dispatch, numQuestions, SECS }) {
+  //const SECS = 1;
   const [timeRemaining, setTimeRemaining] = useState(numQuestions * SECS);
+  //quickly format the time
+  let minutes = Math.floor(timeRemaining / 60);
+  if (minutes < 10) minutes = '0' + minutes;
+  let seconds = Math.floor(timeRemaining % 60);
+  if (seconds < 10) seconds = '0' + seconds;
   useEffect(
     function () {
       if (timeRemaining === 0) {
@@ -17,7 +22,7 @@ function Timer({ dispatch, numQuestions }) {
 
   return (
     <div className="timer">
-      0{Math.floor(timeRemaining / 60)}:{Number(timeRemaining % 60)}
+      {minutes}:{seconds}
     </div>
   );
 }
