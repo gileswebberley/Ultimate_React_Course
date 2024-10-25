@@ -8,6 +8,7 @@ import Question from './Question';
 import NextButton from './NextButton';
 import Progress from './Progress';
 import FinishScreen from './FinishScreen';
+import Timer from './Timer';
 
 //for the useReducer functionality we form a state object
 const initialState = {
@@ -16,18 +17,22 @@ const initialState = {
   answer: null,
   points: 0,
   highScore: 0,
+  timeRemaining: 600,
   //status can be: 'loading', 'error','ready','active', or 'finished' to save on having isLoading etc states
   status: 'loading',
 };
 function reducer(state, action) {
+  //this now acts as a centralised state management system with useReducer implemented
   switch (action.type) {
     case 'data received':
       return { ...state, questions: action.payload, status: 'ready' };
+
     case 'data failed':
       console.log(
         'Error from data failed in reducer(): ' + action.payload.message
       );
       return { ...state, status: 'error' };
+
     case 'start':
       //called from StartScreen
       return {
@@ -37,9 +42,10 @@ function reducer(state, action) {
         points: 0,
         answer: null,
       };
+
     case 'answer':
-      //
       const question = state.questions.at(state.questionIndex);
+      //now award points associated with the question if the user has got it correct
       const pointsAwarded =
         action.payload === question.correctOption ? question.points : 0;
       return {
@@ -47,12 +53,14 @@ function reducer(state, action) {
         answer: action.payload,
         points: state.points + pointsAwarded,
       };
+
     case 'nextQuestion':
       const nextIndex =
         state.questionIndex < state.questions.length - 1
           ? state.questionIndex + 1
-          : 0; //want to move the status onto complete, not sure how to just yet so loop round for now
+          : 0; //avoid accidental out-of-bounds error
       return { ...state, questionIndex: nextIndex, answer: null };
+
     case 'finish':
       return {
         ...state,
@@ -60,25 +68,48 @@ function reducer(state, action) {
         highScore:
           state.points > state.highScore ? state.points : state.highScore,
       };
+
+    case 'countdown':
+      //check if you've run out of time and if so give an alert and set the status to finished
+      if (state.timeRemaining === 0) {
+        alert("Oh no, you've run out of time to complete the quiz");
+        return {
+          ...state,
+          timeRemaining: initialState.timeRemaining,
+          status: 'finished',
+        };
+      }
+      //otherwise remove 1 second
+      return { ...state, timeRemaining: state.timeRemaining - 1 };
+
     default:
-      throw new Error('React Quiz dispatched an unrecognised action');
+      throw new Error('Quiz dispatched an unrecognised action');
   }
 }
 
 export default function App() {
-  //state is {questions, status}
+  //destructure the state in place
   const [
-    { questions, questionIndex, status, answer, points, highScore },
+    {
+      questions,
+      questionIndex,
+      status,
+      answer,
+      points,
+      highScore,
+      timeRemaining,
+    },
     dispatch,
   ] = useReducer(reducer, initialState);
 
+  //remember that reduce is (previous value (or accumulator), current object reference)
   const maxPoints = questions.reduce((acc, q) => acc + q.points, 0);
   //passing this around all over the place so make it a derived state to save on all the calls
   const numQuestions = questions.length;
 
   //we've set up a fake API with the json-server which runs on the data folder so we'll grab our questions
   useEffect(function () {
-    //as it's being fetched from local just quickly chain the response handlers that receive a Promise
+    //as it's being fetched from local just quickly chain the response handlers
     fetch('http://localhost:8000/questions')
       .then((res) => res.json())
       .then((data) => dispatch({ type: 'data received', payload: data }))
@@ -107,12 +138,15 @@ export default function App() {
               dispatch={dispatch}
               answer={answer}
             />
-            <NextButton
-              dispatch={dispatch}
-              answer={answer}
-              index={questionIndex}
-              numQuestions={numQuestions}
-            />
+            <footer>
+              <Timer dispatch={dispatch} timeRemaining={timeRemaining} />
+              <NextButton
+                dispatch={dispatch}
+                answer={answer}
+                index={questionIndex}
+                numQuestions={numQuestions}
+              />
+            </footer>
           </>
         )}
         {status === 'finished' && (
