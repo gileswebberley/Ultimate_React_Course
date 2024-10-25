@@ -1,12 +1,18 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-function Timer({ dispatch, timeRemaining }) {
+function Timer({ dispatch, numQuestions }) {
+  const SECS = 1;
+  const [timeRemaining, setTimeRemaining] = useState(numQuestions * SECS);
   useEffect(
     function () {
-      const interval = setInterval(() => dispatch({ type: 'countdown' }), 1000);
+      if (timeRemaining === 0) {
+        alert("Oh no, you've run out of time to complete the quiz");
+        dispatch({ type: 'finish' });
+      }
+      const interval = setInterval(() => setTimeRemaining((t) => t - 1), 1000);
       return () => clearInterval(interval);
     },
-    [dispatch]
+    [dispatch, timeRemaining]
   );
 
   return (

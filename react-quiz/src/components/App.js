@@ -17,7 +17,6 @@ const initialState = {
   answer: null,
   points: 0,
   highScore: 0,
-  timeRemaining: 600,
   //status can be: 'loading', 'error','ready','active', or 'finished' to save on having isLoading etc states
   status: 'loading',
 };
@@ -69,19 +68,6 @@ function reducer(state, action) {
           state.points > state.highScore ? state.points : state.highScore,
       };
 
-    case 'countdown':
-      //check if you've run out of time and if so give an alert and set the status to finished
-      if (state.timeRemaining === 0) {
-        alert("Oh no, you've run out of time to complete the quiz");
-        return {
-          ...state,
-          timeRemaining: initialState.timeRemaining,
-          status: 'finished',
-        };
-      }
-      //otherwise remove 1 second
-      return { ...state, timeRemaining: state.timeRemaining - 1 };
-
     default:
       throw new Error('Quiz dispatched an unrecognised action');
   }
@@ -90,15 +76,7 @@ function reducer(state, action) {
 export default function App() {
   //destructure the state in place
   const [
-    {
-      questions,
-      questionIndex,
-      status,
-      answer,
-      points,
-      highScore,
-      timeRemaining,
-    },
+    { questions, questionIndex, status, answer, points, highScore },
     dispatch,
   ] = useReducer(reducer, initialState);
 
@@ -139,7 +117,7 @@ export default function App() {
               answer={answer}
             />
             <footer>
-              <Timer dispatch={dispatch} timeRemaining={timeRemaining} />
+              <Timer dispatch={dispatch} numQuestions={numQuestions} />
               <NextButton
                 dispatch={dispatch}
                 answer={answer}
