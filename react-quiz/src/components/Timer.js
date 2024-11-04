@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 
 function Timer({ dispatch, numQuestions, SECS }) {
-  //const SECS = 1;
+  //centralised the time per question which is why the SECS constant is being passed in rather than local
+  //in the original version this timer was running globally in the App component which causes
+  //the entire app to re-render every second which felt ridiculous to me and instead a better
+  //candidate for a local re-render
   const [timeRemaining, setTimeRemaining] = useState(numQuestions * SECS);
   //quickly format the time
   let minutes = Math.floor(timeRemaining / 60);
@@ -15,6 +18,7 @@ function Timer({ dispatch, numQuestions, SECS }) {
         dispatch({ type: 'finish' });
       }
       const interval = setInterval(() => setTimeRemaining((t) => t - 1), 1000);
+      //remember to clear up the setInterval with the clear-up function otherwise there'll be loads running
       return () => clearInterval(interval);
     },
     [dispatch, timeRemaining]

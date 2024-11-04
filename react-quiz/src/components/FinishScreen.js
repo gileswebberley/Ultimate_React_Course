@@ -1,5 +1,6 @@
 function FinishScreen({ points, totalPoints, highScore, dispatch }) {
   const percentage = Math.ceil((points / totalPoints) * 100);
+  //simply give different messages to the user based on how well they scored
   return (
     <>
       <p className="result">

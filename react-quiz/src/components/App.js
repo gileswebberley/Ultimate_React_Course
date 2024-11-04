@@ -96,7 +96,8 @@ export default function App() {
   //passing this around all over the place so make it a derived state to save on all the calls
   const numQuestions = questions.length;
 
-  //we've set up a fake API with the json-server which runs on the data folder so we'll grab our questions
+  //we've set up a fake API with the json-server which runs on the data folder so we'll grab our questions from it by doing -
+  /* We're faking an API server by installing json-server with the terminal command npm i json-server, then we add "server": "json-server --watch data/questions.json --port 8000" to the package.json file and finally type npm run server into the terminal and we find our object that holds an array called questions at the url localhost:8000/questions. */
   useEffect(function () {
     //as it's being fetched from local just quickly chain the response handlers
     fetch('http://localhost:8000/questions')
