@@ -8,6 +8,7 @@ const initialState = {
 };
 
 function reducer(state, action) {
+  if (!state.isActive && action.type !== 'open') return state;
   switch (action.type) {
     case 'open':
       return { ...state, isActive: true, balance: 500 };
@@ -19,7 +20,7 @@ function reducer(state, action) {
       return { ...state, balance: state.balance - action.payload };
 
     case 'loan-request':
-      if (state.loan > 0) return { ...state };
+      if (state.loan > 0) return state;
       else
         return {
           ...state,
@@ -37,9 +38,9 @@ function reducer(state, action) {
     case 'close':
       if (state.balance !== 0 || state.loan !== 0) {
         console.log('Cannot close account without zero balances');
-        return { ...state };
+        return state;
       } else {
-        return { ...initialState };
+        return initialState;
       }
 
     default:
