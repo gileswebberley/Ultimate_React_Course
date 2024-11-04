@@ -16,6 +16,10 @@ code {
   box-sizing: border-box;
 }
 
+.banking {
+  text-align: center;
+}
+
 .rating {
   background-color: #261414;
   border-radius: 0.9rem;
