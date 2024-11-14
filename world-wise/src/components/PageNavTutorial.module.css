@@ -1,0 +1,15 @@
+/* When using css modules namespace clashes are avoided because a random post-fix is automagically added to the end of the classname eg nav becomes _nav_h8y9e_3 */
+.nav {
+  background-color: cornflowerblue;
+}
+/* In css modules you must use class names as element selectors (such as ul, p, etc) defy the logic of modular styling, however, as above we can chain the element selectors into the class */
+.nav ul {
+  list-style-position: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+/* There is an active class that is added to the active link by React Router when we are on the page, however because the css module system adds the random post-fix we cannot simply write .nav .active to set it and so we use the :global function to avoid this happening */
+.nav :global(.active) {
+  background-color: burlywood;
+}
