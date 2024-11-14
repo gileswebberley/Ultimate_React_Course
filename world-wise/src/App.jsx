@@ -3,6 +3,8 @@ import Product from './pages/Product';
 import Pricing from './pages/Pricing';
 import Homepage from './pages/Homepage';
 import PageNotFound from './pages/PageNotFound';
+import AppLayout from './pages/AppLayout';
+import Login from './pages/Login';
 
 function App() {
   //let's define our first routes 'in a declaritive way' within the jsx now we have installed react router into the project
@@ -20,6 +22,8 @@ function App() {
           {/* Now we set up for the url www.example.com/product as an example */}
           <Route path="product" element={<Product />} />
           <Route path="pricing" element={<Pricing />} />
+          <Route path="login" element={<Login />} />
+          <Route path="app" element={<AppLayout />} />
           {/* Finally we can create a 404 not found page for any urls that don't match one of the routes we've set up */}
           <Route path="*" element={<PageNotFound />} />
         </Routes>
