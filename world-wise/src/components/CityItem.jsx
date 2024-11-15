@@ -1,4 +1,7 @@
+import { Link } from 'react-router-dom';
 import styles from './CityItem.module.css';
+import flagemojiToPNG from '../../public/flagemojiToPNG';
+
 const formatDate = (date) =>
   new Intl.DateTimeFormat('en', {
     day: 'numeric',
@@ -7,24 +10,22 @@ const formatDate = (date) =>
     weekday: 'long',
   }).format(new Date(date));
 
-//Thanks to sandeep on udemy for this little function
-function flagemojiToPNG(flag) {
-  const countryCode = Array.from(flag, (codeUnit) => codeUnit.codePointAt())
-    .map((char) => String.fromCharCode(char - 127397).toLowerCase())
-    .join('');
-  return (
-    <img src={`https://flagcdn.com/24x18/${countryCode}.png`} alt="flag" />
-  );
-}
-
 function CityItem({ city }) {
-  const { cityName, emoji, date } = city;
+  const { cityName, emoji, date, id, position } = city;
   return (
-    <li className={styles.cityItem}>
-      <span className={styles.emoji}>{flagemojiToPNG(emoji)}</span>
-      <h3 className={styles.name}>{cityName}</h3>
-      <time className={styles.date}>({formatDate(date)})</time>
-      <button className={styles.deleteBtn}>&times;</button>
+    <li>
+      {/* Here we are implementing the url based state which we defined in App with the Route with a colon based path (cities/:cityId) */}
+      <Link
+        className={styles.cityItem}
+        to={`${id}?lat=${position.lat}&lng=${position.lng}`}
+      >
+        <span className={styles.emoji}>
+          <img src={flagemojiToPNG(emoji)} alt="flag" />
+        </span>
+        <h3 className={styles.name}>{cityName}</h3>
+        <time className={styles.date}>({formatDate(date)})</time>
+        <button className={styles.deleteBtn}>&times;</button>
+      </Link>
     </li>
   );
 }

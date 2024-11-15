@@ -7,6 +7,7 @@ import PageNotFound from './pages/PageNotFound';
 import AppLayout from './pages/AppLayout';
 import Login from './pages/Login';
 import CityList from './components/CityList';
+import City from './components/City';
 import CountriesList from './components/CountriesList';
 
 function App() {
@@ -56,6 +57,8 @@ function App() {
               path="cities"
               element={<CityList cities={cities} isLoading={isLoading} />}
             />
+            {/* In here we are going to start using params which are held within the url path, we do this by defining a parameter name by using the colon as below (be aware that the parameter should be the name of the property you are checking in <City>, namely it can't be 'cityId' for example because in the cities.json the property of the city is called id) */}
+            <Route path="cities/:id" element={<City cities={cities} />} />
             <Route
               path="countries"
               element={<CountriesList cities={cities} isLoading={isLoading} />}

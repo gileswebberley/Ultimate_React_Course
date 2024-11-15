@@ -1,18 +1,12 @@
 import styles from './CountryItem.module.css';
-//Thanks to sandeep on udemy for this little function
-function flagemojiToPNG(flag) {
-  const countryCode = Array.from(flag, (codeUnit) => codeUnit.codePointAt())
-    .map((char) => String.fromCharCode(char - 127397).toLowerCase())
-    .join('');
-  return (
-    <img src={`https://flagcdn.com/24x18/${countryCode}.png`} alt="flag" />
-  );
-}
+import flagemojiToPNG from '../../public/flagemojiToPNG';
 
 function CountryItem({ country }) {
   return (
     <li className={styles.countryItem}>
-      <span>{flagemojiToPNG(country.emoji)}</span>
+      <span>
+        <img src={flagemojiToPNG(country.emoji)} alt="flag" />
+      </span>
       <span>{country.country}</span>
     </li>
   );
