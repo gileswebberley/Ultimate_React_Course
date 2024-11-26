@@ -12,23 +12,8 @@ const formatDate = (date) =>
 
 function City({ cities }) {
   const { id } = useParams();
-  console.log(
-    `From City: (id: ${id}) ${JSON.stringify(
-      cities.reduce(
-        (city_acc, city) => (city.id === String(id) ? city : null),
-        []
-      )
-    )}`
-  );
 
-  const currentCity = {
-    cityName: 'Lisbon',
-    emoji: '🇵🇹',
-    date: '2027-10-31T15:59:59.138Z',
-    notes: 'My favorite city so far!',
-  };
-  //cities.filter((city) => city.id === id);
-
+  const currentCity = cities.find((city) => city.id === id);
   const { cityName, emoji, date, notes } = currentCity;
 
   return (

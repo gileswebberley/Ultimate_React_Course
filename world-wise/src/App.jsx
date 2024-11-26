@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import CityList from './components/CityList';
 import City from './components/City';
 import CountriesList from './components/CountriesList';
+import Form from './components/Form';
 
 function App() {
   const [cities, setCities] = useState([]);
@@ -63,7 +64,7 @@ function App() {
               path="countries"
               element={<CountriesList cities={cities} isLoading={isLoading} />}
             />
-            <Route path="form" element={<p>Form</p>} />
+            <Route path="form" element={<Form />} />
           </Route>
           {/* Finally we can create a 404 not found page for any urls that don't match one of the routes we've set up */}
           <Route path="*" element={<PageNotFound />} />
