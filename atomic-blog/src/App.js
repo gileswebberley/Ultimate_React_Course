@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { faker } from "@faker-js/faker";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { faker } from '@faker-js/faker';
 
 function createRandomPost() {
   return {
@@ -8,11 +8,14 @@ function createRandomPost() {
   };
 }
 
+//Here we will create our first Context API system, first the context itself
+const BlogContext = createContext();
+
 function App() {
   const [posts, setPosts] = useState(() =>
     Array.from({ length: 30 }, () => createRandomPost())
   );
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [isFakeDark, setIsFakeDark] = useState(false);
 
   // Derived state. These are the posts that will actually be displayed
@@ -36,52 +39,60 @@ function App() {
   // Whenever `isFakeDark` changes, we toggle the `fake-dark-mode` class on the HTML element (see in "Elements" dev tool).
   useEffect(
     function () {
-      document.documentElement.classList.toggle("fake-dark-mode");
+      document.documentElement.classList.toggle('fake-dark-mode');
     },
     [isFakeDark]
   );
 
+  //To use the BlogContext we'll wrap all of the possible consumers in it's provider component
   return (
-    <section>
-      <button
-        onClick={() => setIsFakeDark((isFakeDark) => !isFakeDark)}
-        className="btn-fake-dark-mode"
-      >
-        {isFakeDark ? "☀️" : "🌙"}
-      </button>
-
-      <Header
-        posts={searchedPosts}
-        onClearPosts={handleClearPosts}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-      />
-      <Main posts={searchedPosts} onAddPost={handleAddPost} />
-      <Archive onAddPost={handleAddPost} />
-      <Footer />
-    </section>
+    // The value is an object that essentially contains all of the props that are passed down but in key:value pairs
+    <BlogContext.Provider
+      value={{
+        posts: searchedPosts,
+        onClearPosts: handleClearPosts,
+        onAddPost: handleAddPost,
+        searchQuery,
+        setSearchQuery,
+      }}
+    >
+      <section>
+        <button
+          onClick={() => setIsFakeDark((isFakeDark) => !isFakeDark)}
+          className="btn-fake-dark-mode"
+        >
+          {isFakeDark ? '☀️' : '🌙'}
+        </button>
+        {/* And now we can stop passing the props to the child components as they can all access our BlogContext instead */}
+        <Header />
+        <Main />
+        <Archive />
+        <Footer />
+      </section>
+    </BlogContext.Provider>
   );
 }
 
-function Header({ posts, onClearPosts, searchQuery, setSearchQuery }) {
+function Header() {
+  //Finally, here we consume the props that this component requires from the Context
+  const { onClearPosts } = useContext(BlogContext);
+
   return (
     <header>
       <h1>
         <span>⚛️</span>The Atomic Blog
       </h1>
       <div>
-        <Results posts={posts} />
-        <SearchPosts
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-        />
+        <Results />
+        <SearchPosts />
         <button onClick={onClearPosts}>Clear posts</button>
       </div>
     </header>
   );
 }
 
-function SearchPosts({ searchQuery, setSearchQuery }) {
+function SearchPosts() {
+  const { searchQuery, setSearchQuery } = useContext(BlogContext);
   return (
     <input
       value={searchQuery}
@@ -91,37 +102,39 @@ function SearchPosts({ searchQuery, setSearchQuery }) {
   );
 }
 
-function Results({ posts }) {
+function Results() {
+  const { posts } = useContext(BlogContext);
   return <p>🚀 {posts.length} atomic posts found</p>;
 }
 
-function Main({ posts, onAddPost }) {
+function Main() {
   return (
     <main>
-      <FormAddPost onAddPost={onAddPost} />
-      <Posts posts={posts} />
+      <FormAddPost />
+      <Posts />
     </main>
   );
 }
 
-function Posts({ posts }) {
+function Posts() {
   return (
     <section>
-      <List posts={posts} />
+      <List />
     </section>
   );
 }
 
-function FormAddPost({ onAddPost }) {
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
+function FormAddPost() {
+  const { onAddPost } = useContext(BlogContext);
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
 
   const handleSubmit = function (e) {
     e.preventDefault();
     if (!body || !title) return;
     onAddPost({ title, body });
-    setTitle("");
-    setBody("");
+    setTitle('');
+    setBody('');
   };
 
   return (
@@ -141,7 +154,8 @@ function FormAddPost({ onAddPost }) {
   );
 }
 
-function List({ posts }) {
+function List() {
+  const { posts } = useContext(BlogContext);
   return (
     <ul>
       {posts.map((post, i) => (
@@ -154,7 +168,7 @@ function List({ posts }) {
   );
 }
 
-function Archive({ onAddPost }) {
+function Archive() {
   // Here we don't need the setter function. We're only using state to store these posts because the callback function passed into useState (which generates the posts) is only called once, on the initial render. So we use this trick as an optimization technique, because if we just used a regular variable, these posts would be re-created on every render. We could also move the posts outside the components, but I wanted to show you this trick 😉
   const [posts] = useState(() =>
     // 💥 WARNING: This might make your computer slow! Try a smaller `length` first
@@ -162,12 +176,13 @@ function Archive({ onAddPost }) {
   );
 
   const [showArchive, setShowArchive] = useState(false);
+  const { onAddPost } = useContext(BlogContext);
 
   return (
     <aside>
       <h2>Post archive</h2>
       <button onClick={() => setShowArchive((s) => !s)}>
-        {showArchive ? "Hide archive posts" : "Show archive posts"}
+        {showArchive ? 'Hide archive posts' : 'Show archive posts'}
       </button>
 
       {showArchive && (
