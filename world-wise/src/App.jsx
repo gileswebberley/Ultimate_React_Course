@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Product from './pages/Product';
 import Pricing from './pages/Pricing';
@@ -49,16 +49,13 @@ function App() {
           <Route path="login" element={<Login />} />
           {/* We have 'Nested Routes' in the app page, for the cities/countries/map functionality of the Sidebar component */}
           <Route path="app" element={<AppLayout />}>
-            {/* We want cities to be the default when we have the simple [url]/app url in the browser so set that as the index as we have for the home page */}
-            <Route
-              index
-              element={<CityList cities={cities} isLoading={isLoading} />}
-            />
+            {/* We want cities to be the default when we have the simple [url]/app url in the browser so set that as the index as we have for the home page. Now to redirect we use the Navigate component with the 'replace' keyword rather than just the 'to' param so that the back button will still work (otherwise we go back to /app and the Navigate takes us to cities and so we get stuck in a history stack loop) */}
+            <Route index element={<Navigate replace to="cities" />} />
             <Route
               path="cities"
               element={<CityList cities={cities} isLoading={isLoading} />}
             />
-            {/* In here we are going to start using params which are held within the url path, we do this by defining a parameter name by using the colon as below (be aware that the parameter should be the name of the property you are checking in <City>, namely it can't be 'cityId' for example because in the cities.json the property of the city is called id) */}
+            {/* In here we are going to start using params which are held within the url path, we do this by defining a parameter name by using the colon as below (be aware that the parameter should be the name of the property you are grabbing in <City> when we use useParams() hook in there */}
             <Route path="cities/:id" element={<City cities={cities} />} />
             <Route
               path="countries"

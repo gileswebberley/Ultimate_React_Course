@@ -10,9 +10,11 @@ const formatDate = (date) =>
     weekday: 'long',
   }).format(new Date(date));
 
+//Without using the ContextAPI we could pass the cities prop to the city and then search according to the id we grab from the path
 function City({ cities }) {
   const { id } = useParams();
 
+  //This is the search when not using the ContextAPI but rather passing the cities in as a prop
   const currentCity = cities.find((city) => city.id === id);
   const { cityName, emoji, date, notes } = currentCity;
 
