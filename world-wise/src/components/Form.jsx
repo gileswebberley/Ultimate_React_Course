@@ -1,22 +1,17 @@
 // "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=0&longitude=0"
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import styles from "./Form.module.css";
-
-export function convertToEmoji(countryCode) {
-  const codePoints = countryCode
-    .toUpperCase()
-    .split("")
-    .map((char) => 127397 + char.charCodeAt());
-  return String.fromCodePoint(...codePoints);
-}
+import styles from './Form.module.css';
+import Button from './Button';
+import { useNavigate } from 'react-router-dom';
 
 function Form() {
-  const [cityName, setCityName] = useState("");
-  const [country, setCountry] = useState("");
+  const navigate = useNavigate();
+  const [cityName, setCityName] = useState('');
+  const [country, setCountry] = useState('');
   const [date, setDate] = useState(new Date());
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState('');
 
   return (
     <form className={styles.form}>
@@ -49,8 +44,18 @@ function Form() {
       </div>
 
       <div className={styles.buttons}>
-        <button>Add</button>
-        <button>&larr; Back</button>
+        <Button type="primary">Add</Button>
+        {/* By passing a number to the useNavigate instance we can step back through the navigation history, so here for a back button we want to step back to the last page and so pass it the value of -1 
+        Also note that we are actually inside a Form element and so we have to use preventDefault() so that it is not treated as a submit button*/}
+        <Button
+          type="back"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate(-1);
+          }}
+        >
+          &larr; Back
+        </Button>
       </div>
     </form>
   );
