@@ -1,6 +1,10 @@
 import styles from './City.module.css';
 import flagemojiToPNG from '../../public/flagemojiToPNG';
 import { useParams } from 'react-router-dom';
+import { useCitiesContext } from '../Contexts/CitiesContext';
+//import { useEffect } from 'react';
+import Spinner from './Spinner';
+import BackButton from './BackButton';
 
 const formatDate = (date) =>
   new Intl.DateTimeFormat('en', {
@@ -11,11 +15,24 @@ const formatDate = (date) =>
   }).format(new Date(date));
 
 //Without using the ContextAPI we could pass the cities prop to the city and then search according to the id we grab from the path
-function City({ cities }) {
+function City() {
   const { id } = useParams();
+  const { currentCity, getCity, isLoading } = useCitiesContext();
+  //This is my workaround which I think is ok seeing as nothing changes too much in this component so it won't re-render too much either.
+  if (currentCity.id !== id) getCity(id);
 
+  //THIS IS NOT WORKING FOR MANY PEOPLE, just a shame that I don't understand why!?
+  // useEffect(
+  //   function () {
+  //     console.log(`City useEffect running...`);
+  //     getCity(id);
+  //   },
+  //   [id]
+  // );
+
+  if (isLoading) return <Spinner />;
   //This is the search when not using the ContextAPI but rather passing the cities in as a prop
-  const currentCity = cities.find((city) => city.id === id);
+  // const currentCity = cities.find((city) => city.id === id);
   const { cityName, emoji, date, notes } = currentCity;
 
   return (
@@ -53,7 +70,9 @@ function City({ cities }) {
         </a>
       </div>
 
-      <div></div>
+      <div>
+        <BackButton />
+      </div>
     </div>
   );
 }
