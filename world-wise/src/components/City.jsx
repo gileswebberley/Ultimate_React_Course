@@ -5,6 +5,7 @@ import { useCitiesContext } from '../Contexts/CitiesContext';
 //import { useEffect } from 'react';
 import Spinner from './Spinner';
 import BackButton from './BackButton';
+import { useEffect } from 'react';
 
 const formatDate = (date) =>
   new Intl.DateTimeFormat('en', {
@@ -18,17 +19,17 @@ const formatDate = (date) =>
 function City() {
   const { id } = useParams();
   const { currentCity, getCity, isLoading } = useCitiesContext();
-  //This is my workaround which I think is ok seeing as nothing changes too much in this component so it won't re-render too much either.
-  if (currentCity.id !== id) getCity(id);
+  //This is my workaround which I think is ok seeing as nothing changes too much in this component so it won't re-render too much either. Breaks if you click the refresh button in your browser
+  //if (currentCity.id !== id) getCity(id);
 
   //THIS IS NOT WORKING FOR MANY PEOPLE, just a shame that I don't understand why!?
-  // useEffect(
-  //   function () {
-  //     console.log(`City useEffect running...`);
-  //     getCity(id);
-  //   },
-  //   [id]
-  // );
+  useEffect(
+    function () {
+      console.log(`City useEffect running...`);
+      if (currentCity.id !== id) getCity(id);
+    },
+    [id, currentCity]
+  );
 
   if (isLoading) return <Spinner />;
   //This is the search when not using the ContextAPI but rather passing the cities in as a prop
@@ -41,7 +42,7 @@ function City() {
         <h6>City name</h6>
         <h3>
           <span>
-            <img src={flagemojiToPNG(emoji)} alt="flag" />
+            <img src={emoji ? flagemojiToPNG(emoji) : ''} alt="flag" />
           </span>{' '}
           {cityName}
         </h3>

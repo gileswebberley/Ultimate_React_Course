@@ -1,32 +1,121 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './Map.module.css';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  useMapEvents,
+} from 'react-leaflet';
+import L from 'leaflet';
+import { useState, useEffect } from 'react';
+import { useCitiesContext } from '../Contexts/CitiesContext';
+import flagemojiToPNG from '../../public/flagemojiToPNG';
+import Button from './Button';
 
 function Map() {
-  //To programmatically navigate (eg to go to a 'form completed' page when you submit a form) we can use the useNavigate() method from react=router
-  const navigate = useNavigate();
+  //now we have a map we'll get the cities list in so we can place the markers
+  const { cities } = useCitiesContext();
   //to grab the longitude and latitude information from the query string we utilise useSearchParams which is like useState in so much as it returns the current params and a setter function
-  const [searchParams, setSearchParams] = useSearchParams();
-  const lat = searchParams.get('lat');
-  const lng = searchParams.get('lng');
+  const [searchParams] = useSearchParams();
+  let lat = searchParams.get('lat');
+  let lng = searchParams.get('lng');
+  //Now create a position array for use in the Leaflet map, using null coalescence if no position available from params
+  const [mapPosition, setMapPosition] = useState([30, 10]);
+  const [mapLoaded, setMapLoaded] = useState(false);
+
+  //When position is defined in the url path we keep it stored until it changes, that way when we go back to the cities view it remains in it's selected position
+  useEffect(
+    function () {
+      if (lat && lng) {
+        setMapPosition([lat, lng]);
+        if (!mapLoaded) setMapLoaded(true);
+      }
+    },
+    [lat, lng, mapLoaded]
+  );
 
   return (
     <div className={styles.mapContainer}>
-      <h1>
-        Map: lat: {lat} lng: {lng}
-      </h1>
-      {/* and now we can also set params using the setter function provided */}
-      <button
-        onClick={() => {
-          navigate('form');
-        }}
+      {/* With the current location component implemented this button will take you home when on the cities page */}
+      {!lat && (
+        <Button
+          type="position"
+          onClick={(e) => {
+            setMapLoaded((ml) => (ml = false));
+          }}
+        >
+          𖦏
+        </Button>
+      )}
+      <MapContainer
+        center={mapPosition}
+        zoom={3}
+        scrollWheelZoom={true}
+        className={styles.map}
       >
-        Go to Form page
-      </button>
-      <button onClick={() => setSearchParams({ lat: 59, lng: 32 })}>
-        Set New Position
-      </button>
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+        />
+        {cities.map((city, i) => (
+          <Marker position={[city.position.lat, city.position.lng]} key={i}>
+            <Popup>
+              <span>
+                <img src={flagemojiToPNG(city.emoji)} alt="flag emoji" />
+              </span>
+              <span>
+                {city.cityName}
+                <br />
+                {city.notes}
+              </span>
+            </Popup>
+          </Marker>
+        ))}
+        <CentreMap position={mapPosition} />
+        <DetectClickPosition />
+        {
+          //to make map move to your current location on load as the load event does not fire in react-leaflet
+          !mapLoaded && <MoveToCurrentLocation />
+        }
+      </MapContainer>
     </div>
   );
+}
+
+//We use this component to change the position of the map when the mapPosition changes
+function CentreMap({ position }) {
+  const ourMap = useMap();
+  ourMap.flyTo(position, 8);
+  return null;
+}
+
+//Now we create a component to use when the map is clicked on which uses more of the react-leaflet library
+function DetectClickPosition() {
+  //To programmatically navigate (eg to go to a 'form completed' page when you submit a form) we can use the useNavigate() method from react=router
+  const navigate = useNavigate();
+  //here is the way to handle clicks via the leaflet interface
+  useMapEvents({
+    click: (e) => {
+      navigate(`form?lat=${e.latlng.lat}&lng=${e.latlng.lng}`);
+    },
+  });
+
+  return null;
+}
+
+//a little experiment to get the map to centre on current location when it opens -
+function MoveToCurrentLocation() {
+  const map = useMap();
+  //function of leaflet that uses browser location data
+  map.locate();
+  const ourMap = useMapEvents({
+    locationfound: (location) => {
+      console.log('Location found');
+      ourMap.flyTo(location.latlng, 10);
+    },
+  });
 }
 
 export default Map;
