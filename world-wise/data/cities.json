@@ -25,15 +25,39 @@
       "id": "17806751"
     },
     {
-      "id": "FTSZ_97m9IduBFM4uGQTv",
-      "cityName": "Wallasey(Liverpool)",
+      "id": "xpJw2M3wFDPxDK_NfYPA9",
+      "cityName": "Lockerbie",
       "country": "GB",
       "emoji": "🇬🇧",
-      "date": "2022-05-10T17:15:59.000Z",
-      "notes": "Home",
+      "date": "2024-10-30T19:09:38.000Z",
+      "notes": "Extremely wet, lovely pub in Moffat",
       "position": {
-        "lat": 53.4141362673243,
-        "lng": -3.0311965942382812
+        "lat": 55.3316832662332,
+        "lng": -3.4418106079101567
+      }
+    },
+    {
+      "id": "l98ED3Zi6ijrOlLchUmTh",
+      "cityName": "Wallasey (Liverpool)",
+      "country": "GB",
+      "emoji": "🇬🇧",
+      "date": "2022-05-10T18:12:37.000Z",
+      "notes": "Moved into our home",
+      "position": {
+        "lat": 53.413113107235944,
+        "lng": -3.0340290069580083
+      }
+    },
+    {
+      "id": "sG4b3rcDelCB2sUYVaMi6",
+      "cityName": "Manchester",
+      "country": "GB",
+      "emoji": "🇬🇧",
+      "date": "2024-11-08T19:16:50.000Z",
+      "notes": "Often visited",
+      "position": {
+        "lat": 53.47578733864619,
+        "lng": -2.2384643554687504
       }
     }
   ]

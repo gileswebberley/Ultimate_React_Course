@@ -55,7 +55,7 @@ function Form() {
           setCityName(
             data.locality === data.city
               ? data.city
-              : `${data.locality}(${data.city})`
+              : `${data.locality} (${data.city})`
           );
           setEmoji(convertToEmoji(data.countryCode));
         } catch (error) {

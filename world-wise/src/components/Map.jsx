@@ -51,7 +51,7 @@ function Map() {
       {/* The React-Leaflet main component, useMap etc are available to any child components such as our custom CentreMap etc */}
       <MapContainer
         center={mapPosition}
-        zoom={3}
+        zoom={5}
         scrollWheelZoom={true}
         className={styles.map}
       >
@@ -88,7 +88,7 @@ function Map() {
 //We use this component to change the position of the map when the mapPosition changes
 function CentreMap({ position }) {
   const ourMap = useMap();
-  ourMap.flyTo(position, 8);
+  ourMap.flyTo(position, 10);
   return null;
 }
 

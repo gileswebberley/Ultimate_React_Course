@@ -10,6 +10,7 @@ function CityItem({ city }) {
 
   function handleDeleteCity(e) {
     e.preventDefault();
+    //give users the chance to cancel a deletion by using the global window
     if (
       window.confirm(
         `Are you sure that you want to delete ${cityName} from your list?`
