@@ -59,6 +59,18 @@
         "lat": 53.47578733864619,
         "lng": -2.2384643554687504
       }
+    },
+    {
+      "id": "FAkyeiR54gihI8dY_-NZU",
+      "cityName": "Aberdeen",
+      "country": "GB",
+      "emoji": "🇬🇧",
+      "date": "1975-11-05T20:40:13.000Z",
+      "notes": "Visiting dad's parents",
+      "position": {
+        "lat": 57.14443569017366,
+        "lng": -2.1011352539062504
+      }
     }
   ]
 }

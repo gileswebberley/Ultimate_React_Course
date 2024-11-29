@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 
 import styles from './Form.module.css';
 import Button from './Button';
@@ -17,28 +17,80 @@ import { useNavigate } from 'react-router-dom';
 const GEO_BASE_URL =
   'https://api.bigdatacloud.net/data/reverse-geocode-client?';
 
+//let's try to consolidate all this state with a reducer seeing as it's so related and all used in the submit
+const initialState = {
+  cityName: '',
+  country: '',
+  date: new Date(),
+  notes: '',
+  emoji: '',
+  message: '',
+  isLoadingPosition: false,
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    //loading related state
+    case 'loadingGeo':
+      return { ...state, isLoadingPosition: true, message: '' };
+
+    case 'rejected':
+      return { ...state, isLoadingPosition: false, message: action.payload };
+
+    //the reason to put it all together
+    case 'submit': {
+      const data = action.payload;
+      const country =
+        data.countryName.length > 10 ? data.countryCode : data.countryName;
+      const city =
+        data.locality === data.city
+          ? data.city
+          : `${data.locality} (${data.city})`;
+      const emoji = convertToEmoji(data.countryCode);
+      return {
+        ...state,
+        country: country,
+        cityName: city,
+        emoji: emoji,
+        isLoadingPosition: false,
+      };
+    }
+    //event handlers for the form fields
+    case 'city/naming':
+      return { ...state, cityName: action.payload };
+
+    case 'city/dating':
+      return { ...state, date: action.payload };
+
+    case 'city/noting':
+      return { ...state, notes: action.payload };
+
+    default:
+      throw new RangeError('Form reducer does not recognise the action type');
+  }
+}
+
 function Form() {
-  //TODO - try converting this to a reducer as we have so much related state
-  const [cityName, setCityName] = useState('');
-  const [country, setCountry] = useState('');
-  const [date, setDate] = useState(new Date());
-  const [notes, setNotes] = useState('');
-  const [emoji, setEmoji] = useState();
+  const [
+    { cityName, country, date, notes, emoji, message, isLoadingPosition },
+    dispatch,
+  ] = useReducer(reducer, initialState);
+
+  //as it's related to managing the city data it's all in the CitiesContext
   const { createCity, isLoading } = useCitiesContext();
-  //data loading related state
-  const [message, setMessage] = useState('');
-  const [isLoadingPosition, setIsLoadingPosition] = useState(false);
-  const navigate = useNavigate();
+
   //custom hook for grabbing the lat and lng from the url query string
   const [lat, lng] = useUrlPosition();
+
+  //just for the redirect when the form is submitted
+  const navigate = useNavigate();
 
   //grab the location data from an API based on the lat and lng information
   useEffect(
     function () {
       async function fetchCity() {
+        dispatch({ type: 'loadingGeo' });
         try {
-          setIsLoadingPosition(true);
-          setMessage('');
           const result = await fetch(
             `${GEO_BASE_URL}latitude=${lat}&longitude=${lng}`
           );
@@ -48,22 +100,10 @@ function Form() {
             throw new TypeError(
               "We can't find any information on where you have clicked, please try clicking somewhere else..."
             );
-          //console.log(data);
-          setCountry(
-            data.countryName.length > 10 ? data.countryCode : data.countryName
-          );
-          setCityName(
-            data.locality === data.city
-              ? data.city
-              : `${data.locality} (${data.city})`
-          );
-          setEmoji(convertToEmoji(data.countryCode));
+          //otherwise submit the form through the reducer
+          dispatch({ type: 'submit', payload: data });
         } catch (error) {
-          if (error.name === 'TypeError') setMessage(error.message);
-
-          // throw new Error(error.message);
-        } finally {
-          setIsLoadingPosition(false);
+          dispatch({ type: 'rejected', payload: error.message });
         }
       }
       if (lat && lng) fetchCity();
@@ -104,7 +144,9 @@ function Form() {
         <label htmlFor="cityName">City name</label>
         <input
           id="cityName"
-          onChange={(e) => setCityName(e.target.value)}
+          onChange={(e) =>
+            dispatch({ type: 'city/naming', payload: e.target.value })
+          }
           value={cityName}
         />
         <span className={styles.flag}>
@@ -118,7 +160,9 @@ function Form() {
           locale={enGB}
           dateFormat="dd/MM/yyyy"
           selected={date}
-          onChange={(pickerDate) => setDate(pickerDate)}
+          onChange={(pickerDate) =>
+            dispatch({ type: 'city/dating', payload: pickerDate })
+          }
           id="date"
         />
       </div>
@@ -127,7 +171,9 @@ function Form() {
         <label htmlFor="notes">Notes about your trip to {cityName}</label>
         <textarea
           id="notes"
-          onChange={(e) => setNotes(e.target.value)}
+          onChange={(e) =>
+            dispatch({ type: 'city/noting', payload: e.target.value })
+          }
           value={notes}
         />
       </div>

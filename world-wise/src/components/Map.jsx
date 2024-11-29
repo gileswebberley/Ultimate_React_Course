@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './Map.module.css';
 import {
   MapContainer,
@@ -38,7 +38,7 @@ function Map() {
   return (
     <div className={styles.mapContainer}>
       {/* With the current location component implemented this button will take you home when on the cities page ie when no lat/lng are defined */}
-      {(!lat || !lng) && (
+      {!lat && !lng && (
         <Button
           type="position"
           onClick={(e) => {
