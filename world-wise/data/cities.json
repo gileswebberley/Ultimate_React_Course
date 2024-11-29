@@ -25,51 +25,15 @@
       "id": "17806751"
     },
     {
-      "cityName": "Berlin",
-      "country": "Germany",
-      "emoji": "🇩🇪",
-      "date": "2027-02-12T09:24:11.863Z",
-      "notes": "Amazing 😃",
-      "position": {
-        "lat": 52.53586782505711,
-        "lng": 13.376933665713324
-      },
-      "id": "98443197"
-    },
-    {
-      "id": "6AxWoAMaUM9La5YIBimkJ",
-      "cityName": "Ivry-sur-Seine",
-      "country": "France",
-      "emoji": "🇫🇷",
-      "date": "2024-11-29T16:21:29.301Z",
-      "notes": "",
-      "position": {
-        "lat": 48.821332549646655,
-        "lng": 2.3840332031250004
-      }
-    },
-    {
-      "id": "Ra_ExP4VRmNnyEDSthLMf",
+      "id": "FTSZ_97m9IduBFM4uGQTv",
       "cityName": "Wallasey(Liverpool)",
       "country": "GB",
       "emoji": "🇬🇧",
-      "date": "2024-11-29T16:24:41.650Z",
-      "notes": "",
+      "date": "2022-05-10T17:15:59.000Z",
+      "notes": "Home",
       "position": {
-        "lat": 53.41321542435241,
-        "lng": -3.0343723297119145
-      }
-    },
-    {
-      "id": "IbYjQoEsy8n6aoKdYXaVn",
-      "cityName": "Nekkour",
-      "country": "Morocco",
-      "emoji": "🇲🇦",
-      "date": "2024-11-29T16:31:40.893Z",
-      "notes": "",
-      "position": {
-        "lat": 35.04798673426734,
-        "lng": -3.8452148437500004
+        "lat": 53.4141362673243,
+        "lng": -3.0311965942382812
       }
     }
   ]

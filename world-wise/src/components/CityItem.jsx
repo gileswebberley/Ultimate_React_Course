@@ -5,8 +5,21 @@ import { useCitiesContext } from '../Contexts/CitiesContext';
 import formatDate from '../../public/formatDate';
 
 function CityItem({ city }) {
-  const { currentCity } = useCitiesContext();
+  const { currentCity, deleteCity } = useCitiesContext();
   const { cityName, emoji, date, id, position } = city;
+
+  function handleDeleteCity(e) {
+    e.preventDefault();
+    if (
+      window.confirm(
+        `Are you sure that you want to delete ${cityName} from your list?`
+      )
+    ) {
+      console.log('Delete city');
+      deleteCity(id);
+    }
+  }
+
   return (
     <li>
       {/* Here we are implementing the url based state which we defined in App with the Route with a colon based path (cities/:cityId) */}
@@ -21,7 +34,9 @@ function CityItem({ city }) {
         </span>
         <h3 className={styles.name}>{cityName}</h3>
         <time className={styles.date}>({formatDate(date)})</time>
-        <button className={styles.deleteBtn}>&times;</button>
+        <button className={styles.deleteBtn} onClick={handleDeleteCity}>
+          &times;
+        </button>
       </Link>
     </li>
   );

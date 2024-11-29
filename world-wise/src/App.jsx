@@ -20,6 +20,7 @@ function App() {
         This would appear on every page whereas the components inside the routes
         will appear according to the url
       </p> */}
+      {/* Place all of the site inside our Context Provider so that we can access it from any of the components via useCitiesContext() hook */}
       <CitiesContextProvider>
         <BrowserRouter>
           <Routes>

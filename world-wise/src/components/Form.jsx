@@ -71,6 +71,7 @@ function Form() {
     [lat, lng]
   );
 
+  //an async function because it calls an async function in citiesContext and we want to wait until it's done before we redirect with the useNavigate object
   async function handleAddCity(e) {
     e.preventDefault();
     //no point saving if it's not a place with a date that you visited
@@ -83,9 +84,10 @@ function Form() {
       date,
       notes,
       position: { lat, lng },
+      //this is a small package to create uid strings because the City component doesn't manage to search if it's a number (fix from earlier)
       id: nanoid(),
     };
-    //console.log(newCity);
+    //Now we call the function that we've just added to CitiesContext
     await createCity(newCity);
     //once it's done we return to the cities page with the useNavigate object
     navigate('/app/cities');

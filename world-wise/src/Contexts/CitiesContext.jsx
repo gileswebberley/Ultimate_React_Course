@@ -55,7 +55,21 @@ function CitiesContextProvider({ children }) {
       console.log('Error saving cities data: ' + err.message);
     } finally {
       setIsLoading(false);
-      setCities((cities) => [...cities, newCity]);
+      setCities((cities) => [newCity, ...cities]);
+    }
+  }
+
+  async function deleteCity(id) {
+    try {
+      setIsLoading(true);
+      await fetch(`${BASE_URL}/cities/${id}`, {
+        method: 'DELETE',
+      });
+    } catch (err) {
+      console.log('Error deleting cities data: ' + err.message);
+    } finally {
+      setIsLoading(false);
+      setCities((cities) => cities.filter((city) => city.id !== id));
     }
   }
 
@@ -67,6 +81,7 @@ function CitiesContextProvider({ children }) {
         getCity,
         isLoading,
         createCity,
+        deleteCity,
       }}
     >
       {children}
