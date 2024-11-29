@@ -5,7 +5,11 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  overflow-y: scroll;
   gap: 2rem;
+}
+.form::-webkit-scrollbar {
+  width: 0;
 }
 
 .row {

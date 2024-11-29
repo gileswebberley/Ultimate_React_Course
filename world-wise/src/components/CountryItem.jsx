@@ -1,5 +1,5 @@
 import styles from './CountryItem.module.css';
-import flagemojiToPNG from '../../public/flagemojiToPNG';
+import { flagemojiToPNG } from '../../public/flagemojiToPNG';
 
 function CountryItem({ country }) {
   return (

@@ -8,21 +8,20 @@ import {
   useMap,
   useMapEvents,
 } from 'react-leaflet';
-import L from 'leaflet';
 import { useState, useEffect } from 'react';
 import { useCitiesContext } from '../Contexts/CitiesContext';
-import flagemojiToPNG from '../../public/flagemojiToPNG';
+import { flagemojiToPNG } from '../../public/flagemojiToPNG';
 import Button from './Button';
+import { useUrlPosition } from '../hooks/useUrlPosition';
 
 function Map() {
   //now we have a map we'll get the cities list in so we can place the markers
   const { cities } = useCitiesContext();
-  //to grab the longitude and latitude information from the query string we utilise useSearchParams which is like useState in so much as it returns the current params and a setter function
-  const [searchParams] = useSearchParams();
-  let lat = searchParams.get('lat');
-  let lng = searchParams.get('lng');
-  //Now create a position array for use in the Leaflet map, using null coalescence if no position available from params
+  //Let's use our custom hook to grab the position from the url
+  const [lat, lng] = useUrlPosition();
+  //Now create a position array for use in the Leaflet map
   const [mapPosition, setMapPosition] = useState([30, 10]);
+  //So that the current position functionality can be implmented with the MoveToCurrentLocation component down below
   const [mapLoaded, setMapLoaded] = useState(false);
 
   //When position is defined in the url path we keep it stored until it changes, that way when we go back to the cities view it remains in it's selected position
@@ -38,8 +37,8 @@ function Map() {
 
   return (
     <div className={styles.mapContainer}>
-      {/* With the current location component implemented this button will take you home when on the cities page */}
-      {!lat && (
+      {/* With the current location component implemented this button will take you home when on the cities page ie when no lat/lng are defined */}
+      {(!lat || !lng) && (
         <Button
           type="position"
           onClick={(e) => {
@@ -49,6 +48,7 @@ function Map() {
           𖦏
         </Button>
       )}
+      {/* The React-Leaflet main component, useMap etc are available to any child components such as our custom CentreMap etc */}
       <MapContainer
         center={mapPosition}
         zoom={3}
@@ -73,6 +73,7 @@ function Map() {
             </Popup>
           </Marker>
         ))}
+        {/* Custom child components */}
         <CentreMap position={mapPosition} />
         <DetectClickPosition />
         {
@@ -93,7 +94,7 @@ function CentreMap({ position }) {
 
 //Now we create a component to use when the map is clicked on which uses more of the react-leaflet library
 function DetectClickPosition() {
-  //To programmatically navigate (eg to go to a 'form completed' page when you submit a form) we can use the useNavigate() method from react=router
+  //To programmatically navigate (eg to go to a 'form completed' page when you submit a form) we can use the useNavigate() hook from react=router
   const navigate = useNavigate();
   //here is the way to handle clicks via the leaflet interface
   useMapEvents({
@@ -105,15 +106,17 @@ function DetectClickPosition() {
   return null;
 }
 
-//a little experiment to get the map to centre on current location when it opens -
+//a little experiment to get the map to centre on current location when it opens
 function MoveToCurrentLocation() {
+  //get a reference to the current leaflet map instance
   const map = useMap();
-  //function of leaflet that uses browser location data
+  //function of leaflet that uses geolocation data
   map.locate();
   const ourMap = useMapEvents({
+    //event fires when location data is retrieved
     locationfound: (location) => {
-      console.log('Location found');
-      ourMap.flyTo(location.latlng, 10);
+      //console.log('Location found');
+      ourMap.flyTo(location.latlng, 14);
     },
   });
 }

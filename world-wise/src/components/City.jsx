@@ -1,5 +1,5 @@
 import styles from './City.module.css';
-import flagemojiToPNG from '../../public/flagemojiToPNG';
+import { flagemojiToPNG } from '../../public/flagemojiToPNG';
 import { useParams } from 'react-router-dom';
 import { useCitiesContext } from '../Contexts/CitiesContext';
 //import { useEffect } from 'react';
@@ -19,13 +19,10 @@ const formatDate = (date) =>
 function City() {
   const { id } = useParams();
   const { currentCity, getCity, isLoading } = useCitiesContext();
-  //This is my workaround which I think is ok seeing as nothing changes too much in this component so it won't re-render too much either. Breaks if you click the refresh button in your browser
-  //if (currentCity.id !== id) getCity(id);
 
-  //THIS IS NOT WORKING FOR MANY PEOPLE, just a shame that I don't understand why!?
   useEffect(
     function () {
-      console.log(`City useEffect running...`);
+      //console.log(`City useEffect running...`);
       if (currentCity.id !== id) getCity(id);
     },
     [id, currentCity]

@@ -1,15 +1,8 @@
 import { Link } from 'react-router-dom';
 import styles from './CityItem.module.css';
-import flagemojiToPNG from '../../public/flagemojiToPNG';
+import { flagemojiToPNG } from '../../public/flagemojiToPNG';
 import { useCitiesContext } from '../Contexts/CitiesContext';
-
-const formatDate = (date) =>
-  new Intl.DateTimeFormat('en', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    weekday: 'long',
-  }).format(new Date(date));
+import formatDate from '../../public/formatDate';
 
 function CityItem({ city }) {
   const { currentCity } = useCitiesContext();
