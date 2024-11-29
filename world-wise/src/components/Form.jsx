@@ -6,6 +6,13 @@ import BackButton from './BackButton';
 import { useUrlPosition } from '../hooks/useUrlPosition';
 import Spinner from './Spinner';
 import { flagemojiToPNG, convertToEmoji } from '../../public/flagemojiToPNG';
+import Message from './Message';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { enGB } from 'date-fns/locale';
+import { nanoid } from 'nanoid';
+import { useCitiesContext } from '../Contexts/CitiesContext';
+import { useNavigate } from 'react-router-dom';
 
 const GEO_BASE_URL =
   'https://api.bigdatacloud.net/data/reverse-geocode-client?';
@@ -16,20 +23,31 @@ function Form() {
   const [country, setCountry] = useState('');
   const [date, setDate] = useState(new Date());
   const [notes, setNotes] = useState('');
-  const [isLoadingPosition, setIsLoadingPosition] = useState(false);
   const [emoji, setEmoji] = useState();
-
+  const { createCity, isLoading } = useCitiesContext();
+  //data loading related state
+  const [message, setMessage] = useState('');
+  const [isLoadingPosition, setIsLoadingPosition] = useState(false);
+  const navigate = useNavigate();
+  //custom hook for grabbing the lat and lng from the url query string
   const [lat, lng] = useUrlPosition();
 
+  //grab the location data from an API based on the lat and lng information
   useEffect(
     function () {
       async function fetchCity() {
         try {
           setIsLoadingPosition(true);
+          setMessage('');
           const result = await fetch(
             `${GEO_BASE_URL}latitude=${lat}&longitude=${lng}`
           );
           const data = await result.json();
+          //in case user clicks in the sea or something
+          if (!data.countryCode)
+            throw new TypeError(
+              "We can't find any information on where you have clicked, please try clicking somewhere else..."
+            );
           //console.log(data);
           setCountry(
             data.countryName.length > 10 ? data.countryCode : data.countryName
@@ -41,7 +59,9 @@ function Form() {
           );
           setEmoji(convertToEmoji(data.countryCode));
         } catch (error) {
-          throw new Error(error.message);
+          if (error.name === 'TypeError') setMessage(error.message);
+
+          // throw new Error(error.message);
         } finally {
           setIsLoadingPosition(false);
         }
@@ -51,9 +71,33 @@ function Form() {
     [lat, lng]
   );
 
+  async function handleAddCity(e) {
+    e.preventDefault();
+    //no point saving if it's not a place with a date that you visited
+    if (!cityName || !date) return;
+    //otherwise build a new city object that has the same format as cities.json
+    const newCity = {
+      cityName,
+      country,
+      emoji,
+      date,
+      notes,
+      position: { lat, lng },
+      id: nanoid(),
+    };
+    //console.log(newCity);
+    await createCity(newCity);
+    //once it's done we return to the cities page with the useNavigate object
+    navigate('/app/cities');
+  }
+
   if (isLoadingPosition) return <Spinner />;
+  if (message) return <Message message={message} />;
   return (
-    <form className={styles.form}>
+    <form
+      className={`${styles.form} ${isLoading ? styles.loading : ''}`}
+      onSubmit={handleAddCity}
+    >
       <div className={styles.row}>
         <label htmlFor="cityName">City name</label>
         <input
@@ -68,10 +112,12 @@ function Form() {
 
       <div className={styles.row}>
         <label htmlFor="date">When did you go to {cityName}?</label>
-        <input
+        <DatePicker
+          locale={enGB}
+          dateFormat="dd/MM/yyyy"
+          selected={date}
+          onChange={(pickerDate) => setDate(pickerDate)}
           id="date"
-          onChange={(e) => setDate(e.target.value)}
-          value={date}
         />
       </div>
 

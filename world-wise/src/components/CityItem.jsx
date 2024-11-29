@@ -14,7 +14,7 @@ function CityItem({ city }) {
         className={`${styles.cityItem} ${
           id === currentCity.id ? styles['cityItem--active'] : ''
         }`}
-        to={`${id}?lat=${position.lat}&lng=${position.lng}`}
+        to={`${String(id)}?lat=${position.lat}&lng=${position.lng}`}
       >
         <span className={styles.emoji}>
           <img src={flagemojiToPNG(emoji)} alt="flag" />

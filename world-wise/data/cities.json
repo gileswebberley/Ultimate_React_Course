@@ -35,6 +35,42 @@
         "lng": 13.376933665713324
       },
       "id": "98443197"
+    },
+    {
+      "id": "6AxWoAMaUM9La5YIBimkJ",
+      "cityName": "Ivry-sur-Seine",
+      "country": "France",
+      "emoji": "🇫🇷",
+      "date": "2024-11-29T16:21:29.301Z",
+      "notes": "",
+      "position": {
+        "lat": 48.821332549646655,
+        "lng": 2.3840332031250004
+      }
+    },
+    {
+      "id": "Ra_ExP4VRmNnyEDSthLMf",
+      "cityName": "Wallasey(Liverpool)",
+      "country": "GB",
+      "emoji": "🇬🇧",
+      "date": "2024-11-29T16:24:41.650Z",
+      "notes": "",
+      "position": {
+        "lat": 53.41321542435241,
+        "lng": -3.0343723297119145
+      }
+    },
+    {
+      "id": "IbYjQoEsy8n6aoKdYXaVn",
+      "cityName": "Nekkour",
+      "country": "Morocco",
+      "emoji": "🇲🇦",
+      "date": "2024-11-29T16:31:40.893Z",
+      "notes": "",
+      "position": {
+        "lat": 35.04798673426734,
+        "lng": -3.8452148437500004
+      }
     }
   ]
 }
