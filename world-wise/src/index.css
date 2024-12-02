@@ -1,5 +1,8 @@
 /* Taken from getting started guide at: https://leafletjs.com/examples/quick-start/ */
-/* @import 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; */
+/* We have used a 'link' in index.html instead as it fixed the missing marker image
+@import 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; */
+
+/* import for the font */
 @import 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap';
 
 /* These CSS variables are global, so they are available in all CSS modules */
@@ -69,6 +72,7 @@ input:focus {
 }
 
 /*
+Provided 'snippet' for speeding up the use of css modules
 "importCSSModule": {
     "prefix": "csm",
     "scope": "javascript,typescript,javascriptreact",

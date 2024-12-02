@@ -1,18 +1,20 @@
+//Library imports
 import { useEffect, useReducer } from 'react';
-
-import styles from './Form.module.css';
-import Button from './Button';
-import BackButton from './BackButton';
-import { useUrlPosition } from '../hooks/useUrlPosition';
-import Spinner from './Spinner';
-import { flagemojiToPNG, convertToEmoji } from '../../public/flagemojiToPNG';
-import Message from './Message';
+import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { enGB } from 'date-fns/locale';
 import { nanoid } from 'nanoid';
+
+//Project imports
+import styles from './Form.module.css';
+import Button from './Button';
+import BackButton from './BackButton';
+import Spinner from './Spinner';
+import Message from './Message';
 import { useCitiesContext } from '../Contexts/CitiesContext';
-import { useNavigate } from 'react-router-dom';
+import { useUrlPosition } from '../hooks/useUrlPosition';
+import { flagemojiToPNG, convertToEmoji } from '../../public/flagemojiToPNG';
 
 const GEO_BASE_URL =
   'https://api.bigdatacloud.net/data/reverse-geocode-client?';

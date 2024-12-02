@@ -115,7 +115,6 @@ function MoveToCurrentLocation() {
   const ourMap = useMapEvents({
     //event fires when location data is retrieved
     locationfound: (location) => {
-      //console.log('Location found');
       ourMap.flyTo(location.latlng, 14);
     },
   });

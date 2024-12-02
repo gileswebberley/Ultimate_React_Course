@@ -24,3 +24,8 @@
   flex-direction: column;
   gap: 0.5rem;
 }
+
+.error {
+  font-size: 150%;
+  color: red;
+}

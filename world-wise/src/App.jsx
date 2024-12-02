@@ -10,6 +10,8 @@ import City from './components/City';
 import CountriesList from './components/CountriesList';
 import Form from './components/Form';
 import { CitiesContextProvider } from './Contexts/CitiesContext';
+import { AuthProvider } from './Contexts/FakeAuthContext';
+import ProtectedRoute from './pages/ProtectedRoute';
 
 function App() {
   //let's define our first routes 'in a declaritive way' within the jsx now we have installed react router into the project
@@ -22,28 +24,38 @@ function App() {
       </p> */}
       {/* Place all of the site inside our Context Provider so that we can access it from any of the components via useCitiesContext() hook */}
       <CitiesContextProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Set up the homepage, or landing page as the basic url. We can do this by setting it as default by using the 'index route' */}
-            <Route index element={<Homepage />} />
-            {/* Now we set up for the url www.example.com/product as an example */}
-            <Route path="product" element={<Product />} />
-            <Route path="pricing" element={<Pricing />} />
-            <Route path="login" element={<Login />} />
-            {/* We have 'Nested Routes' in the app page, for the cities/countries/map functionality of the Sidebar component */}
-            <Route path="app" element={<AppLayout />}>
-              {/* We want cities to be the default when we have the simple [url]/app url in the browser so set that as the index as we have for the home page. Now to redirect we use the Navigate component with the 'replace' keyword rather than just the 'to' param so that the back button will still work (otherwise we go back to /app and the Navigate takes us to cities and so we get stuck in a history stack loop) */}
-              <Route index element={<Navigate replace to="cities" />} />
-              <Route path="cities" element={<CityList />} />
-              {/* In here we are going to start using params which are held within the url path, we do this by defining a parameter name by using the colon as below (be aware that the parameter should be the name of the property you are grabbing in <City> when we use useParams() hook in there */}
-              <Route path="cities/:id" element={<City />} />
-              <Route path="countries" element={<CountriesList />} />
-              <Route path="form" element={<Form />} />
-            </Route>
-            {/* Finally we can create a 404 not found page for any urls that don't match one of the routes we've set up */}
-            <Route path="*" element={<PageNotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Set up the homepage, or landing page as the basic url. We can do this by setting it as default by using the 'index route' */}
+              <Route index element={<Homepage />} />
+              {/* Now we set up for the url www.example.com/product as an example */}
+              <Route path="product" element={<Product />} />
+              <Route path="pricing" element={<Pricing />} />
+              <Route path="login" element={<Login />} />
+              {/* We have 'Nested Routes' in the app page, for the cities/countries/map functionality of the Sidebar component.
+              To make sure you can't go to the app until you are logged in we've added this protective wrappper component */}
+              <Route
+                path="app"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }
+              >
+                {/* We want cities to be the default when we have the simple [url]/app url in the browser so set that as the index as we have for the home page. Now to redirect we use the Navigate component with the 'replace' keyword rather than just the 'to' param so that the back button will still work (otherwise we go back to /app and the Navigate takes us to cities and so we get stuck in a history stack loop) */}
+                <Route index element={<Navigate replace to="cities" />} />
+                <Route path="cities" element={<CityList />} />
+                {/* In here we are going to start using params which are held within the url path, we do this by defining a parameter name by using the colon as below (be aware that the parameter should be the name of the property you are grabbing in <City> when we use useParams() hook in there */}
+                <Route path="cities/:id" element={<City />} />
+                <Route path="countries" element={<CountriesList />} />
+                <Route path="form" element={<Form />} />
+              </Route>
+              {/* Finally we can create a 404 not found page for any urls that don't match one of the routes we've set up */}
+              <Route path="*" element={<PageNotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
       </CitiesContextProvider>
     </div>
   );

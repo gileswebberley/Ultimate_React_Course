@@ -22,9 +22,10 @@ function City() {
 
   useEffect(
     function () {
-      //console.log(`City useEffect running...`);
+      //we have made all of the ids into strings which may be because of this as params are always strings
       if (currentCity.id !== id) getCity(id);
     },
+    //The tutorial told us not to include getCity in the dependency array
     [id, currentCity]
   );
 
@@ -39,7 +40,7 @@ function City() {
         <h6>City name</h6>
         <h3>
           <span>
-            <img src={emoji ? flagemojiToPNG(emoji) : ''} alt="flag" />
+            <img src={flagemojiToPNG(emoji)} alt="flag" />
           </span>{' '}
           {cityName}
         </h3>
