@@ -19,7 +19,7 @@ const initialState = {
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'login':
+    case ActionTypes.LOGIN:
       return {
         ...state,
         user: action.payload,
@@ -27,16 +27,23 @@ function reducer(state, action) {
         error: initialState.error,
       };
 
-    case 'logout':
+    case ActionTypes.LOGOUT:
       return { initialState };
 
-    case 'login/error':
+    case ActionTypes.ERROR:
       return { initialState, error: 'User name or password is incorrect' };
 
     default:
       throw new RangeError('Unknown action type passed to AuthContext reducer');
   }
 }
+
+//I'm going to create a fake enum for the action types to avoid string problems and enable auto-complete
+const ActionTypes = {
+  LOGIN: 'login',
+  LOGOUT: 'logout',
+  ERROR: 'login/error',
+};
 
 //boilerplate step 2
 function AuthProvider({ children }) {
@@ -47,14 +54,14 @@ function AuthProvider({ children }) {
   function login(email, password) {
     //typically we would have an api call here
     if (email === FAKE_USER.email && password === FAKE_USER.password) {
-      dispatch({ type: 'login', payload: FAKE_USER });
+      dispatch({ type: ActionTypes.LOGIN, payload: FAKE_USER });
     } else {
-      dispatch({ type: 'login/error' });
+      dispatch({ type: ActionTypes.ERROR });
     }
   }
 
   function logout() {
-    dispatch({ type: 'logout' });
+    dispatch({ type: ActionTypes.LOGOUT });
   }
 
   return (

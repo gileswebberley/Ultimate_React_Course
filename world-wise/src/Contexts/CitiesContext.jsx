@@ -46,9 +46,19 @@ function reducer(state, action) {
       return { ...state, currentCity: action.payload, isLoading: false };
 
     default:
-      console.log('switch default');
+      throw new RangeError('Undefined action type dispatched to CitiesContext');
   }
 }
+
+//I'm going to create a fake enum for the action types to avoid string problems and enable auto-complete
+const ActionTypes = {
+  LOADING: 'loading',
+  REJECTED: 'rejected',
+  CITIES_LOADED: 'cities/loaded',
+  CITY_CREATED: 'city/created',
+  CITY_DELETED: 'city/deleted',
+  CITY_SELECTED: 'city/selected',
+};
 
 //part 2 is to create the state and functionalities that the context will provide to any of it's children components
 //the main role of this context is to keep the cities data centralised and available to various components without the need for prop drilling
@@ -65,10 +75,10 @@ function CitiesContextProvider({ children }) {
       try {
         const res = await fetch(`${BASE_URL}/cities`);
         const data = await res.json();
-        dispatch({ type: 'cities/loaded', payload: data });
+        dispatch({ type: ActionTypes.CITIES_LOADED, payload: data });
       } catch (err) {
         dispatch({
-          type: 'rejected',
+          type: ActionTypes.REJECTED,
           payload: `Error loading cities data: ${err.message}`,
         });
       }
@@ -79,14 +89,14 @@ function CitiesContextProvider({ children }) {
   //rather than search through the cities data we are practising getting further details from the server pertaining to a particular city
   async function getCity(id) {
     if (currentCity.id === id) return;
-    dispatch({ type: 'loading' });
+    dispatch({ type: ActionTypes.LOADING });
     try {
       const res = await fetch(`${BASE_URL}/cities/${id}`);
       const data = await res.json();
-      dispatch({ type: 'city/selected', payload: data });
+      dispatch({ type: ActionTypes.CITY_SELECTED, payload: data });
     } catch (err) {
       dispatch({
-        type: 'rejected',
+        type: ActionTypes.REJECTED,
         payload: `Error getting city with id ${id}: ${err.message}`,
       });
     }
@@ -94,7 +104,7 @@ function CitiesContextProvider({ children }) {
 
   //keeping with the basic idea that this context centralises the responsibilty for the city data we keep all the logic associated with the data in here - this adds a new city to our data
   async function createCity(newCity) {
-    dispatch({ type: 'loading' });
+    dispatch({ type: ActionTypes.LOADING });
     try {
       await fetch(`${BASE_URL}/cities`, {
         method: 'POST',
@@ -103,10 +113,10 @@ function CitiesContextProvider({ children }) {
           'Content-Type': 'application/json',
         },
       });
-      dispatch({ type: 'city/created', payload: newCity });
+      dispatch({ type: ActionTypes.CITY_CREATED, payload: newCity });
     } catch (err) {
       dispatch({
-        type: 'rejected',
+        type: ActionTypes.REJECTED,
         payload: `Error saving cities data: ${err.message}`,
       });
     }
@@ -114,15 +124,15 @@ function CitiesContextProvider({ children }) {
 
   //does what it says on the tin - deletes city data based on it's id
   async function deleteCity(id) {
-    dispatch({ type: 'loading' });
+    dispatch({ type: ActionTypes.LOADING });
     try {
       await fetch(`${BASE_URL}/cities/${id}`, {
         method: 'DELETE',
       });
-      dispatch({ type: 'city/deleted', payload: id });
+      dispatch({ type: ActionTypes.CITY_DELETED, payload: id });
     } catch (err) {
       dispatch({
-        type: 'rejected',
+        type: ActionTypes.REJECTED,
         payload: `Error deleting city with id ${id}: ${err.message}`,
       });
     }

@@ -16,7 +16,7 @@ import { useUrlPosition } from '../hooks/useUrlPosition';
 
 function Map() {
   //now we have a map we'll get the cities list in so we can place the markers
-  const { cities } = useCitiesContext();
+  const { cities, currentCity } = useCitiesContext();
   //Let's use our custom hook to grab the position from the url
   const [lat, lng] = useUrlPosition();
   //Now create a position array for use in the Leaflet map
@@ -108,14 +108,17 @@ function DetectClickPosition() {
 
 //a little experiment to get the map to centre on current location when it opens
 function MoveToCurrentLocation() {
+  //check we don't have a currentCity selected and if not go to current location
+  const { currentCity } = useCitiesContext();
   //get a reference to the current leaflet map instance
   const map = useMap();
   //function of leaflet that uses geolocation data
   map.locate();
-  const ourMap = useMapEvents({
+  useMapEvents({
     //event fires when location data is retrieved
     locationfound: (location) => {
-      ourMap.flyTo(location.latlng, 14);
+      if (!currentCity.position) map.flyTo(location.latlng, 14);
+      else map.flyTo([currentCity.position.lat, currentCity.position.lng], 14);
     },
   });
 }
