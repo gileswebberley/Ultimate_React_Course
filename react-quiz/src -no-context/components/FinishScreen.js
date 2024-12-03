@@ -1,20 +1,17 @@
-import { useQuizContext } from '../contexts/QuizContext';
-
-function FinishScreen() {
-  const { points, maxPoints, highScore, dispatch } = useQuizContext();
-  const percentage = Math.ceil((points / maxPoints) * 100);
+function FinishScreen({ points, totalPoints, highScore, dispatch }) {
+  const percentage = Math.ceil((points / totalPoints) * 100);
   //simply give different messages to the user based on how well they scored
   return (
     <>
       <p className="result">
-        {points === maxPoints
+        {points === totalPoints
           ? 'Amazing Job '
-          : points > (maxPoints / 4) * 3
+          : points > (totalPoints / 4) * 3
           ? 'Good Stuff, you got close '
-          : points > maxPoints / 2
+          : points > totalPoints / 2
           ? 'Not Bad, you got more than half the points available '
           : 'Try Again Soon, it shows you have some gaps in your knowledge '}{' '}
-        scoring {points} out of {maxPoints} ({percentage}%)
+        scoring {points} out of {totalPoints} ({percentage}%)
       </p>
       <p className="highscore">
         {points === highScore
