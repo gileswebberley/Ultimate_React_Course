@@ -1,0 +1,76 @@
+{
+  "cities": [
+    {
+      "cityName": "Lisbon",
+      "country": "Portugal",
+      "emoji": "🇵🇹",
+      "date": "2027-10-31T15:59:59.138Z",
+      "notes": "My favorite city so far!",
+      "position": {
+        "lat": 38.727881642324164,
+        "lng": -9.140900099907554
+      },
+      "id": "73930385"
+    },
+    {
+      "cityName": "Madrid",
+      "country": "Spain",
+      "emoji": "🇪🇸",
+      "date": "2027-07-15T08:22:53.976Z",
+      "notes": "",
+      "position": {
+        "lat": 40.46635901755316,
+        "lng": -3.7133789062500004
+      },
+      "id": "17806751"
+    },
+    {
+      "id": "xpJw2M3wFDPxDK_NfYPA9",
+      "cityName": "Lockerbie",
+      "country": "GB",
+      "emoji": "🇬🇧",
+      "date": "2024-10-30T19:09:38.000Z",
+      "notes": "Extremely wet, lovely pub in Moffat",
+      "position": {
+        "lat": 55.3316832662332,
+        "lng": -3.4418106079101567
+      }
+    },
+    {
+      "id": "l98ED3Zi6ijrOlLchUmTh",
+      "cityName": "Wallasey (Liverpool)",
+      "country": "GB",
+      "emoji": "🇬🇧",
+      "date": "2022-05-10T18:12:37.000Z",
+      "notes": "Moved into our home",
+      "position": {
+        "lat": 53.413113107235944,
+        "lng": -3.0340290069580083
+      }
+    },
+    {
+      "id": "sG4b3rcDelCB2sUYVaMi6",
+      "cityName": "Manchester",
+      "country": "GB",
+      "emoji": "🇬🇧",
+      "date": "2024-11-08T19:16:50.000Z",
+      "notes": "Often visited",
+      "position": {
+        "lat": 53.47578733864619,
+        "lng": -2.2384643554687504
+      }
+    },
+    {
+      "id": "FAkyeiR54gihI8dY_-NZU",
+      "cityName": "Aberdeen",
+      "country": "GB",
+      "emoji": "🇬🇧",
+      "date": "1975-11-05T20:40:13.000Z",
+      "notes": "Visiting dad's parents",
+      "position": {
+        "lat": 57.14443569017366,
+        "lng": -2.1011352539062504
+      }
+    }
+  ]
+}

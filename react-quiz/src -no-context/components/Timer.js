@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useQuizContext } from '../contexts/QuizContext';
 
-function Timer() {
-  const { dispatch, numQuestions, secondsPerQuestion } = useQuizContext();
+function Timer({ dispatch, numQuestions, SECS }) {
   //centralised the time per question which is why the SECS constant is being passed in rather than local
   //in the original version this timer was running globally in the App component which causes
   //the entire app to re-render every second which felt ridiculous to me and instead a better
   //candidate for a local re-render
-  const [timeRemaining, setTimeRemaining] = useState(
-    numQuestions * secondsPerQuestion
-  );
+  const [timeRemaining, setTimeRemaining] = useState(numQuestions * SECS);
   //quickly format the time
   let minutes = Math.floor(timeRemaining / 60);
   if (minutes < 10) minutes = '0' + minutes;

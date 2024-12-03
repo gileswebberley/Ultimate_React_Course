@@ -1,8 +1,4 @@
-import { useQuizContext } from '../contexts/QuizContext';
-
-function Options() {
-  const { questions, questionIndex, dispatch, answer } = useQuizContext();
-  const question = questions[questionIndex];
+function Options({ question, dispatch, answer }) {
   //variable to denote whether an answer has been clicked on
   const hasAnswered = answer !== null;
   //in the styles of the button we check for an answer and if it's incorrect we
