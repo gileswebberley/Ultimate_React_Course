@@ -16,7 +16,7 @@ import { useUrlPosition } from '../hooks/useUrlPosition';
 
 function Map() {
   //now we have a map we'll get the cities list in so we can place the markers
-  const { cities, currentCity } = useCitiesContext();
+  const { cities } = useCitiesContext();
   //Let's use our custom hook to grab the position from the url
   const [lat, lng] = useUrlPosition();
   //Now create a position array for use in the Leaflet map

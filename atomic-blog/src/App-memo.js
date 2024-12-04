@@ -25,7 +25,7 @@ function App() {
         )
       : posts;
 
-  //because we are passing this to the memoised Archive component we memoise this too
+  //because we are passing this to the memoised Archive component we memoise this too so as to avoid the re-render whenever state changes in App
   const handleAddPost = useCallback(function handleAddPost(post) {
     setPosts((posts) => [post, ...posts]);
   }, []); //as useState setter functions are auto-memoised no need to put it in the dependecy array

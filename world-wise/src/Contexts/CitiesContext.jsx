@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useReducer } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+} from 'react';
 
 const BASE_URL = 'http://localhost:8001';
 
@@ -86,21 +92,25 @@ function CitiesContextProvider({ children }) {
     fetchCities();
   }, []);
 
-  //rather than search through the cities data we are practising getting further details from the server pertaining to a particular city
-  async function getCity(id) {
-    if (currentCity.id === id) return;
-    dispatch({ type: ActionTypes.LOADING });
-    try {
-      const res = await fetch(`${BASE_URL}/cities/${id}`);
-      const data = await res.json();
-      dispatch({ type: ActionTypes.CITY_SELECTED, payload: data });
-    } catch (err) {
-      dispatch({
-        type: ActionTypes.REJECTED,
-        payload: `Error getting city with id ${id}: ${err.message}`,
-      });
-    }
-  }
+  //rather than search through the cities data we are practising getting further details from the server pertaining to a particular city.
+  //See the City component for the description of why this is wrapped in the useCallback hook
+  const getCity = useCallback(
+    async function getCity(id) {
+      if (currentCity.id === id) return;
+      dispatch({ type: ActionTypes.LOADING });
+      try {
+        const res = await fetch(`${BASE_URL}/cities/${id}`);
+        const data = await res.json();
+        dispatch({ type: ActionTypes.CITY_SELECTED, payload: data });
+      } catch (err) {
+        dispatch({
+          type: ActionTypes.REJECTED,
+          payload: `Error getting city with id ${id}: ${err.message}`,
+        });
+      }
+    },
+    [currentCity.id]
+  );
 
   //keeping with the basic idea that this context centralises the responsibilty for the city data we keep all the logic associated with the data in here - this adds a new city to our data
   async function createCity(newCity) {
