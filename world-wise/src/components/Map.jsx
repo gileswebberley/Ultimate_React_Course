@@ -21,15 +21,20 @@ function Map() {
   const [lat, lng] = useUrlPosition();
   //Now create a position array for use in the Leaflet map
   const [mapPosition, setMapPosition] = useState([30, 10]);
-  //So that the current position functionality can be implmented with the MoveToCurrentLocation component down below
+  //Move to geo-located position, or currently selected city when loading using the MoveToCurrentLocation component down below - true if in City view, false if in CityList view which controls the small zoom behaviour when moving between them
   const [mapLoaded, setMapLoaded] = useState(false);
+  //Functionality to go to geo-located position
+  const [goToGeoPosition, setGoToGeoPosition] = useState(false);
 
   //When position is defined in the url path we keep it stored until it changes, that way when we go back to the cities view it remains in it's selected position
   useEffect(
     function () {
       if (lat && lng) {
         setMapPosition([lat, lng]);
-        if (!mapLoaded) setMapLoaded(true);
+        setMapLoaded(true);
+        setGoToGeoPosition(false);
+      } else {
+        setMapLoaded(false);
       }
     },
     [lat, lng, mapLoaded]
@@ -37,17 +42,19 @@ function Map() {
 
   return (
     <div className={styles.mapContainer}>
-      {/* With the current location component implemented this button will take you home when on the cities page ie when no lat/lng are defined */}
-      {!lat && !lng && (
-        <Button
-          type="position"
-          onClick={(e) => {
-            setMapLoaded((ml) => (ml = false));
-          }}
-        >
-          𖦏
-        </Button>
-      )}
+      {' '}
+      {/* With the current location component implemented this button will take you home when on the cities page ie when no lat/lng are defined
+      TODO - make this work
+      */}
+      <Button
+        type="position"
+        onClick={(e) => {
+          setMapLoaded(true);
+          setGoToGeoPosition(true);
+        }}
+      >
+        𖦏
+      </Button>
       {/* The React-Leaflet main component, useMap etc are available to any child components such as our custom CentreMap etc */}
       <MapContainer
         center={mapPosition}
@@ -77,18 +84,48 @@ function Map() {
         <CentreMap position={mapPosition} />
         <DetectClickPosition />
         {
-          //to make map move to your current location on load as the load event does not fire in react-leaflet
-          !mapLoaded && <MoveToCurrentLocation />
+          //to make map move to your current location or selected city on load as the load event does not fire in react-leaflet
+          !mapLoaded && !goToGeoPosition && <MoveToCurrentLocation />
         }
+        {goToGeoPosition && <MoveHome />}
       </MapContainer>
     </div>
   );
 }
 
+//Small component for moving to your current location when the button is pressed
+function MoveHome() {
+  const map = useMap();
+  //function of leaflet that uses geolocation data
+  map.locate();
+  useMapEvents({
+    //event fires when location data is retrieved
+    locationfound: (location) => {
+      map.flyTo(location.latlng, 14);
+    },
+  });
+}
+//a little experiment to get the map to centre on current location when it opens and to zoom out a bit when you go back from City view to CityList
+function MoveToCurrentLocation() {
+  //check we don't have a currentCity selected and if not go to current location on load
+  const { currentCity } = useCitiesContext();
+  //get a reference to the current leaflet map instance
+  const map = useMap();
+  //function of leaflet that uses geolocation data
+  map.locate();
+  useMapEvents({
+    //event fires when location data is retrieved
+    locationfound: (location) => {
+      if (!currentCity.position) map.flyTo(location.latlng, 14);
+      else map.flyTo([currentCity.position.lat, currentCity.position.lng], 10);
+    },
+  });
+}
+
 //We use this component to change the position of the map when the mapPosition changes
 function CentreMap({ position }) {
   const ourMap = useMap();
-  ourMap.flyTo(position, 10);
+  ourMap.flyTo(position, 14);
   return null;
 }
 
@@ -104,23 +141,6 @@ function DetectClickPosition() {
   });
 
   return null;
-}
-
-//a little experiment to get the map to centre on current location when it opens
-function MoveToCurrentLocation() {
-  //check we don't have a currentCity selected and if not go to current location
-  const { currentCity } = useCitiesContext();
-  //get a reference to the current leaflet map instance
-  const map = useMap();
-  //function of leaflet that uses geolocation data
-  map.locate();
-  useMapEvents({
-    //event fires when location data is retrieved
-    locationfound: (location) => {
-      if (!currentCity.position) map.flyTo(location.latlng, 14);
-      else map.flyTo([currentCity.position.lat, currentCity.position.lng], 14);
-    },
-  });
 }
 
 export default Map;

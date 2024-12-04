@@ -22,17 +22,17 @@ const initialState = {
 function reducer(state, action) {
   switch (action.type) {
     //first off we're going to look after our event handlers using Redux-style names
-    case 'loading':
+    case ActionTypes.LOADING:
       return { ...state, isLoading: true };
 
-    case 'rejected':
-      console.log(action.payload);
+    case ActionTypes.REJECTED:
+      console.error(action.payload);
       return { ...state, error: action.payload, isLoading: false };
 
-    case 'cities/loaded':
+    case ActionTypes.CITIES_LOADED:
       return { ...state, isLoading: false, cities: action.payload };
 
-    case 'city/created':
+    case ActionTypes.CITY_CREATED:
       return {
         ...state,
         cities: [...state.cities, action.payload],
@@ -40,7 +40,7 @@ function reducer(state, action) {
         isLoading: false,
       };
 
-    case 'city/deleted':
+    case ActionTypes.CITY_DELETED:
       return {
         ...state,
         cities: state.cities.filter((city) => city.id !== action.payload),
@@ -48,7 +48,7 @@ function reducer(state, action) {
         currentCity: {},
       };
 
-    case 'city/selected':
+    case ActionTypes.CITY_SELECTED:
       return { ...state, currentCity: action.payload, isLoading: false };
 
     default:
@@ -77,7 +77,7 @@ function CitiesContextProvider({ children }) {
   //on initialisation we have the hook to grab the cities data from the server (json-server in this case)
   useEffect(function () {
     async function fetchCities() {
-      dispatch({ type: 'loading' });
+      dispatch({ type: ActionTypes.LOADING });
       try {
         const res = await fetch(`${BASE_URL}/cities`);
         const data = await res.json();
@@ -155,9 +155,9 @@ function CitiesContextProvider({ children }) {
       value={{
         cities,
         currentCity,
-        getCity,
         isLoading,
         error,
+        getCity,
         createCity,
         deleteCity,
       }}

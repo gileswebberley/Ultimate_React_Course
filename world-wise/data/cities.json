@@ -37,30 +37,6 @@
       }
     },
     {
-      "id": "l98ED3Zi6ijrOlLchUmTh",
-      "cityName": "Wallasey (Liverpool)",
-      "country": "GB",
-      "emoji": "🇬🇧",
-      "date": "2022-05-10T18:12:37.000Z",
-      "notes": "Moved into our home",
-      "position": {
-        "lat": 53.413113107235944,
-        "lng": -3.0340290069580083
-      }
-    },
-    {
-      "id": "sG4b3rcDelCB2sUYVaMi6",
-      "cityName": "Manchester",
-      "country": "GB",
-      "emoji": "🇬🇧",
-      "date": "2024-11-08T19:16:50.000Z",
-      "notes": "Often visited",
-      "position": {
-        "lat": 53.47578733864619,
-        "lng": -2.2384643554687504
-      }
-    },
-    {
       "id": "FAkyeiR54gihI8dY_-NZU",
       "cityName": "Aberdeen",
       "country": "GB",
@@ -71,6 +47,18 @@
         "lat": 57.14443569017366,
         "lng": -2.1011352539062504
       }
+    },
+    {
+      "cityName": "Wallasey (Liverpool)",
+      "country": "GB",
+      "emoji": "🇬🇧",
+      "date": "2022-05-10T16:41:24.000Z",
+      "notes": "Our new home",
+      "position": {
+        "lat": 53.413995584271696,
+        "lng": -3.031303882598877
+      },
+      "id": "lg8y6utM_k9T_5Q35RQ-T"
     }
   ]
 }
