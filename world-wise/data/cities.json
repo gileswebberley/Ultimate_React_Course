@@ -59,6 +59,18 @@
         "lng": -3.031303882598877
       },
       "id": "lg8y6utM_k9T_5Q35RQ-T"
+    },
+    {
+      "cityName": "Bristol",
+      "country": "GB",
+      "emoji": "🇬🇧",
+      "date": "2015-01-10T14:56:13.000Z",
+      "notes": "Home for years",
+      "position": {
+        "lat": 51.479111100486165,
+        "lng": -2.577452659606934
+      },
+      "id": "yGeoNDCYYR4RUjxJW4muW"
     }
   ]
 }

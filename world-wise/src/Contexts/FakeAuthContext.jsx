@@ -2,19 +2,27 @@ import { createContext, useContext, useReducer } from 'react';
 
 //Never do this in a production environment, just for learning
 const FAKE_USER = {
-  name: 'Jack',
-  email: 'jack@example.com',
+  name: 'Giles',
+  email: 'giles@example.com',
   password: 'qwerty',
   avatar: 'https://i.pravatar.cc/100?u=zz',
 };
 
-//boilerplate step 1
+//boilerplate context step 1
 const AuthContext = createContext();
 
+//set up reducer
 const initialState = {
   user: null,
   isAuthenticated: false,
   error: '',
+};
+
+//I'm going to create a fake enum for the action types to avoid string problems and enable auto-complete
+const ActionTypes = {
+  LOGIN: 'login',
+  LOGOUT: 'logout',
+  ERROR: 'login/error',
 };
 
 function reducer(state, action) {
@@ -38,19 +46,13 @@ function reducer(state, action) {
   }
 }
 
-//I'm going to create a fake enum for the action types to avoid string problems and enable auto-complete
-const ActionTypes = {
-  LOGIN: 'login',
-  LOGOUT: 'logout',
-  ERROR: 'login/error',
-};
-
 //boilerplate step 2
 function AuthProvider({ children }) {
   const [{ user, isAuthenticated, error }, dispatch] = useReducer(
     reducer,
     initialState
   );
+
   function login(email, password) {
     //typically we would have an api call here
     if (email === FAKE_USER.email && password === FAKE_USER.password) {

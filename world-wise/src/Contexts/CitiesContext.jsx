@@ -19,6 +19,16 @@ const initialState = {
   error: '',
 };
 
+//I'm going to create a fake enum for the action types to avoid string problems and enable auto-complete
+const ActionTypes = {
+  LOADING: 'loading',
+  REJECTED: 'rejected',
+  CITIES_LOADED: 'cities/loaded',
+  CITY_CREATED: 'city/created',
+  CITY_DELETED: 'city/deleted',
+  CITY_SELECTED: 'city/selected',
+};
+
 function reducer(state, action) {
   switch (action.type) {
     //first off we're going to look after our event handlers using Redux-style names
@@ -55,16 +65,6 @@ function reducer(state, action) {
       throw new RangeError('Undefined action type dispatched to CitiesContext');
   }
 }
-
-//I'm going to create a fake enum for the action types to avoid string problems and enable auto-complete
-const ActionTypes = {
-  LOADING: 'loading',
-  REJECTED: 'rejected',
-  CITIES_LOADED: 'cities/loaded',
-  CITY_CREATED: 'city/created',
-  CITY_DELETED: 'city/deleted',
-  CITY_SELECTED: 'city/selected',
-};
 
 //part 2 is to create the state and functionalities that the context will provide to any of it's children components
 //the main role of this context is to keep the cities data centralised and available to various components without the need for prop drilling

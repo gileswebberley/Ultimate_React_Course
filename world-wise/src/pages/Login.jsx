@@ -7,7 +7,7 @@ import Button from '../components/Button';
 
 export default function Login() {
   // PRE-FILL FOR DEV PURPOSES
-  const [email, setEmail] = useState('jack@example.com');
+  const [email, setEmail] = useState('giles@example.com');
   const [password, setPassword] = useState('qwerty');
   const { login, isAuthenticated, error } = useAuthContext();
   const navigate = useNavigate();
@@ -22,6 +22,7 @@ export default function Login() {
 
   function handleLogin(e) {
     e.preventDefault();
+    //this changes the isAuthenticated state inside FakeAuthContext and so will execute the useEffect and forward us to the app if legitimate
     if (email && password) login(email, password);
   }
 
@@ -52,7 +53,10 @@ export default function Login() {
         <div>
           <Button type="primary">Login</Button>
         </div>
-        {error && <span className={styles.error}>{error}</span>}
+        {
+          //if the login fails then an error message is produced
+          error && <span className={styles.error}>{error}</span>
+        }
       </form>
     </main>
   );
