@@ -1,4 +1,7 @@
-function ToggleSounds({ allowSound, setAllowSound }) {
+import { useSoundContext } from './contexts/SoundContext';
+
+function ToggleSounds() {
+  const { allowSound, setAllowSound } = useSoundContext();
   return (
     <button
       className="btn-sound"

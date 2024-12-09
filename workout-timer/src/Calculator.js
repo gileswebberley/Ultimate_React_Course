@@ -1,22 +1,21 @@
-import { useEffect, useState } from 'react';
-import clickSound from './ClickSound.m4a';
-import { useTimeContext } from './TimeContext';
+import { useState } from 'react';
+import Countdown from './Countdown';
 
-function Calculator({ workouts, allowSound, children }) {
+function Calculator({ workouts }) {
+  //index of workout selected
   const [number, setNumber] = useState(0);
   const [sets, setSets] = useState(3);
   const [speed, setSpeed] = useState(90);
   const [durationBreak, setDurationBreak] = useState(5);
   //store how many minutes have been added/subtracted
   const [durationAdaptation, setDurationAdaptation] = useState(0);
-  const { setWorkoutDuration } = useTimeContext();
 
+  //recalculate duration when one of the time states changes
   let duration =
     (workouts.at(number).numExercises * sets * speed) / 60 +
     (sets - 1) * durationBreak;
 
-  console.log(`duration: ${duration}`);
-
+  //apply durationAdaptation if possible
   if (durationAdaptation < 0 && Math.abs(durationAdaptation) <= duration) {
     duration = duration + durationAdaptation;
   } else if (durationAdaptation > 0) {
@@ -24,16 +23,6 @@ function Calculator({ workouts, allowSound, children }) {
   } else if (durationAdaptation !== 0) {
     duration = 0;
   }
-
-  useEffect(() => {
-    setWorkoutDuration(duration);
-  }, [duration, setWorkoutDuration]);
-
-  // const playSound = function () {
-  //   if (!allowSound) return;
-  //   const sound = new Audio(clickSound);
-  //   sound.play();
-  // };
 
   return (
     <>
@@ -104,7 +93,7 @@ function Calculator({ workouts, allowSound, children }) {
         >
           –
         </button>
-        {children}
+        <Countdown workoutDuration={duration} />
         <button
           onClick={() => {
             setDurationAdaptation(
@@ -118,5 +107,4 @@ function Calculator({ workouts, allowSound, children }) {
     </>
   );
 }
-
 export default Calculator;

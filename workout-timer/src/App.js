@@ -1,13 +1,13 @@
-import { memo, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Calculator from './Calculator';
 import ToggleSounds from './ToggleSounds';
-import { useTimeContext } from './TimeContext';
 import Timer from './Timer';
 import Countdown from './Countdown';
+import { startTime } from './scripts/timeUtility';
+import { SoundContextProvider } from './contexts/SoundContext';
 
 function App() {
   const [allowSound, setAllowSound] = useState(true);
-  const { startTime } = useTimeContext();
 
   // Will be be AM or PM
   const partOfDay = startTime.slice(-2);
@@ -42,12 +42,12 @@ function App() {
     <main>
       <h1>Workout timer</h1>
       <Timer />
-      <ToggleSounds allowSound={allowSound} setAllowSound={setAllowSound} />
-      <Calculator workouts={workouts} allowSound={allowSound}>
-        <Countdown allowSound={allowSound} />
-      </Calculator>
+      <SoundContextProvider>
+        <ToggleSounds />
+        <Calculator workouts={workouts} />
+      </SoundContextProvider>
     </main>
   );
 }
 
-export default memo(App);
+export default App;
