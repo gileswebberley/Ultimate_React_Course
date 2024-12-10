@@ -1,48 +1,21 @@
 //legacy thing because it is old fashioned, now use redux toolkit
-import { legacy_createStore as createStore } from 'redux';
-
+import { combineReducers, legacy_createStore as createStore } from 'redux';
+import accountReducer from './features/accounts/accountSlice';
+import customerReducer from './features/customers/customerSlice';
 //introduction to Redux
-const initialState = {
-  balance: 0,
-  loan: 0,
-  loanPurpose: '',
-};
-
-function reducer(state = initialState, action) {
-  switch (action.type) {
-    //action names should be it's domain then model what has or is happening
-    case 'account/deposit':
-      return { ...state, balance: state.balance + action.payload };
-
-    case 'account/withdraw':
-      return { ...state, balance: state.balance - action.payload };
-
-    case 'account/requestLoan':
-      if (state.loan > 0) return state;
-      return {
-        ...state,
-        loan: action.payload.amount,
-        loanPurpose: action.payload.purpose,
-        balance: state.balance + action.payload.amount,
-      };
-
-    case 'account/payLoan':
-      return {
-        ...state,
-        loan: initialState.loan,
-        loanPurpose: initialState.loanPurpose,
-        balance: state.balance - state.loan,
-      };
-
-    default:
-      //in Redux it's recommended that you do not throw an error
-      console.log('store reducer called with undefined action type');
-      return state;
-  }
-}
 
 //Now use the Redux functionality (npm i redux)
-const store = createStore(reducer);
+//const store = createStore(accountReducer);
+
+//now we have two reducer functions, and indeed two state contexts, we use redux to produce a root reducer which we can pass to our store
+const rootReducer = combineReducers({
+  account: accountReducer,
+  customer: customerReducer,
+});
+
+const store = createStore(rootReducer);
+
+export default store;
 
 //now we can use dispatch just like in useReducer on the store object, we also have getState()
 //just as a few examples we import this file into index.js
@@ -50,16 +23,11 @@ const store = createStore(reducer);
 //   type: 'account/requestLoan',
 //   payload: { amount: 1000, purpose: 'For fun things' },
 // });
-store.dispatch({ type: 'account/deposit', payload: 400 });
-console.log(store.getState());
+// store.dispatch({ type: 'account/deposit', payload: 400 });
+// console.log(store.getState());
 
-//a useful convention is to use action creators, an example for the loan -
-function requestLoan(amount, purpose) {
-  return {
-    type: 'account/requestLoan',
-    payload: { amount, purpose },
-  };
-}
+// store.dispatch(requestLoan(1000, 'Test'));
+// console.log(store.getState());
 
-store.dispatch(requestLoan(1000, 'Test'));
-console.log(store.getState());
+// store.dispatch(createCustomer('Giles Webberley', '123456'));
+// console.log(store.getState());
