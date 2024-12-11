@@ -1,27 +1,16 @@
-//legacy thing because it is old fashioned, now use redux toolkit
-import {
-  applyMiddleware,
-  combineReducers,
-  legacy_createStore as createStore,
-} from 'redux';
-//implement the middleware for asyncronous state changing (with Thunk)
-import { thunk } from 'redux-thunk';
-//get our redux devtools chrome extension working
-import { composeWithDevTools } from 'redux-devtools-extension';
+//replace the createStore with the new RTK alternative that automatically sets up Thunk and DevTools and also wraps the createStore
+import { configureStore } from '@reduxjs/toolkit';
 
 import accountReducer from './features/accounts/accountSlice';
 import customerReducer from './features/customers/customerSlice';
 
-//now we have two reducer functions, and indeed two state contexts, we use redux to produce a root reducer which we can pass to our store
-const rootReducer = combineReducers({
-  account: accountReducer,
-  customer: customerReducer,
+//Now with the RTK we set up our store like so
+const store = configureStore({
+  reducer: {
+    account: accountReducer,
+    customer: customerReducer,
+  },
 });
-
-//here we are implementing Thunk and DevTools with the additional argument
-const store = createStore(
-  rootReducer,
-  composeWithDevTools(applyMiddleware(thunk))
-);
+//this leads to it all working as before even with the old style other parts of the process
 
 export default store;
