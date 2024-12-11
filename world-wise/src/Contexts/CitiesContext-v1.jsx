@@ -17,7 +17,7 @@ function CitiesContextProvider({ children }) {
         const data = await res.json();
         setCities(data);
       } catch (err) {
-        console.log('Error loading cities data: ' + err.message);
+        console.error('Error loading cities data: ' + err.message);
       } finally {
         setIsLoading(false);
       }
@@ -33,7 +33,7 @@ function CitiesContextProvider({ children }) {
       const data = await res.json();
       setCurrentCity(data);
     } catch (err) {
-      console.log('Error loading cities data: ' + err.message);
+      console.error('Error loading cities data: ' + err.message);
     } finally {
       setIsLoading(false);
     }
@@ -49,12 +49,13 @@ function CitiesContextProvider({ children }) {
           'Content-Type': 'application/json',
         },
       });
-      const data = await res.json();
-      console.log(`new city: ${data}`);
+      //const data = await res.json();
+      //console.log(`new city: ${data}`);
     } catch (err) {
-      console.log('Error saving cities data: ' + err.message);
+      console.error('Error saving cities data: ' + err.message);
     } finally {
       setIsLoading(false);
+      //just to keep the cities synced with the DB
       setCities((cities) => [newCity, ...cities]);
     }
   }
@@ -66,7 +67,7 @@ function CitiesContextProvider({ children }) {
         method: 'DELETE',
       });
     } catch (err) {
-      console.log('Error deleting cities data: ' + err.message);
+      console.error('Error deleting cities data: ' + err.message);
     } finally {
       setIsLoading(false);
       setCities((cities) => cities.filter((city) => city.id !== id));

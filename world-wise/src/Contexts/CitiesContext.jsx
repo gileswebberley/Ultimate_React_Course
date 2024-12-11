@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useReducer } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+} from 'react';
 
 const BASE_URL = 'http://localhost:8001';
 
@@ -13,43 +19,6 @@ const initialState = {
   error: '',
 };
 
-function reducer(state, action) {
-  switch (action.type) {
-    //first off we're going to look after our event handlers using Redux-style names
-    case 'loading':
-      return { ...state, isLoading: true };
-
-    case 'rejected':
-      console.log(action.payload);
-      return { ...state, error: action.payload, isLoading: false };
-
-    case 'cities/loaded':
-      return { ...state, isLoading: false, cities: action.payload };
-
-    case 'city/created':
-      return {
-        ...state,
-        cities: [...state.cities, action.payload],
-        currentCity: action.payload,
-        isLoading: false,
-      };
-
-    case 'city/deleted':
-      return {
-        ...state,
-        cities: state.cities.filter((city) => city.id !== action.payload),
-        isLoading: false,
-        currentCity: {},
-      };
-
-    case 'city/selected':
-      return { ...state, currentCity: action.payload, isLoading: false };
-
-    default:
-      throw new RangeError('Undefined action type dispatched to CitiesContext');
-  }
-}
-
 //I'm going to create a fake enum for the action types to avoid string problems and enable auto-complete
 const ActionTypes = {
   LOADING: 'loading',
@@ -59,6 +28,43 @@ const ActionTypes = {
   CITY_DELETED: 'city/deleted',
   CITY_SELECTED: 'city/selected',
 };
+
+function reducer(state, action) {
+  switch (action.type) {
+    //first off we're going to look after our event handlers using Redux-style names
+    case ActionTypes.LOADING:
+      return { ...state, isLoading: true };
+
+    case ActionTypes.REJECTED:
+      console.error(action.payload);
+      return { ...state, error: action.payload, isLoading: false };
+
+    case ActionTypes.CITIES_LOADED:
+      return { ...state, isLoading: false, cities: action.payload };
+
+    case ActionTypes.CITY_CREATED:
+      return {
+        ...state,
+        cities: [...state.cities, action.payload],
+        currentCity: action.payload,
+        isLoading: false,
+      };
+
+    case ActionTypes.CITY_DELETED:
+      return {
+        ...state,
+        cities: state.cities.filter((city) => city.id !== action.payload),
+        isLoading: false,
+        currentCity: {},
+      };
+
+    case ActionTypes.CITY_SELECTED:
+      return { ...state, currentCity: action.payload, isLoading: false };
+
+    default:
+      throw new RangeError('Undefined action type dispatched to CitiesContext');
+  }
+}
 
 //part 2 is to create the state and functionalities that the context will provide to any of it's children components
 //the main role of this context is to keep the cities data centralised and available to various components without the need for prop drilling
@@ -71,7 +77,7 @@ function CitiesContextProvider({ children }) {
   //on initialisation we have the hook to grab the cities data from the server (json-server in this case)
   useEffect(function () {
     async function fetchCities() {
-      dispatch({ type: 'loading' });
+      dispatch({ type: ActionTypes.LOADING });
       try {
         const res = await fetch(`${BASE_URL}/cities`);
         const data = await res.json();
@@ -86,21 +92,25 @@ function CitiesContextProvider({ children }) {
     fetchCities();
   }, []);
 
-  //rather than search through the cities data we are practising getting further details from the server pertaining to a particular city
-  async function getCity(id) {
-    if (currentCity.id === id) return;
-    dispatch({ type: ActionTypes.LOADING });
-    try {
-      const res = await fetch(`${BASE_URL}/cities/${id}`);
-      const data = await res.json();
-      dispatch({ type: ActionTypes.CITY_SELECTED, payload: data });
-    } catch (err) {
-      dispatch({
-        type: ActionTypes.REJECTED,
-        payload: `Error getting city with id ${id}: ${err.message}`,
-      });
-    }
-  }
+  //rather than search through the cities data we are practising getting further details from the server pertaining to a particular city.
+  //See the City component for the description of why this is wrapped in the useCallback hook
+  const getCity = useCallback(
+    async function getCity(id) {
+      if (currentCity.id === id) return;
+      dispatch({ type: ActionTypes.LOADING });
+      try {
+        const res = await fetch(`${BASE_URL}/cities/${id}`);
+        const data = await res.json();
+        dispatch({ type: ActionTypes.CITY_SELECTED, payload: data });
+      } catch (err) {
+        dispatch({
+          type: ActionTypes.REJECTED,
+          payload: `Error getting city with id ${id}: ${err.message}`,
+        });
+      }
+    },
+    [currentCity.id]
+  );
 
   //keeping with the basic idea that this context centralises the responsibilty for the city data we keep all the logic associated with the data in here - this adds a new city to our data
   async function createCity(newCity) {
@@ -145,9 +155,9 @@ function CitiesContextProvider({ children }) {
       value={{
         cities,
         currentCity,
-        getCity,
         isLoading,
         error,
+        getCity,
         createCity,
         deleteCity,
       }}
