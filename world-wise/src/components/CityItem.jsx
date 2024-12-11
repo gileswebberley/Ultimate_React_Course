@@ -18,7 +18,6 @@ function CityItem({ city }) {
         `Are you sure that you want to delete ${cityName} from your list?`
       )
     ) {
-      console.log('Delete city');
       deleteCity(id);
     }
   }

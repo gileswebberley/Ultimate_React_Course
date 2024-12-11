@@ -25,8 +25,9 @@ function City() {
       //we have made all of the ids into strings which may be because of this as params are always strings
       if (currentCity.id !== id) getCity(id);
     },
-    //The tutorial told us not to include getCity in the dependency array
-    [id, currentCity]
+    /* The tutorial told us not to include getCity in the dependency array because without the if statement it would cause an infinite loop of re-renders.
+    This is because getCity calls dispatch() within it's body which changes the state of the CitiesContext and causes it to re-render, which of course causes the getCity function to be recreated, which is a change to this component's state and so causes this component to re-render and so it goes on. This is an occasion to use the useCallback hook to wrap the getCity function */
+    [id, currentCity, getCity]
   );
 
   if (isLoading) return <Spinner />;
