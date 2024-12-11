@@ -35,6 +35,7 @@ const accountSlice = createSlice({
     //here we want our action creator to recieve more than one argument and so we must use the prepare method
     requestLoan: {
       prepare(amount, purpose) {
+        //if you wanted to create any extra arguments to be passed on here is the place - for example in customerSlice we have the created date (which should not be done in the reducer/action creator itself)
         return { payload: { amount, purpose } };
       },
 
