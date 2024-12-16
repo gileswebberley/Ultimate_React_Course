@@ -12,19 +12,19 @@ function SearchOrder() {
     setQuery("");
   }
   return (
-    <form onSubmit={handleQuery} className="space-x-3">
+    <form onSubmit={handleQuery} className="space-y-2">
       <input
-        placeholder="Search for order by id"
+        placeholder="Search order #"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="px-2"
+        className="w-28 rounded-lg bg-amber-200 px-2 py-1 text-amber-900 transition-all duration-300 placeholder:text-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-900 sm:w-32 sm:focus:w-36"
       />
-      <button
+      {/* <button
         type="submit"
         className="rounded-md border-2 border-amber-700 px-2"
       >
         Find Order
-      </button>
+      </button> */}
     </form>
   );
 }

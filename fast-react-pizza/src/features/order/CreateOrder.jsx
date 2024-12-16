@@ -1,31 +1,31 @@
-import { useState } from 'react';
-import { Form, redirect, useActionData, useNavigation } from 'react-router-dom';
-import { createOrder } from '../../services/apiRestaurant';
+import { useState } from "react";
+import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
+import { createOrder } from "../../services/apiRestaurant";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
   /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(
-    str
+    str,
   );
 
 const fakeCart = [
   {
     pizzaId: 12,
-    name: 'Mediterranean',
+    name: "Mediterranean",
     quantity: 2,
     unitPrice: 16,
     totalPrice: 32,
   },
   {
     pizzaId: 6,
-    name: 'Vegetale',
+    name: "Vegetale",
     quantity: 1,
     unitPrice: 13,
     totalPrice: 13,
   },
   {
     pizzaId: 11,
-    name: 'Spinach and Mushroom',
+    name: "Spinach and Mushroom",
     quantity: 1,
     unitPrice: 15,
     totalPrice: 15,
@@ -37,7 +37,7 @@ function CreateOrder() {
   const cart = fakeCart;
 
   const nav = useNavigation();
-  const isSubmitting = nav.state === 'submitting';
+  const isSubmitting = nav.state === "submitting";
 
   //grab the errors object that might have been created by our action function
   const formErrors = useActionData(); //see the phone field for usage
@@ -51,13 +51,15 @@ function CreateOrder() {
       <Form method="POST">
         <div>
           <label>First Name</label>
-          <input type="text" name="customer" required />
+          <div>
+            <input type="text" name="customer" className="input" required />
+          </div>
         </div>
 
         <div>
           <label>Phone number</label>
           <div>
-            <input type="tel" name="phone" required />
+            <input type="tel" name="phone" className="input" required />
           </div>
           {formErrors?.phone && <p>{formErrors.phone}</p>}
         </div>
@@ -65,7 +67,7 @@ function CreateOrder() {
         <div>
           <label>Address</label>
           <div>
-            <input type="text" name="address" required />
+            <input type="text" name="address" className="input" required />
           </div>
         </div>
 
@@ -83,8 +85,11 @@ function CreateOrder() {
         <div>
           {/* Remember the old way of passing extra data as a string within an html form, well you can still do that within Form so that it get's passed to the action (although this is very insecure!!) */}
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <button disabled={isSubmitting}>
-            {isSubmitting ? 'Placing Order' : 'Order now'}
+          <button
+            disabled={isSubmitting}
+            className="mt-3 inline-block rounded-full bg-amber-500 px-3 py-2 font-bold uppercase tracking-wide text-stone-600 transition-colors duration-200 hover:bg-amber-400 focus:outline-none focus:ring focus:ring-amber-700 focus:ring-offset-1 disabled:cursor-wait"
+          >
+            {isSubmitting ? "Placing Order" : "Order now"}
           </button>
         </div>
       </Form>
@@ -105,7 +110,7 @@ export async function action({ request }) {
   const order = {
     ...data,
     cart: JSON.parse(data.cart),
-    priority: data.priority === 'on',
+    priority: data.priority === "on",
   };
   //console.log(order);
 
@@ -113,7 +118,7 @@ export async function action({ request }) {
   const errors = {};
   if (!isValidPhone(order.phone))
     errors.phone =
-      'Please provide a valid phone number as we may need to contact you';
+      "Please provide a valid phone number as we may need to contact you";
 
   //easy way to check if an object is empty
   if (Object.keys(errors).length > 0) return errors;
