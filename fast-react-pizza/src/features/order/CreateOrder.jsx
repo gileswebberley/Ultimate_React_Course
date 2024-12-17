@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
+import Button from "../../ui/Button";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -85,12 +86,9 @@ function CreateOrder() {
         <div>
           {/* Remember the old way of passing extra data as a string within an html form, well you can still do that within Form so that it get's passed to the action (although this is very insecure!!) */}
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <button
-            disabled={isSubmitting}
-            className="mt-3 inline-block rounded-full bg-amber-500 px-3 py-2 font-bold uppercase tracking-wide text-stone-600 transition-colors duration-200 hover:bg-amber-400 focus:outline-none focus:ring focus:ring-amber-700 focus:ring-offset-1 disabled:cursor-wait"
-          >
+          <Button disabled={isSubmitting}>
             {isSubmitting ? "Placing Order" : "Order now"}
-          </button>
+          </Button>
         </div>
       </Form>
     </div>

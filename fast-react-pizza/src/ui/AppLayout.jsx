@@ -11,10 +11,10 @@ function AppLayout() {
   const isLoading = navigation.state === "loading";
   return (
     <div className="grid h-svh grid-rows-[auto_1fr_auto]">
+      {isLoading && <LoaderScreen />}
       <Header />
       <div className="no-scrollbar overflow-y-auto">
         <main className="mx-auto max-w-max">
-          {isLoading && <LoaderScreen />}
           <Outlet />
         </main>
       </div>

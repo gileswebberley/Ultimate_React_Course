@@ -10,7 +10,7 @@ function Home() {
         <br />
         <span className="text-amber-600">
           Out of the oven
-          <br /> and straight to you.
+          <br /> and straight to you
         </span>
       </h1>
 

@@ -1,4 +1,5 @@
-import { useNavigate, useRouteError } from 'react-router-dom';
+import { useNavigate, useRouteError } from "react-router-dom";
+import SimpleLink from "./SimpleLink";
 
 function Error() {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ function Error() {
     <div>
       <h1>Something went wrong 😢</h1>
       <p>{err.message || err.data}</p>
-      <button onClick={() => navigate(-1)}>&larr; Go back</button>
+      <SimpleLink to="-1">&larr; Go back</SimpleLink>
     </div>
   );
 }
