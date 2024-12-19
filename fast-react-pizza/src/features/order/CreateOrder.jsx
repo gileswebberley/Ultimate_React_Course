@@ -43,44 +43,61 @@ function CreateOrder() {
   //grab the errors object that might have been created by our action function
   const formErrors = useActionData(); //see the phone field for usage
 
+  const inputLayout =
+    "mb-3 flex flex-col items-stretch justify-between gap-1 md:flex-row";
+
   return (
-    <div>
-      <h2>Ready to order? Let's go!</h2>
+    <div className="mx-3 pt-3">
+      <h2 className="mb-2 text-center text-2xl font-semibold text-stone-700">
+        Ready to order?
+        <br />
+        <span className="text-amber-600">Let's go!</span>
+      </h2>
       {/* To get the react router actions working for us we replace the form element with the Form component. method can be 'POST'/'PATCH'/'DELETE' but not 'GET'
       No need to set up all of the 'controlled elements' as all this info is sent to the action as the request object 
       As this form is not going through a js validation function we use the 'required' keyword which is equivalent to if(!customer) return; */}
       <Form method="POST">
-        <div>
+        <div className={inputLayout}>
           <label>First Name</label>
           <div>
-            <input type="text" name="customer" className="input" required />
+            <input
+              type="text"
+              name="customer"
+              className="input w-80"
+              required
+            />
           </div>
         </div>
 
-        <div>
+        <div className={inputLayout}>
           <label>Phone number</label>
           <div>
-            <input type="tel" name="phone" className="input" required />
+            <input type="tel" name="phone" className="input w-80" required />
+            {formErrors?.phone && (
+              <p className="mt-2 w-80 rounded-md bg-red-200 p-2 text-xs text-red-700">
+                {formErrors.phone}
+              </p>
+            )}
           </div>
-          {formErrors?.phone && <p>{formErrors.phone}</p>}
         </div>
 
-        <div>
+        <div className={inputLayout}>
           <label>Address</label>
           <div>
-            <input type="text" name="address" className="input" required />
+            <input type="text" name="address" className="input w-80" required />
           </div>
         </div>
 
-        <div>
+        <div className="mb-6 flex w-80 items-center gap-3 md:w-fit">
           <input
+            className="h-5 w-5 border-amber-200 accent-amber-300 ring-amber-600 focus:outline-none focus:ring-1"
             type="checkbox"
             name="priority"
             id="priority"
             // value={withPriority}
             // onChange={(e) => setWithPriority(e.target.checked)}
           />
-          <label htmlFor="priority">Want to yo give your order priority?</label>
+          <label htmlFor="priority">Want to give your order priority?</label>
         </div>
 
         <div>
@@ -125,6 +142,7 @@ export async function action({ request }) {
 
   //Now as we can't use any hooks in here we can't useNavigate but react router provides an alternative way - by returning a redirect function
   return redirect(`/order/${newOrder.id}`);
+  //return null;//for testing
 }
 
 export default CreateOrder;

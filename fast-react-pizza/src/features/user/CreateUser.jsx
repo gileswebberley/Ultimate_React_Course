@@ -11,7 +11,7 @@ function CreateUser() {
   return (
     <form onSubmit={handleSubmit}>
       <p className="pb-1 text-sm text-stone-700 md:text-base">
-        <span className="text-2xl font-bold">Welcome</span>
+        <span className="text-2xl font-bold text-stone-600">Welcome</span>
         <br />
         Please start by telling us your name
       </p>
@@ -25,7 +25,7 @@ function CreateUser() {
       />
 
       {username !== "" && (
-        <div>
+        <div className="mt-2">
           <Button>Start ordering</Button>
         </div>
       )}

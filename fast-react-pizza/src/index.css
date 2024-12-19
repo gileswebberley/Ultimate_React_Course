@@ -15,6 +15,23 @@ Simply add no-scrollbar to the className list
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+  /* A firefox style narrow scrollbar for chrome that appears when mouse over scrollable content */
+  .ff-scroll::-webkit-scrollbar {
+    width: 0px;
+  }
+  .ff-scroll:hover::-webkit-scrollbar {
+    width: 8px;
+  }
+  .ff-scroll::-webkit-scrollbar-track {
+    margin-block: 10px;
+  }
+
+  .ff-scroll::-webkit-scrollbar-thumb {
+    background: #959595;
+    background-clip: content-box;
+    border: 2px solid transparent;
+    border-radius: 10px;
+  }
 }
 
 /* To create global classes with tailwind we can do the following which we use by using the in the old school way - This should be the exeption and not the rule otherwise we may as well stick to the standard way
