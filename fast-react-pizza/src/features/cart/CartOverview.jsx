@@ -9,6 +9,8 @@ function CartOverview() {
   const numberOfPizzas = useSelector(getNumberOfPizzas);
   const totalCartPrice = useSelector(getTotalCartPrice);
 
+  //hide this overview when the cart is empty...no need, it's in the Footer
+
   return (
     <div className="flex items-center justify-between">
       <p className="space-x-2 font-semibold">

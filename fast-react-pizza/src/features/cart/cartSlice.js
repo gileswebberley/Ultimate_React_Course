@@ -72,10 +72,15 @@ export const {
 
 export default cartSlice.reducer;
 
-//Place all state related functionality in the slice definition
+//Place all state related functionality in the slice definition (check out the reselect library for a more efficient way to do this in larger projects)
 
 export const getNumberOfPizzas = (state) =>
   state.cart.cart.reduce((sum, item) => sum + item.quantity, 0);
 
 export const getTotalCartPrice = (state) =>
   state.cart.cart.reduce((sum, item) => sum + item.totalPrice, 0);
+
+export const getCart = (state) => state.cart.cart;
+
+export const getCurrentQuantityById = (id) => (state) =>
+  state.cart.cart.find((item) => item.pizzaId === id)?.quantity ?? 0;

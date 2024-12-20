@@ -1,10 +1,12 @@
-import { useDispatch } from "react-redux";
-import Button from "../../ui/Button";
+import { useDispatch, useSelector } from "react-redux";
 import { formatCurrency } from "../../utils/helpers";
-import { addToCart } from "../cart/cartSlice";
+import { addToCart, getCurrentQuantityById } from "../cart/cartSlice";
+import RemoveFromCart from "../cart/RemoveFromCart";
+import AddToCart from "../cart/AddToCart";
 
 function MenuItem({ pizza }) {
   const { id, name, unitPrice, ingredients, soldOut, imageUrl } = pizza;
+  const currentQuantity = useSelector(getCurrentQuantityById(id));
   const dispatch = useDispatch();
 
   function handleAddToCart() {
@@ -13,7 +15,7 @@ function MenuItem({ pizza }) {
       name,
       quantity: 1,
       unitPrice,
-      totalPrice: 1 * unitPrice,
+      totalPrice: unitPrice,
     };
     dispatch(addToCart(newItem));
   }
@@ -38,9 +40,19 @@ function MenuItem({ pizza }) {
             <p className="font-semibold uppercase opacity-70">Sold out</p>
           )}
           {!soldOut && (
-            <Button type="small" onClick={handleAddToCart}>
-              Add
-            </Button>
+            <div>
+              {currentQuantity > 0 ? (
+                <div className="flex flex-nowrap space-x-1">
+                  <RemoveFromCart pizzaId={id} quantity={currentQuantity}>
+                    &minus;
+                  </RemoveFromCart>
+                  <p>{currentQuantity}</p>
+                  <AddToCart pizza={pizza}>+</AddToCart>
+                </div>
+              ) : (
+                <AddToCart pizza={pizza}>Add</AddToCart>
+              )}
+            </div>
           )}
         </div>
       </div>
