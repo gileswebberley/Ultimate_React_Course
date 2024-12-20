@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Button from "../../ui/Button";
 import SimpleLink from "../../ui/SimpleLink";
 import CartItem from "./CartItem";
-import BackToMenu from "../../ui/BackToMenu";
+import { useSelector } from "react-redux";
 
 const fakeCart = [
   {
@@ -30,17 +30,18 @@ const fakeCart = [
 
 function Cart() {
   const cart = fakeCart;
+  const username = useSelector((state) => state.user.username);
 
   return (
     <div className="w-full min-w-72 px-4 py-2 md:w-96">
       {/* This is now programatically shown within AppLayout everywhere other than home or menu to avoid it affecting layout of individual pages
       <BackToMenu /> */}
 
-      <h2 className="mt-5 text-center text-2xl font-semibold">
-        Your cart, %NAME%
+      <h2 className="mt-5 text-balance text-center text-2xl font-semibold">
+        Cart for {username}
       </h2>
 
-      <ul className="divide-y divide-stone-500 p-2">
+      <ul className="mx-2 my-6 divide-y divide-stone-500 border-y border-stone-500">
         {cart.map((item, i) => (
           <CartItem item={item} key={i} />
         ))}

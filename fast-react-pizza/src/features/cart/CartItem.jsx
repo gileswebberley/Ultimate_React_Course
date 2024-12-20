@@ -5,7 +5,7 @@ function CartItem({ item }) {
   const { pizzaId, name, quantity, totalPrice } = item;
 
   return (
-    <li className="py-2">
+    <li className="px-2 pb-4 pt-2">
       <p className="text-lg font-semibold">
         {quantity} &times; {name}
       </p>

@@ -1,13 +1,19 @@
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-//First bit of Flexbox implementation with Tailwind
-const stylingP = "space-x-2 font-semibold";
+import { getNumberOfPizzas, getTotalCartPrice } from "./cartSlice";
+import { formatCurrency } from "../../utils/helpers";
 
 function CartOverview() {
+  //here we work out the total pizzas but it is actually better to put this in the cart slice (so any functionality to do with the relative state)
+  // const numberOfPizzas = useSelector((state) => ....
+  const numberOfPizzas = useSelector(getNumberOfPizzas);
+  const totalCartPrice = useSelector(getTotalCartPrice);
+
   return (
     <div className="flex items-center justify-between">
-      <p className={stylingP}>
-        <span>23 pizzas</span>
-        <span>$23.45</span>
+      <p className="space-x-2 font-semibold">
+        <span>{numberOfPizzas} pizzas</span>
+        <span>{formatCurrency(totalCartPrice)}</span>
       </p>
       <Link to="/cart">Open cart &rarr;</Link>
     </div>

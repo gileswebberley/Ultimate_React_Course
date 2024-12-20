@@ -18,6 +18,7 @@ function Menu() {
 //implementing react router data loading, suggested to put this function within the file that the data is going to be consumed in
 export async function loader() {
   const menu = await getMenu();
+  //console.log(menu);
   return menu;
 }
 
