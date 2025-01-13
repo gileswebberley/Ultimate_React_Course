@@ -13,9 +13,10 @@ function RemoveFromCart({ children, pizzaId, quantity = 1 }) {
   const dispatch = useDispatch();
 
   function handleRemoveFromCart() {
-    //if there's more than one just decrease the number of items
-    if (quantity > 1) dispatch(decreaseItemQuantity(pizzaId));
-    else dispatch(removeFromCart(pizzaId));
+    //if there's more than one just decrease the number of items, actually I've put this use-case into the decreaseItemQuantity so let's leave it to that
+    dispatch(decreaseItemQuantity(pizzaId));
+    // if (quantity > 1) dispatch(decreaseItemQuantity(pizzaId));
+    // else dispatch(removeFromCart(pizzaId));
   }
 
   return (

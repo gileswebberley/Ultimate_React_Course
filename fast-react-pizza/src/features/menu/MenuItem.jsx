@@ -1,24 +1,13 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { formatCurrency } from "../../utils/helpers";
-import { addToCart, getCurrentQuantityById } from "../cart/cartSlice";
+import { getCurrentQuantityById } from "../cart/cartSlice";
 import RemoveFromCart from "../cart/RemoveFromCart";
 import AddToCart from "../cart/AddToCart";
+import QuantityAdjuster from "../cart/QuantityAdjuster";
 
 function MenuItem({ pizza }) {
   const { id, name, unitPrice, ingredients, soldOut, imageUrl } = pizza;
   const currentQuantity = useSelector(getCurrentQuantityById(id));
-  const dispatch = useDispatch();
-
-  function handleAddToCart() {
-    const newItem = {
-      pizzaId: id,
-      name,
-      quantity: 1,
-      unitPrice,
-      totalPrice: unitPrice,
-    };
-    dispatch(addToCart(newItem));
-  }
 
   return (
     <li className="flex gap-3 py-2">
@@ -42,13 +31,7 @@ function MenuItem({ pizza }) {
           {!soldOut && (
             <div>
               {currentQuantity > 0 ? (
-                <div className="flex flex-nowrap space-x-1">
-                  <RemoveFromCart pizzaId={id} quantity={currentQuantity}>
-                    &minus;
-                  </RemoveFromCart>
-                  <p>{currentQuantity}</p>
-                  <AddToCart pizza={pizza}>+</AddToCart>
-                </div>
+                <QuantityAdjuster pizza={pizza} />
               ) : (
                 <AddToCart pizza={pizza}>Add</AddToCart>
               )}

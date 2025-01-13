@@ -13,6 +13,9 @@ import PriceSummary from "./PriceSummary";
 import OrderHeader from "./OrderHeader";
 import OrderTiming from "./OrderTiming";
 import OrderOverview from "./OrderOverview";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { clearCart } from "../cart/cartSlice";
 
 const order = {
   id: "ABCDEF",
@@ -51,6 +54,8 @@ const order = {
 
 function Order() {
   const order = useLoaderData();
+  const dispatch = useDispatch();
+
   // Everyone can search for all orders, so for privacy reasons we're gonna gonna exclude names or address, these are only for the restaurant staff
   const {
     id,
@@ -62,6 +67,14 @@ function Order() {
     cart,
   } = order;
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
+
+  //clear the cart as we have now placed the order
+  useEffect(
+    function () {
+      dispatch(clearCart());
+    },
+    [dispatch],
+  );
 
   return (
     <>
@@ -89,7 +102,6 @@ function Order() {
 export async function loader({ params }) {
   //const { orderId } = useParams(); This doesn't work because it is not a react component, however loader() takes params as an argument
   const data = await getOrder(params.orderId);
-  //console.log(`Order params: ${JSON.stringify(params)}`);
   return data;
 }
 

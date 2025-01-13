@@ -1,17 +1,17 @@
 //We are using react-router v6+ which provides us with the Browser Router which should be setup outside of the react tree with a statically defined set of routes. This type of router allows us to use the data fetching capabilities (loaders, actions, fetchers, and more)
 
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Home from './ui/Home';
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Home from "./ui/Home";
 //now import our loader for the menu as well
-import Menu, { loader as menuLoader } from './features/menu/Menu';
-import Cart from './features/cart/Cart';
+import Menu, { loader as menuLoader } from "./features/menu/Menu";
+import Cart from "./features/cart/Cart";
 import CreateOrder, {
   action as CreateOrderAction,
-} from './features/order/CreateOrder';
-import Order, { loader as orderLoader } from './features/order/Order';
-import AppLayout from './ui/AppLayout';
+} from "./features/order/CreateOrder";
+import Order, { loader as orderLoader } from "./features/order/Order";
+import AppLayout from "./ui/AppLayout";
+import Error from "./ui/Error";
 
-import Error from './ui/Error';
 //Let's build out our Routes in an imperative way, unlike in our WorldWise app, so that we can do data loading in this way
 const router = createBrowserRouter(
   //Now we're going to create a layout that will work with phone screens or browsers on a pc in the AppLayout component, then make our routes children
@@ -23,11 +23,11 @@ const router = createBrowserRouter(
       errorElement: <Error />,
       children: [
         {
-          path: '/',
+          path: "/",
           element: <Home />,
         },
         {
-          path: '/menu',
+          path: "/menu",
           element: <Menu />,
           //loader function defined and exported from Menu.js
           loader: menuLoader,
@@ -35,26 +35,26 @@ const router = createBrowserRouter(
           errorElement: <Error />,
         },
         {
-          path: '/cart',
+          path: "/cart",
           element: <Cart />,
           errorElement: <Error />,
         },
         {
-          path: '/order/new',
+          path: "/order/new",
           element: <CreateOrder />,
           //now we are using the actions functionality to submit a Form (not form) from the CreateOrder component
           action: CreateOrderAction,
           errorElement: <Error />,
         },
         {
-          path: '/order/:orderId',
+          path: "/order/:orderId",
           element: <Order />,
           loader: orderLoader,
           errorElement: <Error />,
         },
       ],
     },
-  ]
+  ],
 );
 
 function App() {
