@@ -1,7 +1,7 @@
 function OrderHeader({ id, priority, status }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-x-20 gap-y-2 px-5">
-      <h2 className="text-xl font-semibold">Order #{id} status</h2>
+      <h2 className="text-xl font-semibold">Order #{id}</h2>
 
       <div className="space-x-2">
         {priority && (

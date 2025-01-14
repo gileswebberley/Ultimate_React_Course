@@ -10,6 +10,7 @@ import OrderOverview from "./OrderOverview";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { clearCart } from "../cart/cartSlice";
+import UpdateOrder from "./UpdateOrder";
 
 function Order() {
   //get the data that is returned from this component's loader function
@@ -52,6 +53,7 @@ function Order() {
           priorityPrice={priorityPrice}
           orderPrice={orderPrice}
         />
+        {!priority && <UpdateOrder />}
       </div>
     </>
   );

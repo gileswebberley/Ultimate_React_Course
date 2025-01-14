@@ -1,12 +1,14 @@
 import { useFetcher } from "react-router-dom";
 import OrderItem from "./OrderItem";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { getCart } from "../cart/cartSlice";
 
 function OrderOverview({ cart }) {
   //sometimes we might wanty to use data from another route without navigating to the relevant path, that's wehen a fetcher is useful
   const fetcher = useFetcher();
 
-  //here we are going to get the ingredients information from the menu route using the fetcher
+  //here we are going to get the ingredients information from the menu route using the fetcher - this essentially runs the loader function on the Menu component
   useEffect(
     function () {
       if (!fetcher.data && fetcher.state === "idle") {
