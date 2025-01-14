@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
 import Button from "../../ui/Button";
-import { useSelector } from "react-redux";
-import { getUsername } from "../user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAddress, getUsername } from "../user/userSlice";
 import { getCart } from "../cart/cartSlice";
 
 // https://uibakery.io/regex-library/phone-number
@@ -13,9 +13,19 @@ const isValidPhone = (str) =>
   );
 
 function CreateOrder() {
-  // const [withPriority, setWithPriority] = useState(false);
+  const [withPriority, setWithPriority] = useState(false);
   const cart = useSelector(getCart);
   const username = useSelector(getUsername);
+  //for the auto address get the state from the user slice
+  const {
+    address,
+    status: addrStatus,
+    position,
+    error: addrError,
+  } = useSelector((state) => state.user);
+  const isLoadingAddress = addrStatus === "loading";
+  //for the fetch address functionality we will now dispatch our new Thunks action
+  const dispatch = useDispatch();
 
   const nav = useNavigation();
   const isSubmitting = nav.state === "submitting";
@@ -23,8 +33,13 @@ function CreateOrder() {
   //grab the errors object that might have been created by our action function
   const formErrors = useActionData(); //see the phone field for usage
 
+  function handleFetchAddress(e) {
+    e.preventDefault();
+    dispatch(fetchAddress());
+  }
+
   const inputLayout =
-    "mb-3 flex flex-col items-stretch justify-between gap-1 md:flex-row";
+    "relative mb-3 flex flex-col items-stretch justify-between gap-1 md:flex-row";
 
   return (
     <div className="mx-3 pt-3">
@@ -65,7 +80,30 @@ function CreateOrder() {
         <div className={inputLayout}>
           <label>Address</label>
           <div>
-            <input type="text" name="address" className="input w-80" required />
+            <input
+              type="text"
+              name="address"
+              className="input w-80"
+              required
+              disabled={isLoadingAddress}
+              defaultValue={address}
+            />
+            {!position.latitude && !position.longitude && (
+              <span className="absolute right-[3px] z-30">
+                <Button
+                  type="vsmall"
+                  onClick={handleFetchAddress}
+                  disabled={isLoadingAddress}
+                >
+                  🎯
+                </Button>
+              </span>
+            )}
+            {addrStatus === "error" && (
+              <p className="mt-2 w-80 rounded-md bg-red-200 p-2 text-xs text-red-700">
+                {addrError}
+              </p>
+            )}
           </div>
         </div>
 
@@ -75,8 +113,8 @@ function CreateOrder() {
             type="checkbox"
             name="priority"
             id="priority"
-            // value={withPriority}
-            // onChange={(e) => setWithPriority(e.target.checked)}
+            value={withPriority}
+            onChange={(e) => setWithPriority(e.target.checked)}
           />
           <label htmlFor="priority">Want to give your order priority?</label>
         </div>
@@ -84,6 +122,15 @@ function CreateOrder() {
         <div>
           {/* Remember the old way of passing extra data as a string within an html form, well you can still do that within Form so that it get's passed to the action (although this is very insecure!!) */}
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
+          <input
+            type="hidden"
+            name="position"
+            value={
+              position.latitude && position.longitude
+                ? `lat: ${position.latitude} lng: ${position.longitude}`
+                : "No position provided"
+            }
+          />
           <Button disabled={isSubmitting}>
             {isSubmitting ? "Placing Order" : "Order now"}
           </Button>
@@ -106,7 +153,8 @@ export async function action({ request }) {
   const order = {
     ...data,
     cart: JSON.parse(data.cart),
-    priority: data.priority === "on",
+    position: data.position,
+    priority: data.priority === "true",
   };
   //console.log(order);
 
@@ -116,9 +164,10 @@ export async function action({ request }) {
     errors.phone =
       "Please provide a valid phone number as we may need to contact you";
 
-  //easy way to check if an object is empty
+  //easy way to check if an object is empty, if not return the errors
   if (Object.keys(errors).length > 0) return errors;
 
+  //otherwise the order has all the valid info it needs
   const newOrder = await createOrder(order);
 
   //Now as we can't use any hooks in here we can't useNavigate but react router provides an alternative way - by returning a redirect function

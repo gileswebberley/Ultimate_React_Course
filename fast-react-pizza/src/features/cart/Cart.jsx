@@ -3,13 +3,13 @@ import CartItem from "./CartItem";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart, getCart } from "./cartSlice";
 import { getUsername } from "../user/userSlice";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 
 function Cart() {
   const cart = useSelector(getCart);
   const username = useSelector(getUsername);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   function handleClearCart() {
     if (cart.length === 0) return;

@@ -1,7 +1,6 @@
 import { useSelector } from "react-redux";
 import { formatCurrency } from "../../utils/helpers";
 import { getCurrentQuantityById } from "../cart/cartSlice";
-import RemoveFromCart from "../cart/RemoveFromCart";
 import AddToCart from "../cart/AddToCart";
 import QuantityAdjuster from "../cart/QuantityAdjuster";
 

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 /** Multi use button
  *  - if 'to' is defined it will become a Link
- *  - type (default 'primary') can be 'small' and 'secondary' also
+ *  - type (default 'primary') can be 'small', 'vsmall' and 'secondary' also
  *  - disabled (default false) is for the button disabled */
 function Button({
   children,
@@ -29,7 +29,7 @@ function Button({
       </Link>
     );
   //don't bother wasting resources by adding an event listener if onClick === undefined
-  if (onClick)
+  if (onClick !== undefined)
     return (
       <button disabled={disabled} className={style[type]} onClick={onClick}>
         {children}

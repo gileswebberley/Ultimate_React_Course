@@ -1,9 +1,10 @@
 import { useSelector } from "react-redux";
 
 import Logout from "./Logout";
+import { getUsername } from "./userSlice";
 
 function UserName() {
-  const username = useSelector((state) => state.user.username);
+  const username = useSelector(getUsername);
 
   if (!username) return null;
   //Tailwind to hide username on a smaller screen

@@ -15,7 +15,6 @@ function CartItem({ item }) {
       </p>
       <div className="flex items-stretch justify-between">
         <p>{formatCurrency(totalPrice)}</p>
-        {/* <Button type="small">Delete</Button> */}
         {currentQuantity > 0 ? (
           <QuantityAdjuster pizza={{ id: pizzaId, name, unitPrice }} />
         ) : (
