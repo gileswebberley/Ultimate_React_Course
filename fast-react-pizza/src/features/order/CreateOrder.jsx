@@ -3,8 +3,9 @@ import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
 import Button from "../../ui/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAddress, getUsername } from "../user/userSlice";
+import { fetchAddress, getUsername, updateAddress } from "../user/userSlice";
 import { getCart } from "../cart/cartSlice";
+import store from "../../store";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -166,6 +167,9 @@ export async function action({ request }) {
 
   //easy way to check if an object is empty, if not return the errors
   if (Object.keys(errors).length > 0) return errors;
+
+  //we cannot use the dispatch hook outside of the component so a work-around is to import the store itself and then call dispatch on that (DO NOT OVER-USE!). Here we will set the address of the user based on the data input
+  store.dispatch(updateAddress(data.address));
 
   //otherwise the order has all the valid info it needs
   const newOrder = await createOrder(order);

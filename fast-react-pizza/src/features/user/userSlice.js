@@ -1,7 +1,6 @@
 import { getAddress } from "../../services/apiGeocoding";
 
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { action } from "../order/CreateOrder";
 
 function getPosition() {
   return new Promise(function (resolve, reject) {
@@ -35,7 +34,7 @@ const initialUserState = {
   //properties related to the Thunks address functionality
   status: "idle",
   position: {},
-  address: "",
+  address: localStorage.getItem("userAddress") || "",
   error: "",
 };
 
@@ -51,6 +50,12 @@ const userSlice = createSlice({
     logout(state) {
       state.username = "";
       localStorage.removeItem("username");
+      state.address = "";
+      localStorage.removeItem("userAddress");
+    },
+    updateAddress(state, action) {
+      state.address = action.payload;
+      localStorage.setItem("userAddress", action.payload);
     },
   },
   //Now to implement the async thunk actions for the 3 states by chaining cases to the builder object that it recieves
@@ -70,8 +75,9 @@ const userSlice = createSlice({
       }),
 });
 
-export const { updateName, logout } = userSlice.actions;
+export const { updateName, logout, updateAddress } = userSlice.actions;
 
 export default userSlice.reducer;
 
 export const getUsername = (state) => state.user.username;
+export const getUserAddress = (state) => state.user.address;
