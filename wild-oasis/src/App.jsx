@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 import GlobalStyles from './styles/GlobalStyles';
 import Button from './ui/Button';
-//first example of a styled component
-const H1 = styled.h1`
-  font-size: 30px;
-  font-weight: 600;
+import Row from './ui/Row';
+
+const StyledApp = styled.div`
+  margin: 10px;
 `;
 
 function App() {
@@ -12,10 +12,15 @@ function App() {
   return (
     <>
       <GlobalStyles />
-      <div>
-        App
-        <Button>temp button</Button>
-      </div>
+      <StyledApp>
+        <Row orientation="vertical">
+          App
+          {/* see the Button component for intro to using props to make them more reusable and flexible */}
+          <Button size="small" variation="danger">
+            temp button
+          </Button>
+        </Row>
+      </StyledApp>
     </>
   );
 }
