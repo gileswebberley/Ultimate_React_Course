@@ -64,11 +64,13 @@ const GlobalStyles = createGlobalStyle`
 *,
 *::before,
 *::after {
+    /* if you define content: in ::before or ::after it will automatically add it to the end of any of the defined classes/elements/ids, eg - to add the href property to the end of any a-tag you could write a::after{content: '(attr(href))';}, but it can also be used like this to add common styling to everything (that's what the * means).
+    ps. you can also add custom attributes to elements with the [attr-name] method, so to have a span with a meta-desc attribute you'd write span[meta-desc] and then you could have spans like <span meta-desc='...'></span> */
   box-sizing: border-box;
   padding: 0;
   margin: 0;
 
-  /* Creating animations for dark mode */
+  /* This affects all changes to background-color, for example all button hovers will transition in 0.3s */
   transition: background-color 0.3s, border 0.3s;
 }
 

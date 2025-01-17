@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import GlobalStyles from './styles/GlobalStyles';
+import Button from './ui/Button';
 //first example of a styled component
 const H1 = styled.h1`
   font-size: 30px;
@@ -11,7 +12,10 @@ function App() {
   return (
     <>
       <GlobalStyles />
-      <div>App</div>
+      <div>
+        App
+        <Button>temp button</Button>
+      </div>
     </>
   );
 }

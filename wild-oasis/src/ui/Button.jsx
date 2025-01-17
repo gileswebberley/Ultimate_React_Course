@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled, { css } from 'styled-components';
 
 const sizes = {
   small: css`
@@ -47,3 +47,27 @@ const variations = {
     }
   `,
 };
+
+//Above was provided to us but this is our first styled component proper, so now we can use Button in place of the html button tag and it will be styled appropriately (according to this centralised definition)
+const Button = styled.button`
+  font-size: 1.4rem;
+  padding: 1.2rem 1.6rem; //x and y
+  font-weight: 500;
+  border: none;
+  //now use some of those globally defined css variables in GlobalStyles
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-brand-600);
+  color: var(--color-brand-50);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+
+  //to select the element that this styling is connected to we can use the ampersand (asCss), here we want to define the hover behaviour using the css pseudo-class like so
+  &:hover {
+    background-color: var(
+      --color-brand-700
+    ); //the transition behaviour is already defined in GlobalStyles, ie transition: background-color 0.3s
+  }
+`;
+
+//finally default export this styled component
+export default Button;
