@@ -4,14 +4,14 @@ const Row = styled.div`
   display: flex;
 
   ${(props) =>
-    props.orientation === 'horizontal' &&
+    props.type === 'horizontal' &&
     css`
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
     `}
   ${(props) =>
-    props.orientation === 'vertical' &&
+    props.type === 'vertical' &&
     css`
       flex-direction: column;
       justify-content: space-between;
