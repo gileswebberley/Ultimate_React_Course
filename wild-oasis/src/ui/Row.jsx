@@ -9,6 +9,7 @@ const Row = styled.div`
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
+      width: 100%;
     `}
   ${(props) =>
     props.type === 'vertical' &&
@@ -19,5 +20,9 @@ const Row = styled.div`
       gap: 1.2rem;
     `}
 `;
+
+Row.defaultProps = {
+  type: 'horizontal',
+};
 
 export default Row;

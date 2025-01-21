@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 //now let's setup react-query, a bit like setup for Redux or ContextAPI
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import Dashboard from './pages/Dashboard';
 import Account from './pages/Account';
@@ -29,6 +30,8 @@ function App() {
     <>
       {/* Just like with other state management libraries we'll wrap the whole application in our new React(Tanstack)-Query query client */}
       <QueryClientProvider client={queryClient}>
+        {/* Also, we've now npm installed the devtools so we can add it like so (this creates a little icon on our page which we can click to open) */}
+        <ReactQueryDevtools initialIsOpen={false} />
         {/* add our styles as a sibling component to our routes so it's available throughout the application */}
         <GlobalStyles />
         <BrowserRouter>

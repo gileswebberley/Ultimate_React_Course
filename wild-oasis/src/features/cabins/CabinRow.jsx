@@ -1,4 +1,8 @@
-import styled from "styled-components";
+import styled from 'styled-components';
+import { formatCurrency } from '../../utils/helpers';
+import Button from '../../ui/Button';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteCabin } from '../../services/apiCabins';
 
 const TableRow = styled.div`
   display: grid;
@@ -14,7 +18,8 @@ const TableRow = styled.div`
 
 const Img = styled.img`
   display: block;
-  width: 6.4rem;
+  width: 100%;
+  /* height: 100%; */
   aspect-ratio: 3 / 2;
   object-fit: cover;
   object-position: center;
@@ -25,16 +30,49 @@ const Cabin = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--color-grey-600);
-  font-family: "Sono";
+  font-family: 'Sono';
 `;
 
 const Price = styled.div`
-  font-family: "Sono";
+  font-family: 'Sono';
   font-weight: 600;
 `;
 
 const Discount = styled.div`
-  font-family: "Sono";
+  font-family: 'Sono';
   font-weight: 500;
   color: var(--color-green-700);
 `;
+
+function CabinRow({ cabin }) {
+  const { id, name, imageUrl, maxCapacity, regularPrice, discount } = cabin;
+
+  //for the onSuccess cache clearing we need access to our queryClient from the App page
+  const queryClient = useQueryClient();
+
+  //To allow the delete functionality to work we do not use useQuery but instead useMutation which provides the mutate function, a bit like dispatch from useDispatch
+  const { isLoading: isDeleting, mutate } = useMutation({
+    mutationFn: (id) => deleteCabin(id),
+    //clear the cache when it's deleted so the ui updates
+    onSuccess: () => {
+      //you can use the devtools to see the name of the queryKey
+      queryClient.invalidateQueries({ queryKey: ['cabins'] });
+    },
+    onError: (err) => alert(err.message),
+  });
+
+  return (
+    <TableRow role="row">
+      <Img src={imageUrl} />
+      <Cabin>{name}</Cabin>
+      <div>Fits upto {maxCapacity} guests</div>
+      <Price>{formatCurrency(regularPrice)}</Price>
+      <Discount>{formatCurrency(discount)}</Discount>
+      <Button onClick={() => mutate(id)} disabled={isDeleting}>
+        Delete
+      </Button>
+    </TableRow>
+  );
+}
+
+export default CabinRow;

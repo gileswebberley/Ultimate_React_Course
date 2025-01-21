@@ -11,3 +11,12 @@ export async function getCabins() {
 
   return data;
 }
+
+//we must adjust our RLS policy to allow this
+export async function deleteCabin(id) {
+  const { error } = await supabase.from('cabins').delete().eq('id', id);
+  if (error) {
+    console.error(error);
+    throw new Error(`Could not delete cabin with id: ${id}`);
+  }
+}
