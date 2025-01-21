@@ -1,4 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+//now let's setup react-query, a bit like setup for Redux or ContextAPI
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 import Dashboard from './pages/Dashboard';
 import Account from './pages/Account';
 import Bookings from './pages/Bookings';
@@ -10,27 +13,40 @@ import Users from './pages/Users';
 import GlobalStyles from './styles/GlobalStyles';
 import AppLayout from './ui/AppLayout';
 
+//now let's continue the setup of react-query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      //amount of time before data is refetched
+      staleTime: 60 * 1000,
+    },
+  },
+});
+
 function App() {
   //as we are not using the data loading features of React-Router we'll go back to the declaritive style of setup (like in world-wise rather than the fast-react-pizza)
   return (
     <>
-      {/* add our styles as a sibling component to our routes so it's available throughout the application */}
-      <GlobalStyles />
-      <BrowserRouter>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route index element={<Navigate replace to="dashboard" />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="bookings" element={<Bookings />} />
-            <Route path="cabins" element={<Cabins />} />
-            <Route path="users" element={<Users />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="account" element={<Account />} />
-          </Route>
-          <Route path="login" element={<Login />} />
-          <Route path="*" element={<PageNotFound />} />
-        </Routes>
-      </BrowserRouter>
+      {/* Just like with other state management libraries we'll wrap the whole application in our new React(Tanstack)-Query query client */}
+      <QueryClientProvider client={queryClient}>
+        {/* add our styles as a sibling component to our routes so it's available throughout the application */}
+        <GlobalStyles />
+        <BrowserRouter>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route index element={<Navigate replace to="dashboard" />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="bookings" element={<Bookings />} />
+              <Route path="cabins" element={<Cabins />} />
+              <Route path="users" element={<Users />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="account" element={<Account />} />
+            </Route>
+            <Route path="login" element={<Login />} />
+            <Route path="*" element={<PageNotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </QueryClientProvider>
     </>
   );
 }
