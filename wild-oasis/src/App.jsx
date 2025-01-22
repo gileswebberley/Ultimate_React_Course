@@ -13,6 +13,7 @@ import Settings from './pages/Settings';
 import Users from './pages/Users';
 import GlobalStyles from './styles/GlobalStyles';
 import AppLayout from './ui/AppLayout';
+import { Toaster } from 'react-hot-toast';
 
 //now let's continue the setup of react-query
 const queryClient = new QueryClient({
@@ -49,6 +50,27 @@ function App() {
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </BrowserRouter>
+        {/* For the more attractive notifications we have installed react-hot-toast package */}
+        <Toaster
+          position="top-center"
+          gutter={8}
+          containerStyle={{ margin: '8px' }}
+          toastOptions={{
+            success: {
+              duration: 2000,
+            },
+            error: {
+              duration: 4000,
+            },
+            style: {
+              fontSize: '16px',
+              maxWidth: '400px',
+              padding: '16px 24px',
+              backgroundColor: 'var(--color-green-700)',
+              color: 'var(--color-grey-50)',
+            },
+          }}
+        />
       </QueryClientProvider>
     </>
   );

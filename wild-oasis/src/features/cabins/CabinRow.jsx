@@ -3,6 +3,7 @@ import { formatCurrency } from '../../utils/helpers';
 import Button from '../../ui/Button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteCabin } from '../../services/apiCabins';
+import toast from 'react-hot-toast';
 
 const TableRow = styled.div`
   display: grid;
@@ -23,7 +24,9 @@ const Img = styled.img`
   aspect-ratio: 3 / 2;
   object-fit: cover;
   object-position: center;
-  transform: scale(1.5) translateX(-7px);
+  &:hover {
+    transform: scale(1.5) translateX(-7px);
+  }
 `;
 
 const Cabin = styled.div`
@@ -57,6 +60,8 @@ function CabinRow({ cabin }) {
     onSuccess: () => {
       //you can use the devtools to see the name of the queryKey
       queryClient.invalidateQueries({ queryKey: ['cabins'] });
+      //now we can use our react hot toast notification
+      toast.success('You have successfully deleted the cabin');
     },
     onError: (err) => alert(err.message),
   });
