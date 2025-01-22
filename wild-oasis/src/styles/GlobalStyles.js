@@ -104,6 +104,7 @@ button {
   cursor: not-allowed;
 }
 
+textarea:disabled,
 select:disabled,
 input:disabled {
   background-color: var(--color-grey-200);
