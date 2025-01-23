@@ -37,12 +37,34 @@ const Error = styled.span`
   color: var(--color-red-700);
 `;
 
-/** register,
-  isLoading,
-  elementID,
-  labelStr,
-  validationObj,
-  errors */
+/**
+ * For use in a react-hook-form to create a row made up of label|input|error messages
+ * @typedef {Object} Props
+ * @property {UseFormRegister} register - register object returned by react-hook-form useForm hook
+ * @property {Boolean} isLoading - state of retrieval of data
+ * @property {String} elementID - name of the element used by label and input
+ * @property {String} labelStr - text contained within the label
+ * @property {Object} validationObj - react-hook-form validation object to be implemented by this input eg {required: 'This field is required'}
+ * @property {Object} errors - object with error objects as value of a key equal to the elementID
+ * @property {String} type - equivalent to the type prop of an html input element
+ * @param {Props} props
+ * @example
+ * <RegisteredFormRow
+        register={register}
+        isLoading={isCreating}
+        elementID="maxCapacity"
+        labelStr="Maximum capacity"
+        validationObj={{
+          required: 'Max capacity is required',
+          min: {
+            value: 1,
+            message: 'Capacity must be 1 or greater',
+          },
+        }}
+        errors={errors}
+        type="number"
+      />
+ **/
 function RegisteredFormRow({
   register,
   isLoading,
@@ -57,7 +79,6 @@ function RegisteredFormRow({
       <Label htmlFor={elementID}>{labelStr}</Label>
       <Input
         disabled={isLoading}
-        defaultValue={0}
         type={type}
         id={elementID}
         {
