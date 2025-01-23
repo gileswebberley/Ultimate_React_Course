@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Input from './Input';
+import Textarea from './Textarea';
 
 const FormRow = styled.div`
   display: grid;
@@ -46,10 +47,11 @@ const Error = styled.span`
  * @property {String} labelStr - text contained within the label
  * @property {Object} validationObj - react-hook-form validation object to be implemented by this input eg {required: 'This field is required'}
  * @property {Object} errors - object with error objects as value of a key equal to the elementID
- * @property {String} type - equivalent to the type prop of an html input element
+ * @property {String} type - equivalent to the type prop of an html input element (enter textarea for a multiline textfield)
+ * @property {any} defaultValue - [optional] value for the equivalent html input field property
  * @param {Props} props
  * @example
- * <RegisteredFormRow
+ * <RegisteredFormInput
         register={register}
         isLoading={isCreating}
         elementID="maxCapacity"
@@ -65,7 +67,7 @@ const Error = styled.span`
         type="number"
       />
  **/
-function RegisteredFormRow({
+function RegisteredFormInput({
   register,
   isLoading,
   elementID,
@@ -73,21 +75,30 @@ function RegisteredFormRow({
   validationObj,
   errors,
   type = 'text',
+  defaultValue,
 }) {
   return (
     <FormRow>
       <Label htmlFor={elementID}>{labelStr}</Label>
-      <Input
-        disabled={isLoading}
-        type={type}
-        id={elementID}
-        {
-          ...register(
-            elementID,
-            validationObj
-          ) /*no point making it required as it has a default value*/
-        }
-      />
+
+      {type !== 'textarea' ? (
+        <Input
+          disabled={isLoading}
+          type={type}
+          id={elementID}
+          defaultValue={defaultValue ?? undefined}
+          {...register(elementID, validationObj)}
+        />
+      ) : (
+        <Textarea
+          disabled={isLoading}
+          type="text"
+          id={elementID}
+          defaultValue={defaultValue ?? undefined}
+          {...register(elementID, validationObj)}
+        />
+      )}
+
       {errors?.[elementID]?.message && (
         <Error>{errors[elementID].message}</Error>
       )}
@@ -95,4 +106,4 @@ function RegisteredFormRow({
   );
 }
 
-export default RegisteredFormRow;
+export default RegisteredFormInput;

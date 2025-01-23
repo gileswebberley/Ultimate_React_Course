@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 
-import Input from '../../ui/Input';
 import Form from '../../ui/Form';
 import Button from '../../ui/Button';
 import FileInput from '../../ui/FileInput';
@@ -9,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createCabin } from '../../services/apiCabins';
 import toast from 'react-hot-toast';
-import RegisteredFormRow from '../../ui/RegisteredFormRow';
+import RegisteredFormInput from '../../ui/RegisteredFormInput';
 
 const FormRow = styled.div`
   display: grid;
@@ -86,39 +85,19 @@ function CreateCabinForm({ closeMe }) {
   //If any of these fail then the handleSubmit will not call submitCabin but instead will pass the errors to our onError function
   return (
     <Form onSubmit={handleSubmit(submitCabin, onError)}>
-      <FormRow>
-        <Label htmlFor="name">Cabin name</Label>
-        <Input
-          disabled={isCreating}
-          type="text"
-          id="name"
-          {...register('name', {
-            required: 'Name is required',
-          })}
-        />
-        {errors?.name?.message && <Error>{errors.name.message}</Error>}
-      </FormRow>
+      <RegisteredFormInput
+        register={register}
+        isLoading={isCreating}
+        elementID="name"
+        labelStr="Cabin name"
+        validationObj={{
+          required: 'Name is required',
+        }}
+        errors={errors}
+        type="text"
+      />
 
-      {/* <FormRow>
-        <Label htmlFor="maxCapacity">Maximum capacity</Label>
-        <Input
-          disabled={isCreating}
-          type="number"
-          id="maxCapacity"
-          {...register('maxCapacity', {
-            required: 'Max capacity is required',
-            min: {
-              value: 1,
-              message: 'Capacity must be 1 or greater',
-            },
-          })}
-        />
-        {errors?.maxCapacity?.message && (
-          <Error>{errors.maxCapacity.message}</Error>
-        )}
-      </FormRow> */}
-
-      <RegisteredFormRow
+      <RegisteredFormInput
         register={register}
         isLoading={isCreating}
         elementID="maxCapacity"
@@ -134,54 +113,44 @@ function CreateCabinForm({ closeMe }) {
         type="number"
       />
 
-      <FormRow>
-        <Label htmlFor="regularPrice">Regular price</Label>
-        <Input
-          disabled={isCreating}
-          type="number"
-          id="regularPrice"
-          {...register('regularPrice', {
-            required: 'Price is required',
-          })}
-        />
-        {errors?.regularPrice?.message && (
-          <Error>{errors.regularPrice.message}</Error>
-        )}
-      </FormRow>
+      <RegisteredFormInput
+        register={register}
+        isLoading={isCreating}
+        elementID="regularPrice"
+        labelStr="Regular price"
+        validationObj={{
+          required: 'Price is required',
+        }}
+        errors={errors}
+        type="number"
+      />
 
-      <FormRow>
-        <Label htmlFor="discount">Discount</Label>
-        <Input
-          disabled={isCreating}
-          defaultValue={0}
-          type="number"
-          id="discount"
-          {
-            ...register('discount', {
-              validate: (value, fieldValues) =>
-                Number(value) <= Number(fieldValues.regularPrice) ||
-                'Discount must be less than the regular price',
-            }) /*no point making it required as it has a default value*/
-          }
-        />
-        {errors?.discount?.message && <Error>{errors.discount.message}</Error>}
-      </FormRow>
+      <RegisteredFormInput
+        register={register}
+        isLoading={isCreating}
+        elementID="discount"
+        labelStr="Discount"
+        validationObj={{
+          validate: (value, fieldValues) =>
+            Number(value) <= Number(fieldValues.regularPrice) ||
+            'Discount must be less than the regular price',
+        }}
+        errors={errors}
+        type="number"
+        defaultValue={0}
+      />
 
-      <FormRow>
-        <Label htmlFor="description">Description for website</Label>
-        <Textarea
-          disabled={isCreating}
-          type="text"
-          id="description"
-          defaultValue=""
-          {...register('description', {
-            required: 'Please supply a description',
-          })}
-        />
-        {errors?.description?.message && (
-          <Error>{errors.description.message}</Error>
-        )}
-      </FormRow>
+      <RegisteredFormInput
+        register={register}
+        isLoading={isCreating}
+        elementID="description"
+        labelStr="Description for website"
+        validationObj={{
+          required: 'Please supply a description',
+        }}
+        errors={errors}
+        type="textarea"
+      />
 
       <FormRow>
         <Label htmlFor="image">Cabin photo</Label>
@@ -189,7 +158,6 @@ function CreateCabinForm({ closeMe }) {
       </FormRow>
 
       <FormRow>
-        {/* type is an HTML attribute! */}
         <Button
           variation="secondary"
           type="reset"
