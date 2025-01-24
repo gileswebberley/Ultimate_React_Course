@@ -26,12 +26,12 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  //as we are not using the data loading features of React-Router we'll go back to the declaritive style of setup (like in world-wise rather than the fast-react-pizza)
+  //as we are not using the data loading features of React-Router we'll go back to the declaritive style of route setup (like in world-wise rather than the fast-react-pizza)
   return (
     <>
       {/* Just like with other state management libraries we'll wrap the whole application in our new React(Tanstack)-Query query client */}
       <QueryClientProvider client={queryClient}>
-        {/* Also, we've now npm installed the devtools so we can add it like so (this creates a little icon on our page which we can click to open) */}
+        {/* Also, we've now npm installed the devtools so we can add it as a sibling component (this creates a little icon on our page which we can click to open) */}
         <ReactQueryDevtools initialIsOpen={false} />
         {/* add our styles as a sibling component to our routes so it's available throughout the application */}
         <GlobalStyles />
