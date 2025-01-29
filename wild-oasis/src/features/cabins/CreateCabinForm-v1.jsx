@@ -5,10 +5,9 @@ import Button from '../../ui/Button';
 import FileInput from '../../ui/FileInput';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createEditCabin } from '../../services/apiCabins';
+import { createCabin } from '../../services/apiCabins';
 import toast from 'react-hot-toast';
 import RegisteredFormInput from '../../ui/RegisteredFormInput';
-import { useState } from 'react';
 
 const FormRow = styled.div`
   display: grid;
@@ -30,7 +29,7 @@ const FormRow = styled.div`
     border-bottom: 1px solid var(--color-grey-100);
   }
 
-  &:has(button):last-child {
+  &:has(button) {
     display: flex;
     justify-content: flex-end;
     gap: 1.2rem;
@@ -40,45 +39,26 @@ const FormRow = styled.div`
 const Label = styled.label`
   font-weight: 500;
 `;
-
-const EditImage = styled.img`
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  object-position: center;
-  width: 10rem;
-`;
-
-const EditImgDiv = styled.div`
-  display: flex;
-  justify-content: space-evenly;
-  align-items: end;
-  min-width: 20rem;
-  gap: 1.2rem;
-  /* flex-direction: column; */
-`;
-
-//See CreateCabinForm-v1 for extensive learning notes
-function CreateCabinForm({ closeMe, cabinToEdit }) {
-  const isEditing = Boolean(cabinToEdit);
-  const { id: editId, ...editData } = cabinToEdit ?? {};
-  //decided to show the current image when editing and allow it to be changed if required
-  const [addNewImage, setAddNewImage] = useState(!isEditing);
-  //console.log(`Cabin Edit Mode = ${isEditing}`);
-
-  const { register, handleSubmit, reset, formState } = useForm({
-    defaultValues: isEditing ? editData : {},
-  });
+//We're using react-hook-form so notice we don't have to set up the controlled elements
+//closeMe is simply the hide functionality from the parent component (Cabins)
+function CreateCabinForm({ closeMe }) {
+  //now we can spread the 'register' by passing it the field id, this automatically gives them onBlur and onChange event handlers that are linked to automatically created state (ie it makes them controlled form elements)
+  //handleSubmit goes through the validation arguments in the form and if all pass it calls our submit function, otherwise it calls our onError function
+  //reset is self explanatory I think
+  //formState returns various state variables such as isDirty, isValidating, etc but it also returns an object of the errors that arose during validation which we can use to show these error messages in the form
+  const { register, handleSubmit, reset, formState } = useForm();
+  //errors is an object made up of individual error objects for each field that has failed validation, eg {name:{type:'required',message:'the message'}, description:{...}, etc}
   const { errors } = formState;
 
   //React query usage
   const queryClient = useQueryClient();
-  //Create cabin
-  const { mutate: createMutate, isLoading: isCreating } = useMutation({
-    mutationFn: createEditCabin,
+  const { mutate, isLoading: isCreating } = useMutation({
+    mutationFn: createCabin,
     onSuccess: () => {
       toast.success('New cabin successfully created');
-      //to reload cabins data
+      //to reload the cabins component remember to invalidate the current cabins data so that it is refetched and forces a re-render
       queryClient.invalidateQueries({ queryKey: ['cabins'] });
+      //now we can use the react hook form's reset function
       reset();
       //and close the form? I think if we want to add multiple we'd expect to do it one at a time
       closeMe();
@@ -88,60 +68,28 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
     },
   });
 
-  //Edit cabin
-  // const { mutate: editMutate, isLoading: isUpdating } = useMutation({
-  //   mutationFn: createCabin,
-  //   onSuccess: () => {
-  //     toast.success('New cabin successfully created');
-  //     //to reload cabins data
-  //     queryClient.invalidateQueries({ queryKey: ['cabins'] });
-  //     reset();
-  //     //and close the form? I think if we want to add multiple we'd expect to do it one at a time
-  //     closeMe();
-  //   },
-  //   onError: () => {
-  //     toast.error('Something went wrong whilst trying to add this new cabin');
-  //   },
-  // });
-
-  const isBusy = isCreating;
-
+  //we must make sure that all of our fields have the same id as the name we gave the relevant column in our supabase db
   function submitCabin(data) {
     //upload our image by selecting the file and name it in accordance with our db naming convention
-    if (isEditing) {
-      //console.log(editData.imageUrl.split('/'));
-      data = addNewImage
-        ? {
-            oldImage: editData.imageUrl,
-            id: editId,
-            ...data,
-            imageUrl: data.imageUrl[0],
-          }
-        : { id: editId, ...data, imageUrl: editData.imageUrl };
-    } else {
-      data = { ...data, imageUrl: data.imageUrl[0] };
-    }
+    data = { ...data, imageUrl: data.image[0] };
+    //remove the image entry as it now resides in imageUrl
+    delete data.image;
     //console.log(data);
-    createMutate(data);
+    mutate(data);
   }
 
+  //errors is the same as our errors object above
   function onError(errors) {
     toast.error('Please check that you have filled out the form correctly');
   }
 
-  //for when you want to change the image when editing rather than creating
-  function handleChangeImage(e) {
-    e.preventDefault();
-    //editData.imageUrl = null;
-    console.log(`editData.imageUrl: ${editData.imageUrl}`);
-    setAddNewImage(true);
-  }
-
+  //we're going to use the react hook form's validation system to make sure all of the fields are correctly input, simply add the validation object to the register arguments.
+  //If any of these fail then the handleSubmit will not call submitCabin but instead will pass the errors to our onError function
   return (
     <Form onSubmit={handleSubmit(submitCabin, onError)}>
       <RegisteredFormInput
         register={register}
-        isLoading={isBusy}
+        isLoading={isCreating}
         elementID="name"
         labelStr="Cabin name"
         validationObj={{
@@ -153,7 +101,7 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
 
       <RegisteredFormInput
         register={register}
-        isLoading={isBusy}
+        isLoading={isCreating}
         elementID="maxCapacity"
         labelStr="Maximum capacity"
         validationObj={{
@@ -169,7 +117,7 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
 
       <RegisteredFormInput
         register={register}
-        isLoading={isBusy}
+        isLoading={isCreating}
         elementID="regularPrice"
         labelStr="Regular price"
         validationObj={{
@@ -181,7 +129,7 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
 
       <RegisteredFormInput
         register={register}
-        isLoading={isBusy}
+        isLoading={isCreating}
         elementID="discount"
         labelStr="Discount"
         validationObj={{
@@ -196,7 +144,7 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
 
       <RegisteredFormInput
         register={register}
-        isLoading={isBusy}
+        isLoading={isCreating}
         elementID="description"
         labelStr="Description for website"
         validationObj={{
@@ -207,41 +155,21 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
       />
 
       <FormRow>
-        {!addNewImage ? (
-          <>
-            <Label>Cabin photo</Label>
-            <EditImgDiv>
-              <EditImage src={editData.imageUrl} />
-              <span>
-                <Button
-                  size="small"
-                  disabled={isBusy}
-                  onClick={handleChangeImage}
-                >
-                  Change Image
-                </Button>
-              </span>
-            </EditImgDiv>
-          </>
-        ) : (
-          <>
-            <Label htmlFor="imageUrl">Cabin photo</Label>
-            <FileInput
-              id="imageUrl"
-              accept="image/*"
-              {...register('imageUrl', {
-                required: 'Please add a photo of the cabin',
-              })}
-            />
-          </>
-        )}
+        <Label htmlFor="imageUrl">Cabin photo</Label>
+        <FileInput
+          id="image"
+          accept="image/*"
+          {...register('image', {
+            required: 'Please add a photo of the cabin',
+          })}
+        />
       </FormRow>
 
       <FormRow>
         <Button
           variation="secondary"
           type="reset"
-          disabled={isBusy}
+          disabled={isCreating}
           onClick={() => {
             reset();
             closeMe();
@@ -249,7 +177,7 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
         >
           Cancel
         </Button>
-        <Button disabled={isBusy}>{isEditing ? 'Edit' : 'Add'} Cabin</Button>
+        <Button disabled={isCreating}>Add Cabin</Button>
       </FormRow>
     </Form>
   );

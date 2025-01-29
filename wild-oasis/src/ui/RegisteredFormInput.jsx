@@ -78,7 +78,7 @@ function RegisteredFormInput({
   defaultValue,
 }) {
   return (
-    <FormRow>
+    <FormRow role="row">
       <Label htmlFor={elementID}>{labelStr}</Label>
 
       {type !== 'textarea' ? (

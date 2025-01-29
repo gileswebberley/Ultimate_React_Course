@@ -4,6 +4,8 @@ import Button from '../../ui/Button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteCabin } from '../../services/apiCabins';
 import toast from 'react-hot-toast';
+import { useState } from 'react';
+import CreateCabinForm from './CreateCabinForm';
 
 const TableRow = styled.div`
   display: grid;
@@ -45,7 +47,14 @@ const Discount = styled.div`
   color: var(--color-green-700);
 `;
 
+const ButtonBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+`;
+
 function CabinRow({ cabin }) {
+  const [showForm, setShowForm] = useState(false);
   const { id, name, imageUrl, maxCapacity, regularPrice, discount } = cabin;
 
   //for the onSuccess cache clearing we need access to our queryClient from the App page
@@ -65,16 +74,39 @@ function CabinRow({ cabin }) {
   });
 
   return (
-    <TableRow role="row">
-      <Img src={imageUrl} />
-      <Cabin>{name}</Cabin>
-      <div>Fits upto {maxCapacity} guests</div>
-      <Price>{formatCurrency(regularPrice)}</Price>
-      <Discount>{formatCurrency(discount)}</Discount>
-      <Button onClick={() => mutate(id)} disabled={isDeleting}>
-        Delete
-      </Button>
-    </TableRow>
+    <>
+      <TableRow role="row">
+        <Img src={imageUrl} />
+        <Cabin>{name}</Cabin>
+        <div>Fits upto {maxCapacity} guests</div>
+        <Price>{formatCurrency(regularPrice)}</Price>
+        <Discount>{formatCurrency(discount)}</Discount>
+        <ButtonBox>
+          <Button
+            size="small"
+            variation="primary"
+            onClick={() => setShowForm((show) => !show)}
+            disabled={isDeleting}
+          >
+            {showForm ? 'Close' : 'Edit'}
+          </Button>
+          <Button
+            size="small"
+            variation="danger"
+            onClick={() => mutate(id)}
+            disabled={isDeleting}
+          >
+            Delete
+          </Button>
+        </ButtonBox>
+      </TableRow>
+      {showForm && (
+        <CreateCabinForm
+          closeMe={() => setShowForm(false)}
+          cabinToEdit={cabin}
+        />
+      )}
+    </>
   );
 }
 
