@@ -15,7 +15,11 @@ export async function getCabins() {
   return data;
 }
 
-//Delete cabin row based on id
+/**
+ * Delete cabin row and associated image based on unique row id
+ * @param {Number} id unique row id
+ * @returns {CabinObject} {name: string, maxCapacity: number, regularPrice: number, discount: number, description: string, imageUrl: string}
+ */
 export async function deleteCabin(id) {
   //select().single() used to get reference to associated image file
   const { data, error } = await supabase
@@ -28,20 +32,22 @@ export async function deleteCabin(id) {
     console.error(error);
     throw new Error(`Could not delete cabin with id: ${id}`);
   } else {
-    console.table(data);
+    console.log(
+      `Cabin ${data.name} was successfully deleted, now removing associated image from storage...`
+    );
     await deleteCabinImage(data.imageUrl).catch((error) => {
       throw new Error(
         `Could not delete the image associated with the cabin called ${data.name}`
       );
     });
   }
+  return data;
 }
 
 /**
- *
- * @param {String} imageName - file name eg 'image.jpg
- * @param {File} imageFile - the image file to upload
- * @returns {Promise<Union>} - resolved - it returns an object {"path":file name,"id":image id string,"fullPath":bucket name/file name}, rejected - StorageError
+ * This will either attempt to upload an image file to the cabin-images storage bucket or reformat the string url of an already existing image file so that updateCabin or createCabin can function without being aware of which of the options is being dealt with
+ * @param {FileObject[] | String} imageFile - the image File to upload or the string url to an already existing image in the storage bucket
+ * @returns {Promise<Union>} resolved - { data: {"path":file name,"id":image id string,"fullPath":bucket name/file name}; error: null } | rejected - {data: null; error: StorageError}
  */
 // function uploadCabinImage(imageName, imageFile) {
 function uploadCabinImage(imageFile) {
@@ -50,6 +56,9 @@ function uploadCabinImage(imageFile) {
     const urlArray = imageFile.split('/');
     const filename = urlArray.pop();
     const filepath = `${urlArray.pop()}/${filename}`;
+    console.log(
+      `Image ${filename} already exists in storage, no need to upload...`
+    );
     return new Promise((resolve) =>
       resolve({
         data: { path: filename, fullPath: filepath, id: null },
@@ -59,10 +68,22 @@ function uploadCabinImage(imageFile) {
   }
   //make sure the image name is formatted correctly for uploading
   const imgName = `${Math.random()}-${imageFile.name}`.replaceAll('/', '_');
+  console.log(`Image ${imgName} is a new file and so will be uploaded...`);
   //upload the image to our supabase bucket called cabin-images and return the Promise
   return supabase.storage.from(cabinBucket).upload(imgName, imageFile);
 }
 
+/**
+ *
+ * @param {String} imageName - either the full url of the image to be deleted or simply the name of the image
+ * @returns {Promise<Union>} - resolved - {
+    data: FileObject[];
+    error: null;
+} | rejected - {
+    data: null;
+    error: StorageError;
+}
+ */
 function deleteCabinImage(imageName) {
   //check if it's the image url or image name
   if (imageName.startsWith?.(storageUrl)) {
@@ -72,11 +93,34 @@ function deleteCabinImage(imageName) {
   return supabase.storage.from(cabinBucket).remove([imageName]);
 }
 
+/**
+ * 
+ * @param {CabinObject} cabinData - {name: string, maxCapacity: number, regularPrice: number, discount: number, description: string, imageUrl: string} 
+ * @returns {Promise<Union>} resolved - {
+    data: CabinObject;
+    error: null;
+} | rejected - {
+    data: null;
+    error: StorageError;
+}
+ */
 function createCabin(cabinData) {
-  return supabase.from('cabins').insert(cabinData);
+  return supabase.from('cabins').insert(cabinData).select().single();
 }
 
-async function updateCabin(id, cabinData) {
+/**
+ * 
+ * @param {Number} id - unique row id of cabin to be updated
+ * @param {CabinObject} cabinData -{name: string, maxCapacity: number, regularPrice: number, discount: number, description: string, imageUrl: string} 
+ * @returns  {Promise<Union>} resolved - {
+    data: CabinObject;
+    error: null;
+} | rejected - {
+    data: null;
+    error: StorageError;
+}
+ */
+function updateCabin(id, cabinData) {
   return supabase
     .from('cabins')
     .update(cabinData)
@@ -85,7 +129,11 @@ async function updateCabin(id, cabinData) {
     .single();
 }
 
-//for some reason the numbers are being cast to string en-route to here so I'm going to clean it up to see if that is what is causing my 400 error
+/**
+ * for some reason the numbers are being cast to string en-route to here so I'm going to clean it up
+ * @param {CabinObject} data  -{name: string, maxCapacity: string, regularPrice: string, discount: string, description: string, imageUrl: string}
+ * @returns {CabinObject}  -{name: string, maxCapacity: number, regularPrice: number, discount: number, description: string, imageUrl: string}
+ */
 function cleanDataTypes(data) {
   let { maxCapacity, regularPrice, discount, name, description, imageUrl } =
     data;
@@ -95,16 +143,27 @@ function cleanDataTypes(data) {
   return { name, maxCapacity, regularPrice, discount, description, imageUrl };
 }
 
+/**
+ * If id (unique row id) is included this will update a cabin row otherwise it will add a new cabin to the database.
+ * if oldImage (image name or storage url) is included it will delete that image before uploading the new image
+ * @param {ExtendedCabinObject} newCabin -{name: string, maxCapacity: number | string, regularPrice: number | string, discount: number | string, description: string, imageUrl: FIleObject[], [...id: number, oldImage: string]}
+ * @returns {CabinObject} {name: string, maxCapacity: number, regularPrice: number, discount: number, description: string, imageUrl: string}
+ */
 export async function createEditCabin(newCabin) {
   //We send different data through depending on if it's being edited/created and if it's being edited then we might have changed the image
   let { id, oldImage, ...cabinData } = newCabin;
   cabinData = cleanDataTypes(cabinData);
-  console.log(`id: ${id}, oldImage:${oldImage}`);
-  console.table(cabinData);
+  // console.log(`id: ${id}, oldImage:${oldImage}`);
+  // console.table(cabinData);
 
   if (oldImage) {
     //the image has been changed during editing so delete the old one so it doesn't become an orphan
-    await deleteCabinImage(oldImage).catch((error) => console.log(error));
+    await deleteCabinImage(oldImage)
+      .then(console.log('Old image successfully removed'))
+      .catch((error) => {
+        console.log(error);
+        throw new Error('Could not delete old image');
+      });
   }
 
   let imageUploadData = null;
@@ -116,29 +175,24 @@ export async function createEditCabin(newCabin) {
     console.error(uploadError);
     throw new Error(`Could not upload cabin image`);
   } else {
-    console.log(`returned data from upload: ${JSON.stringify(uploadData)}`);
-    console.log('Image successfully uploaded, creating cabin...');
+    console.log('Image upload function successful');
     imageUploadData = uploadData;
   }
 
-  //if upload is successful then create or update the cabin that has the uploaded image associated, if there is an id then it is an edit so update
+  //if upload has not thrown an error then create or update the cabin that has the uploaded image associated, if there is an id then it is an edit so update
   let createEditData = null;
-  let createEditError = null;
   if (id) {
     //update cabin
-    console.log('Updating Cabin....');
-    const updateCabinData = {
+    console.log(`Updating Cabin....${id}`);
+    const { data: updateData, error: updateError } = await updateCabin(id, {
       ...cabinData,
       imageUrl: `${storageUrl}${imageUploadData.fullPath}`,
-    };
-    const { data: updateData, error: updateError } = await updateCabin(
-      id,
-      updateCabinData
-    );
+    });
     createEditData = updateData;
-    createEditError = updateError;
     if (updateError) {
-      throw new Error(`Could not update cabin ${id} - ${updateCabinData}`);
+      throw new Error(`Could not update cabin ${id}`);
+    } else {
+      console.log(`Cabin "${updateData.name}" successfully updated`);
     }
   } else {
     //create cabin
@@ -148,19 +202,18 @@ export async function createEditCabin(newCabin) {
       imageUrl: `${storageUrl}${imageUploadData.fullPath}`,
     });
     createEditData = createData;
-    createEditError = createError;
     if (createError) {
       //if unsuccessful then clear up our storage by removing the associated image which is now orphaned
-      await deleteCabinImage(imageUploadData.path).catch((error) =>
-        console.log(error)
-      );
+      await deleteCabinImage(imageUploadData.path).catch((error) => {
+        //we won't throw an error as it is just part of the create new cabin failing which throws an error of it's own
+        console.error(
+          'Could not remove image when creating a new cabin failed'
+        );
+      });
       throw new Error(`Could not add new cabin`);
+    } else {
+      console.log(`Cabin "${createData.name}" successfully created`);
     }
-  }
-  //Deal with the Promise from inserting the cabin
-  if (!createEditError) {
-    console.log('Cabin created successfully');
-    console.table(createEditData);
   }
 
   return createEditData;
