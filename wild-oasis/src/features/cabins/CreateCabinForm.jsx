@@ -59,12 +59,14 @@ const EditImgDiv = styled.div`
 
 //See CreateCabinForm-v1 for extensive learning notes
 function CreateCabinForm({ closeMe, cabinToEdit }) {
+  //if cabinToEdit is passed through then we are in editing mode rather than creating a new cabin
   const isEditing = Boolean(cabinToEdit);
+  //if editing extract the cabin id and the current data, otherwise set both to null
   const { id: editId, ...editData } = cabinToEdit ?? {};
-  //decided to show the current image when editing and allow it to be changed if required
+  //I decided to show the current image when editing and allow it to be changed if required
   const [addNewImage, setAddNewImage] = useState(!isEditing);
-  //console.log(`Cabin Edit Mode = ${isEditing}`);
 
+  //React-hook-form usage setup
   const { register, handleSubmit, reset, formState } = useForm({
     defaultValues: isEditing ? editData : {},
   });
@@ -72,44 +74,30 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
 
   //React query usage
   const queryClient = useQueryClient();
-  //Create cabin
-  const { mutate: createMutate, isLoading: isCreating } = useMutation({
+  const { mutate: createEditMutate, isLoading: isBusy } = useMutation({
     mutationFn: createEditCabin,
-    onSuccess: () => {
-      toast.success('New cabin successfully created');
+    onSuccess: (data) => {
+      toast.success(
+        `New cabin "${data.name}" successfully ${
+          isEditing ? 'updated' : 'created'
+        }`
+      );
       //to reload cabins data
       queryClient.invalidateQueries({ queryKey: ['cabins'] });
       reset();
       //and close the form? I think if we want to add multiple we'd expect to do it one at a time
       closeMe();
     },
-    onError: () => {
-      toast.error('Something went wrong whilst trying to add this new cabin');
+    onError: (error) => {
+      toast.error(`Something went wrong whilst trying to add this new cabin -
+        ${error.message}`);
     },
   });
 
-  //Edit cabin
-  // const { mutate: editMutate, isLoading: isUpdating } = useMutation({
-  //   mutationFn: createCabin,
-  //   onSuccess: () => {
-  //     toast.success('New cabin successfully created');
-  //     //to reload cabins data
-  //     queryClient.invalidateQueries({ queryKey: ['cabins'] });
-  //     reset();
-  //     //and close the form? I think if we want to add multiple we'd expect to do it one at a time
-  //     closeMe();
-  //   },
-  //   onError: () => {
-  //     toast.error('Something went wrong whilst trying to add this new cabin');
-  //   },
-  // });
-
-  const isBusy = isCreating;
-
   function submitCabin(data) {
-    //upload our image by selecting the file and name it in accordance with our db naming convention
     if (isEditing) {
-      //console.log(editData.imageUrl.split('/'));
+      //edit mode so we need to pass in the id
+      //check if we have changed the image and structure the data accordingly by adding the oldImage property to remove the image that is no longer associated with a cabin
       data = addNewImage
         ? {
             oldImage: editData.imageUrl,
@@ -119,10 +107,11 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
           }
         : { id: editId, ...data, imageUrl: editData.imageUrl };
     } else {
+      //create mode
       data = { ...data, imageUrl: data.imageUrl[0] };
     }
-    //console.log(data);
-    createMutate(data);
+
+    createEditMutate(data);
   }
 
   function onError(errors) {
@@ -132,8 +121,6 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
   //for when you want to change the image when editing rather than creating
   function handleChangeImage(e) {
     e.preventDefault();
-    //editData.imageUrl = null;
-    console.log(`editData.imageUrl: ${editData.imageUrl}`);
     setAddNewImage(true);
   }
 
@@ -161,6 +148,10 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
           min: {
             value: 1,
             message: 'Capacity must be 1 or greater',
+          },
+          max: {
+            value: 30,
+            message: 'Capacity cannot be greater than 30',
           },
         }}
         errors={errors}
