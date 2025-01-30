@@ -153,8 +153,6 @@ export async function createEditCabin(newCabin) {
   //We send different data through depending on if it's being edited/created and if it's being edited then we might have changed the image
   let { id, oldImage, ...cabinData } = newCabin;
   cabinData = cleanDataTypes(cabinData);
-  // console.log(`id: ${id}, oldImage:${oldImage}`);
-  // console.table(cabinData);
 
   if (oldImage) {
     //the image has been changed during editing so delete the old one so it doesn't become an orphan
@@ -188,11 +186,11 @@ export async function createEditCabin(newCabin) {
       ...cabinData,
       imageUrl: `${storageUrl}${imageUploadData.fullPath}`,
     });
-    createEditData = updateData;
     if (updateError) {
       throw new Error(`Could not update cabin ${id}`);
     } else {
       console.log(`Cabin "${updateData.name}" successfully updated`);
+      createEditData = updateData;
     }
   } else {
     //create cabin

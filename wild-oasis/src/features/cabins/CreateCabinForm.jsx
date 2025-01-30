@@ -5,7 +5,7 @@ import Button from '../../ui/Button';
 import FileInput from '../../ui/FileInput';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createEditCabin } from '../../services/apiCabins';
+import { createEditCabin } from '../../services/apiCabins-v1';
 import toast from 'react-hot-toast';
 import RegisteredFormInput from '../../ui/RegisteredFormInput';
 import { useState } from 'react';
