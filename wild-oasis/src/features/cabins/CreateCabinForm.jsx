@@ -9,6 +9,7 @@ import { createEditCabin } from '../../services/apiCabins-v1';
 import toast from 'react-hot-toast';
 import RegisteredFormInput from '../../ui/RegisteredFormInput';
 import { useState } from 'react';
+import { useCreateEditCabin } from './useCreateEditCabin';
 
 const FormRow = styled.div`
   display: grid;
@@ -72,27 +73,29 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
   });
   const { errors } = formState;
 
+  const { createEditMutate, isBusy } = useCreateEditCabin(isEditing);
+
   //React query usage
-  const queryClient = useQueryClient();
-  const { mutate: createEditMutate, isLoading: isBusy } = useMutation({
-    mutationFn: createEditCabin,
-    onSuccess: (data) => {
-      toast.success(
-        `New cabin "${data.name}" successfully ${
-          isEditing ? 'updated' : 'created'
-        }`
-      );
-      //to reload cabins data
-      queryClient.invalidateQueries({ queryKey: ['cabins'] });
-      reset();
-      //and close the form? I think if we want to add multiple we'd expect to do it one at a time
-      closeMe();
-    },
-    onError: (error) => {
-      toast.error(`Something went wrong whilst trying to add this new cabin -
-        ${error.message}`);
-    },
-  });
+  // const queryClient = useQueryClient();
+  // const { mutate: createEditMutate, isLoading: isBusy } = useMutation({
+  //   mutationFn: createEditCabin,
+  //   onSuccess: (data) => {
+  //     toast.success(
+  //       `New cabin "${data.name}" successfully ${
+  //         isEditing ? 'updated' : 'created'
+  //       }`
+  //     );
+  //     //to reload cabins data
+  //     queryClient.invalidateQueries({ queryKey: ['cabins'] });
+  //     reset();
+  //     //and close the form? I think if we want to add multiple we'd expect to do it one at a time
+  //     closeMe();
+  //   },
+  //   onError: (error) => {
+  //     toast.error(`Something went wrong whilst trying to add this new cabin -
+  //       ${error.message}`);
+  //   },
+  // });
 
   function submitCabin(data) {
     if (isEditing) {
@@ -110,15 +113,20 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
       //create mode
       data = { ...data, imageUrl: data.imageUrl[0] };
     }
-
-    createEditMutate(data);
+    //This mutation function also receives the onSuccess, onError, etc so that we can perform extra functionality now that we've extracted the react query functionailty into it's own custom hook
+    createEditMutate(data, {
+      onSuccess: () => {
+        reset();
+        closeMe();
+      },
+    });
   }
 
   function onError(errors) {
     toast.error('Please check that you have filled out the form correctly');
   }
 
-  //for when you want to change the image when editing rather than creating
+  //for when you want to change the image when editing rather than when creating
   function handleChangeImage(e) {
     e.preventDefault();
     setAddNewImage(true);
@@ -202,7 +210,7 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
           <>
             <Label>Cabin photo</Label>
             <EditImgDiv>
-              <EditImage src={editData.imageUrl} />
+              <EditImage src={editData.imageUrl} alt="Current cabin image" />
               <span>
                 <Button
                   size="small"

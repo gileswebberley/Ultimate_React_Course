@@ -6,6 +6,7 @@ import { deleteCabin } from '../../services/apiCabins-v1';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 import CreateCabinForm from './CreateCabinForm';
+import { useDeleteCabin } from './useDeleteCabin';
 
 const TableRow = styled.div`
   display: grid;
@@ -55,32 +56,18 @@ const ButtonBox = styled.div`
 
 function CabinRow({ cabin }) {
   const [showForm, setShowForm] = useState(false);
+  //extracted the deletion to a custom hook because it uses a couple of hooks
+  const { isDeleting, deleteCabinMutate } = useDeleteCabin();
   const { id, name, imageUrl, maxCapacity, regularPrice, discount } = cabin;
-
-  //for the onSuccess cache clearing we need access to our queryClient from the App page
-  const queryClient = useQueryClient();
-
-  //To allow the delete functionality to work we do not use useQuery but instead useMutation which provides the mutate function, a bit like dispatch from useDispatch
-  const { isLoading: isDeleting, mutate } = useMutation({
-    mutationFn: (id) => deleteCabin(id),
-    //clear the cache when it's deleted so the ui updates
-    onSuccess: () => {
-      //you can use the devtools to see the name of the queryKey
-      queryClient.invalidateQueries({ queryKey: ['cabins'] });
-      //now we can use our react hot toast notification
-      toast.success('You have successfully deleted the cabin');
-    },
-    onError: (err) => alert(err.message),
-  });
 
   return (
     <>
       <TableRow role="row">
-        <Img src={imageUrl} />
+        <Img src={imageUrl} alt="Image of this cabin" />
         <Cabin>{name}</Cabin>
         <div>Fits upto {maxCapacity} guests</div>
         <Price>{formatCurrency(regularPrice)}</Price>
-        <Discount>{formatCurrency(discount)}</Discount>
+        <Discount>{discount ? formatCurrency(discount) : 'n/a'}</Discount>
         <ButtonBox>
           <Button
             size="small"
@@ -93,7 +80,7 @@ function CabinRow({ cabin }) {
           <Button
             size="small"
             variation="danger"
-            onClick={() => mutate(id)}
+            onClick={() => deleteCabinMutate(id)}
             disabled={isDeleting}
           >
             Delete
