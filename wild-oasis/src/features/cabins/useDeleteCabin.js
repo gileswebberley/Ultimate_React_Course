@@ -16,7 +16,7 @@ export function useDeleteCabin() {
       //now we can use our react hot toast notification
       toast.success('You have successfully deleted the cabin');
     },
-    onError: (err) => alert(err.message),
+    onError: (err) => toast.error(err.message),
   });
   return { isDeleting, deleteCabinMutate };
 }

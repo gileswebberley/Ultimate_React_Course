@@ -1,16 +1,19 @@
 import styled from 'styled-components';
-import { formatCurrency } from '../../utils/helpers';
-import Button from '../../ui/Button';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteCabin } from '../../services/apiCabins-v1';
-import toast from 'react-hot-toast';
 import { useState } from 'react';
-import CreateCabinForm from './CreateCabinForm';
+import { useCreateEditCabin } from './useCreateEditCabin';
 import { useDeleteCabin } from './useDeleteCabin';
+import { formatCurrency } from '../../utils/helpers';
+
+import Button from '../../ui/Button';
+import CreateCabinForm from './CreateCabinForm';
+import SpinnerTiny from '../../ui/SpinnerTiny';
+import { HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
+import { HiArrowCircleUp } from 'react-icons/hi';
+import toast from 'react-hot-toast';
 
 const TableRow = styled.div`
   display: grid;
-  grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
+  grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr minmax(10rem, 1fr);
   column-gap: 2.4rem;
   align-items: center;
   padding: 1.4rem 2.4rem;
@@ -50,15 +53,81 @@ const Discount = styled.div`
 
 const ButtonBox = styled.div`
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   gap: 0.2rem;
+`;
+
+const ConfirmToast = styled.div`
+  background-color: var(--color-red-800);
+  color: var(--color-grey-50);
+  font-size: 16px;
+  text-align: center;
+  border-radius: 20px;
+  max-width: 400px;
+  padding: 16px 24px;
+`;
+
+const ConfirmButtons = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding-top: 20px;
 `;
 
 function CabinRow({ cabin }) {
   const [showForm, setShowForm] = useState(false);
   //extracted the deletion to a custom hook because it uses a couple of hooks
   const { isDeleting, deleteCabinMutate } = useDeleteCabin();
-  const { id, name, imageUrl, maxCapacity, regularPrice, discount } = cabin;
+  const { isBusy, createEditMutate } = useCreateEditCabin();
+  const {
+    id,
+    name,
+    imageUrl,
+    maxCapacity,
+    regularPrice,
+    discount,
+    description,
+  } = cabin;
+
+  function handleDuplicateCabin() {
+    createEditMutate({
+      name: `Copy of ${name}`,
+      maxCapacity,
+      regularPrice,
+      discount,
+      description,
+      imageUrl,
+    });
+  }
+
+  function handleDeleteCabin(id) {
+    toast.custom((t) => (
+      <ConfirmToast>
+        Are you sure you want to delete this cabin, this action cannot be
+        undone?
+        <ConfirmButtons>
+          <Button
+            size="medium"
+            variation="primary"
+            onClick={() => {
+              deleteCabinMutate(id);
+              toast.dismiss(t.id);
+            }}
+          >
+            Yes
+          </Button>
+          <Button
+            size="medium"
+            variation="primary"
+            onClick={() => toast.dismiss(t.id)}
+          >
+            Cancel
+          </Button>
+        </ConfirmButtons>
+      </ConfirmToast>
+    ));
+  }
 
   return (
     <>
@@ -73,17 +142,25 @@ function CabinRow({ cabin }) {
             size="small"
             variation="primary"
             onClick={() => setShowForm((show) => !show)}
-            disabled={isDeleting}
+            disabled={isDeleting || isBusy}
           >
-            {showForm ? 'Close' : 'Edit'}
+            {showForm ? <HiArrowCircleUp /> : <HiPencil />}
+          </Button>
+          <Button
+            size="small"
+            variation="primary"
+            onClick={() => handleDuplicateCabin()}
+            disabled={isDeleting || isBusy}
+          >
+            {isBusy ? <SpinnerTiny /> : <HiSquare2Stack />}
           </Button>
           <Button
             size="small"
             variation="danger"
-            onClick={() => deleteCabinMutate(id)}
-            disabled={isDeleting}
+            onClick={() => handleDeleteCabin(id)}
+            disabled={isDeleting || isBusy}
           >
-            Delete
+            {isDeleting ? <SpinnerTiny /> : <HiTrash />}
           </Button>
         </ButtonBox>
       </TableRow>

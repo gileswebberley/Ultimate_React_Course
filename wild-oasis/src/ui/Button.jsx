@@ -51,6 +51,11 @@ const variations = {
 };
 
 //this is our first styled component proper, so now we can use Button in place of the html button tag and it will be styled appropriately (according to this centralised definition) but still have all of the built in props of an html button. We also make it more flexible by using the props functionality of the styled component model. Use the callback function to access the props object that is passed in.
+/**
+ * @typedef {HTMLElement} Button A styled reusable button
+ * @property {String} size small | medium | large
+ * @property {String} variant primary | secondary | danger
+ */
 const Button = styled.button`
   border: none;
   border-radius: var(--border-radius-sm);
