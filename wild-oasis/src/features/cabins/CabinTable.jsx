@@ -1,8 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
-import { getCabins } from '../../services/apiCabins-v1';
 import Spinner from '../../ui/Spinner';
 import CabinRow from './CabinRow';
+import { useCabins } from './useCabins';
 
 const Table = styled.div`
   border: 1px solid var(--color-grey-200);
@@ -29,16 +28,8 @@ const TableHeader = styled.header`
 `;
 
 function CabinTable() {
-  //now we'll use react query
-  //pass in the unique query key as an array which identifies this data, and the query function which does the actual fetching but must return a promise (as in any async function). This returns a lot of isFunctions along with the status
-  const {
-    isLoading,
-    data: cabins,
-    error,
-  } = useQuery({
-    queryKey: ['cabins'],
-    queryFn: getCabins,
-  });
+  //now we'll use react query who's functionality we have extracted into useCabins
+  const { isLoading, error, cabins } = useCabins();
 
   if (isLoading) return <Spinner />;
 

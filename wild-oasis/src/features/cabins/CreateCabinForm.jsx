@@ -1,15 +1,14 @@
 import styled from 'styled-components';
 
+import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { useCreateEditCabin } from './useCreateEditCabin';
+
 import Form from '../../ui/Form';
 import Button from '../../ui/Button';
 import FileInput from '../../ui/FileInput';
-import { useForm } from 'react-hook-form';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createEditCabin } from '../../services/apiCabins-v1';
 import toast from 'react-hot-toast';
 import RegisteredFormInput from '../../ui/RegisteredFormInput';
-import { useState } from 'react';
-import { useCreateEditCabin } from './useCreateEditCabin';
 
 const FormRow = styled.div`
   display: grid;
@@ -73,29 +72,8 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
   });
   const { errors } = formState;
 
+  //Extracted react query functionality into a custom hook
   const { createEditMutate, isBusy } = useCreateEditCabin(isEditing);
-
-  //React query usage
-  // const queryClient = useQueryClient();
-  // const { mutate: createEditMutate, isLoading: isBusy } = useMutation({
-  //   mutationFn: createEditCabin,
-  //   onSuccess: (data) => {
-  //     toast.success(
-  //       `New cabin "${data.name}" successfully ${
-  //         isEditing ? 'updated' : 'created'
-  //       }`
-  //     );
-  //     //to reload cabins data
-  //     queryClient.invalidateQueries({ queryKey: ['cabins'] });
-  //     reset();
-  //     //and close the form? I think if we want to add multiple we'd expect to do it one at a time
-  //     closeMe();
-  //   },
-  //   onError: (error) => {
-  //     toast.error(`Something went wrong whilst trying to add this new cabin -
-  //       ${error.message}`);
-  //   },
-  // });
 
   function submitCabin(data) {
     if (isEditing) {

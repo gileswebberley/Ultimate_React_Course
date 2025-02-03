@@ -4,10 +4,10 @@ import toast from 'react-hot-toast';
 
 /**
  *
- * @param {Boolean} isEditMode optional - denotes whether we are creating a cabin or editing a cabin that already exists
+ * @param {Boolean} isEditMode optional - denotes whether we are creating a cabin or editing a cabin that already exists. If not stated then the success message will simply default to saying 'created' rather than 'updated' when editing.
  * @returns
  */
-export function useCreateEditCabin(isEditMode) {
+export function useCreateEditCabin(isEditMode = false) {
   const queryClient = useQueryClient();
   const { mutate: createEditMutate, isLoading: isBusy } = useMutation({
     mutationFn: createEditCabin,
