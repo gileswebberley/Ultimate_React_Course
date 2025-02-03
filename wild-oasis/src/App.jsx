@@ -20,7 +20,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       //amount of time before data is refetched
-      staleTime: 60 * 1000,
+      staleTime: 2000,
     },
   },
 });
@@ -57,16 +57,24 @@ function App() {
           containerStyle={{ margin: '8px' }}
           toastOptions={{
             success: {
-              duration: 4000,
+              duration: 5000,
+              style: {
+                backgroundColor: 'var(--color-green-700)',
+                color: 'var(--color-grey-50)',
+              },
             },
             error: {
               duration: 5000,
+              style: {
+                backgroundColor: 'var(--color-red-800)',
+                color: 'var(--color-grey-50)',
+              },
             },
             style: {
               fontSize: '16px',
               maxWidth: '400px',
               padding: '16px 24px',
-              backgroundColor: 'var(--color-green-700)',
+              backgroundColor: 'var(--color-grey-800)',
               color: 'var(--color-grey-50)',
             },
           }}

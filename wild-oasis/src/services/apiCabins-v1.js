@@ -18,6 +18,48 @@ export async function getCabins() {
 }
 
 /**
+ * @typedef {Object} CabinObject An object that reflects the data required for a cabin entry in the database table 'cabins'
+ * @property {String} name Cabin name
+ * @property {Number} maxCapacity The maximum number of guests that fit in this cabin
+ * @property {Number} regularPrice The list price per chargeable unit of time
+ * @property {Number} discount Any discount applied to be removed from regularPrice per chargeable unit of time
+ * @property {String} description Short description to appear on the website
+ * @property {String} imageUrl The url of the image stored in the bucket called cabin-images
+ */
+
+/**
+ * @typedef {Object} ImageCabinObject An object that reflects the data required for a cabin entry in the database table 'cabins' but with an image file that needs to be uploaded to storage (this must be converted to the storage url before it can be entered into the database)
+ * @property {String} name Cabin name
+ * @property {Number} maxCapacity The maximum number of guests that fit in this cabin
+ * @property {Number} regularPrice The list price per chargeable unit of time
+ * @property {Number} discount Any discount applied to be removed from regularPrice per chargeable unit of time
+ * @property {String} description Short description to appear on the website
+ * @property {File[]} imageUrl The image File[]
+ */
+
+/**
+ * @typedef {Object} FileObject Information about a file that is stored in a supabase storage bucket
+ * @property {String} name Image file name eg 'image-1.jpg
+ * @property {String} bucket_id The bucket name
+ * @property {String} owner registered owner
+ * @property {String} owner_id registered owner's id
+ * @property {String} version file version number
+ * @property {String} id file's unique storage id
+ * @property {String} updated_at date string for when it was last updated
+ * @property {String} created_at date string of when it was first uploaded
+ * @property {String} last_accessed_at date string for when the file was last accessed
+ * @property {Object} metadata original file metadata including 'size' in bytes
+ * @property {Object} user_metadata additional metadata
+ */
+
+/**
+ * @typedef {Object} StorageObject An object that reflects the data required for a cabin entry in the database table 'cabins' but with an image file that needs to be uploaded to storage (this must be converted to the storage url before it can be entered into the database)
+ * @property {String} path Image file name eg 'image-1.jpg
+ * @property {String} id
+ * @property {String} fullPath Path with storage bucket name and image name eg 'bucket-1/image-1.jpg'
+ */
+
+/**
  * Delete cabin row and associated image based on unique row id
  * @param {Number} id unique row id
  * @returns {CabinObject} {name: string, maxCapacity: number, regularPrice: number, discount: number, description: string, imageUrl: string}
@@ -48,11 +90,11 @@ export async function deleteCabin(id) {
 
 /**
  * This will either attempt to upload an image file to the cabin-images storage bucket or reformat the string url of an already existing image file so that updateCabin or createCabin can function without being aware of which of the options is being dealt with
- * @param {FileObject[] | String} imageFile - the image File to upload or the string url to an already existing image in the storage bucket
- * @returns {CabinImageObject} {"path":file name,"id":image id string,"fullPath":bucket name/file name}
+ * @param {File[] | String} imageFile - the image File to upload or the string url to an already existing image in the storage bucket
+ * @returns {FileObject} {"path":file name,"id":image id string,"fullPath":bucket name/file name}
  */
 async function uploadCabinImage(imageFile) {
-  //If it's a url then we have been sent the wrong thing and so it already exists in the storage bucket
+  //If it's a url then we have been sent the wrong thing and so it already exists in the storage bucket - no need since the refactor but I don't think it hurts to leave it here in case it is used this way by someone
   if (imageFile.startsWith?.(storageUrl)) {
     const urlArray = imageFile.split('/');
     const filename = urlArray.pop();
@@ -80,14 +122,8 @@ async function uploadCabinImage(imageFile) {
 
 /**
  *
- * @param {String} imageName - either the full url of the image to be deleted or simply the name of the image
- * @returns {Union} - resolved - {
-    data: FileObject[];
-    error: null;
-} | rejected - {
-    data: null;
-    error: StorageError;
-}
+ * @param {String} imageName - either the full storage bucket url of the image to be deleted or simply the name of the image
+ * @returns {StorageObject} information about the file and it's storage
  */
 async function deleteCabinImage(imageName) {
   //check if it's the image url or image name
@@ -103,8 +139,9 @@ async function deleteCabinImage(imageName) {
     console.log(error);
     throw new Error('Could not delete old image');
   } else {
+    console.table(data[0].metadata);
     console.log(`Image ${data[0].name} removed`);
-    return { data, error };
+    return data[0];
   }
 }
 
@@ -146,7 +183,7 @@ function updateCabin(id, cabinData) {
 
 /**
  * for some reason the numbers are being cast to string en-route to here so I'm going to clean it up
- * @param {CabinObject} data  -{name: string, maxCapacity: string, regularPrice: string, discount: string, description: string, imageUrl: string}
+ * @param {StringCabinObject} data  -{name: string, maxCapacity: string, regularPrice: string, discount: string, description: string, imageUrl: string}
  * @returns {CabinObject}  -{name: string, maxCapacity: number, regularPrice: number, discount: number, description: string, imageUrl: string}
  */
 function cleanDataTypes(data) {
@@ -160,8 +197,20 @@ function cleanDataTypes(data) {
 
 async function cabinUpdater(id, cabinData, oldImage = null) {
   if (oldImage) {
-    //the image has been changed during editing so delete the old one so it doesn't become an orphan
-    await deleteCabinImage(oldImage);
+    try {
+      //upload the new image and set cabinData.imageUrl to it's path (rather than the File[] that this function has received it as)
+      const imageUploadData = await uploadCabinImage(cabinData.imageUrl);
+      cabinData = {
+        ...cabinData,
+        imageUrl: `${storageUrl}${imageUploadData.fullPath}`,
+      };
+      //the image has been changed during editing delete the old one so it doesn't become an orphan now that the new one has been successfully uploaded
+      await deleteCabinImage(oldImage);
+    } catch (error) {
+      throw new Error(
+        `There was a problem whilst trying to update cabin "${cabinData.name}" to a new image: ${error.message}`
+      );
+    }
   }
 
   const { data: updateData, error: updateError } = await updateCabin(
@@ -169,22 +218,30 @@ async function cabinUpdater(id, cabinData, oldImage = null) {
     cabinData
   );
   if (updateError) {
-    throw new Error(`Could not update cabin ${id}`);
+    throw new Error(`Could not update cabin ${cabinData.name}`);
   } else {
-    console.log(`Cabin "${updateData.name}" successfully updated`);
+    console.log(`Cabin "${cabinData.name}" successfully updated`);
     return updateData;
   }
 }
 
-async function cabinCreator(cabinData, imageData) {
+/**
+ * Create a new cabin in the database including the upload of the associated image file
+ * @param {ImageCabinObject | CabinObject} cabinData { name: string, maxCapacity: number | string, regularPrice: number | string, discount: number | string, description: string, imageUrl: FIleObject[] | string }
+ * @returns {CabinObject} { name: string, maxCapacity: number | string, regularPrice: number | string, discount: number | string, description: string, imageUrl: string }
+ */
+async function cabinCreator(cabinData) {
+  //upload the image to our supabase bucket called cabin-images, if it's already in the bucket it will be a url to an already existing one which this function will take care of
+  const imageUploadData = await uploadCabinImage(cabinData.imageUrl);
   const { data: createData, error: createError } = await createCabin({
     ...cabinData,
-    imageUrl: `${storageUrl}${imageData.fullPath}`,
+    imageUrl: `${storageUrl}${imageUploadData.fullPath}`,
   });
   if (createError) {
     //if unsuccessful then clear up our storage by removing the associated image which is now orphaned
-    const { error: deleteError } = await deleteCabinImage(imageData.path);
-    if (deleteError) {
+    try {
+      await deleteCabinImage(imageUploadData.path);
+    } catch (error) {
       //we won't throw an error as it is just part of the create new cabin failing which throws an error of it's own
       console.error('Could not remove image when creating a new cabin failed');
     }
@@ -197,8 +254,8 @@ async function cabinCreator(cabinData, imageData) {
 
 /**
  * If id (unique row id) is included this will update a cabin row otherwise it will add a new cabin to the database.
- * if oldImage (image name or storage url) is included it will delete that image before uploading the new image
- * @param {ExtendedCabinObject} newCabin -{name: string, maxCapacity: number | string, regularPrice: number | string, discount: number | string, description: string, imageUrl: FIleObject[], [...id: number, oldImage: string]}
+ * if oldImage (image name or storage url) is included along with id it will delete that image before uploading the new image
+ * @param {ExtendableCabinObject} newCabin -{name: string, maxCapacity: number | string, regularPrice: number | string, discount: number | string, description: string, imageUrl: FIleObject[], [...id: number, oldImage: string]}
  * @returns {CabinObject} {name: string, maxCapacity: number, regularPrice: number, discount: number, description: string, imageUrl: string}
  */
 export async function createEditCabin(newCabin) {
@@ -206,33 +263,21 @@ export async function createEditCabin(newCabin) {
   let { id, oldImage, ...cabinData } = newCabin;
   cabinData = cleanDataTypes(cabinData);
 
-  let imageUploadData = null;
+  //let imageUploadData = null;
   //upload the image to our supabase bucket called cabin-images, if it's already in the bucket it will be a url to an already existing one which this function will take care of
-  imageUploadData = await uploadCabinImage(cabinData.imageUrl);
+  //const imageUploadData = await uploadCabinImage(cabinData.imageUrl);
 
   //if upload has not thrown an error then create or update the cabin that has the uploaded image associated, if there is an id then it is an edit so update
   let createEditData = null;
   if (id) {
     //update cabin
     console.log(`Updating Cabin....${id}`);
-    createEditData = await cabinUpdater(
-      id,
-      {
-        ...cabinData,
-        imageUrl: `${storageUrl}${imageUploadData.fullPath}`,
-      },
-      oldImage
-    );
+    console.table(cabinData);
+    createEditData = await cabinUpdater(id, cabinData, oldImage);
   } else {
     //create cabin
     console.log(`Creating Cabin...`);
-    createEditData = await cabinCreator(
-      {
-        ...cabinData,
-        imageUrl: `${storageUrl}${imageUploadData.fullPath}`,
-      },
-      imageUploadData
-    );
+    createEditData = await cabinCreator(cabinData);
   }
 
   return createEditData;
