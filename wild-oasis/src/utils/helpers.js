@@ -27,3 +27,9 @@ export const formatCurrency = (value) =>
   new Intl.NumberFormat('en', { style: 'currency', currency: 'GBP' }).format(
     value
   );
+
+export const camelToFlat = (c) => {
+  c = c.replace(/[A-Z]/g, ' $&');
+  c = c[0].toUpperCase() + c.slice(1);
+  return c;
+};
