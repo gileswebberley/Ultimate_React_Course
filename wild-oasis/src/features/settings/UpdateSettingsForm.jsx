@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
 import Input from '../../ui/Input';
@@ -28,7 +29,16 @@ function UpdateSettingsForm() {
     updateSetting({ [fieldName]: value });
   }
 
+  function handleValidate(e) {
+    const { value } = e.target;
+    if (value < 0) {
+      toast.error('Negative values are not permitted');
+      return (e.target.value = 0);
+    }
+  }
+
   if (isLoading) return <Spinner />;
+  if (error) return <div>ERROR: {error}</div>;
 
   return (
     <Form>
@@ -39,6 +49,7 @@ function UpdateSettingsForm() {
           defaultValue={minBookingLength}
           disabled={isUpdatingSetting}
           onBlur={(e) => handleUpdate(e, 'minBookingLength')}
+          onChange={(e) => handleValidate(e)}
         />
       </FormRow>
       <FormRow label="Maximum nights/booking">
@@ -48,6 +59,7 @@ function UpdateSettingsForm() {
           defaultValue={maxBookingLength}
           disabled={isUpdatingSetting}
           onBlur={(e) => handleUpdate(e, 'maxBookingLength')}
+          onChange={(e) => handleValidate(e)}
         />
       </FormRow>
       <FormRow label="Maximum guests/booking">
@@ -57,6 +69,7 @@ function UpdateSettingsForm() {
           defaultValue={maxGuestsPerBooking}
           disabled={isUpdatingSetting}
           onBlur={(e) => handleUpdate(e, 'maxGuestsPerBooking')}
+          onChange={(e) => handleValidate(e)}
         />
       </FormRow>
       <FormRow label="Breakfast price">
@@ -66,6 +79,7 @@ function UpdateSettingsForm() {
           defaultValue={breakfastPrice}
           disabled={isUpdatingSetting}
           onBlur={(e) => handleUpdate(e, 'breakfastPrice')}
+          onChange={(e) => handleValidate(e)}
         />
       </FormRow>
     </Form>
