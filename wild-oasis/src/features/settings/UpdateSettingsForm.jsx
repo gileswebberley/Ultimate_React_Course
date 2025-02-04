@@ -21,9 +21,10 @@ function UpdateSettingsForm() {
   const { updateSetting, isUpdatingSetting } = useUpdateSetting();
 
   function handleUpdate(e, fieldName) {
-    const { value } = e.target;
-    //check that the value has changed rather than just being tabbed past (I think this is a safe use of eval?)
-    if (!value || Number(eval(fieldName)) === Number(value)) return;
+    const { value, defaultValue } = e.target;
+    //check that the value has changed rather than just being tabbed past
+    if (!value || Number(defaultValue) === Number(value))
+      return (e.target.value = defaultValue);
     updateSetting({ [fieldName]: value });
   }
 
