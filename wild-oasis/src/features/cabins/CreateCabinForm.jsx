@@ -58,7 +58,12 @@ const EditImgDiv = styled.div`
 `;
 
 //See CreateCabinForm-v1 for extensive learning notes
-function CreateCabinForm({ closeMe, cabinToEdit }) {
+//presentationType prop added to change form styling if used within the modal window we've created
+function CreateCabinForm({
+  closeMe,
+  cabinToEdit,
+  presentationType = 'regular',
+}) {
   //if cabinToEdit is passed through then we are in editing mode rather than creating a new cabin
   const isEditing = Boolean(cabinToEdit);
   //if editing extract the cabin id and the current data, otherwise set both to null
@@ -95,7 +100,7 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
     createEditMutate(data, {
       onSuccess: () => {
         reset();
-        closeMe();
+        closeMe?.();
       },
     });
   }
@@ -111,7 +116,7 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
   }
 
   return (
-    <Form onSubmit={handleSubmit(submitCabin, onError)}>
+    <Form onSubmit={handleSubmit(submitCabin, onError)} type={presentationType}>
       <RegisteredFormInput
         register={register}
         isLoading={isBusy}
@@ -221,7 +226,7 @@ function CreateCabinForm({ closeMe, cabinToEdit }) {
           disabled={isBusy}
           onClick={() => {
             reset();
-            closeMe();
+            closeMe?.();
           }}
         >
           Cancel

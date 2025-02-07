@@ -132,6 +132,7 @@ function CreateCabinForm({ closeMe }) {
         isLoading={isCreating}
         elementID="discount"
         labelStr="Discount"
+        // more complex validation can be achieved with the validate object which receives the current field value along with an object of all of the other field's values...
         validationObj={{
           validate: (value, fieldValues) =>
             +value <= +fieldValues.regularPrice ||

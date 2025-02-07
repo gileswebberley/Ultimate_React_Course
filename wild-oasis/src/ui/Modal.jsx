@@ -1,5 +1,7 @@
-import styled from "styled-components";
-
+import { createPortal } from 'react-dom';
+import { HiXMark } from 'react-icons/hi2';
+import styled from 'styled-components';
+//This is to create a pop-up style space to place, to start with, our add CreateCabinForm
 const StyledModal = styled.div`
   position: fixed;
   top: 50%;
@@ -11,7 +13,7 @@ const StyledModal = styled.div`
   padding: 3.2rem 4rem;
   transition: all 0.5s;
 `;
-
+//This is to blur out the background, ie the page 'behind' this modal window
 const Overlay = styled.div`
   position: fixed;
   top: 0;
@@ -23,7 +25,7 @@ const Overlay = styled.div`
   z-index: 1000;
   transition: all 0.5s;
 `;
-
+//A simple close button
 const Button = styled.button`
   background: none;
   border: none;
@@ -48,3 +50,21 @@ const Button = styled.button`
     color: var(--color-grey-500);
   }
 `;
+
+//The idea of using the createPortal is to move this outside of the DOM structure so that we can avoid parent elements' visibility styling having an affect
+function Modal({ children, closeMe }) {
+  //createPortal takes the returned JSX as it's first argument and where to place it within the DOM as it's second argument
+  return createPortal(
+    <Overlay>
+      <StyledModal>
+        <Button onClick={closeMe}>
+          <HiXMark />
+        </Button>
+        <div>{children}</div>
+      </StyledModal>
+    </Overlay>,
+    document.body
+  );
+}
+
+export default Modal;
