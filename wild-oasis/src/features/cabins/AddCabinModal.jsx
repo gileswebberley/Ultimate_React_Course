@@ -1,24 +1,19 @@
-import { useState } from 'react';
 import Button from '../../ui/Button';
 import CreateCabinForm from './CreateCabinForm';
-import Modal from '../../ui/Modal';
+import CompoundModal from '../../ui/CompoundModal';
 
 function AddCabinModal() {
-  const [showForm, setShowForm] = useState(false);
-  const closeModal = () => setShowForm(false);
   return (
-    <>
-      {!showForm && (
-        <Button onClick={() => setShowForm((show) => !show)}>
-          Add New Cabin
-        </Button>
-      )}
-      {showForm && (
-        <Modal closeMe={closeModal}>
-          <CreateCabinForm closeMe={closeModal} presentationType="modal" />
-        </Modal>
-      )}
-    </>
+    <CompoundModal>
+      <CompoundModal.Open openName="add-cabin">
+        {/* onClick prop is added to the button with cloneElement inside CompoundModal */}
+        <Button>Add New Cabin</Button>
+      </CompoundModal.Open>
+      <CompoundModal.Modal contentName="add-cabin">
+        {/* closeMe and presentationType props are added to the form with cloneElement inside CompoundModal */}
+        <CreateCabinForm />
+      </CompoundModal.Modal>
+    </CompoundModal>
   );
 }
 

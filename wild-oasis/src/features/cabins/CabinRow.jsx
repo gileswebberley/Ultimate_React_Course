@@ -80,6 +80,8 @@ function CabinRow({ cabin }) {
   //extracted the deletion to a custom hook because it uses a couple of hooks
   const { isDeleting, deleteCabinMutate } = useDeleteCabin();
   const { isBusy, createEditMutate } = useCreateEditCabin();
+  const isDisabled = isDeleting || isBusy;
+
   const {
     id,
     name,
@@ -142,7 +144,7 @@ function CabinRow({ cabin }) {
             size="small"
             variation="primary"
             onClick={() => setShowForm((show) => !show)}
-            disabled={isDeleting || isBusy}
+            disabled={isDisabled}
           >
             {showForm ? <HiArrowCircleUp /> : <HiPencil />}
           </Button>
@@ -150,7 +152,7 @@ function CabinRow({ cabin }) {
             size="small"
             variation="primary"
             onClick={() => handleDuplicateCabin()}
-            disabled={isDeleting || isBusy}
+            disabled={isDisabled}
           >
             {isBusy ? <SpinnerTiny /> : <HiSquare2Stack />}
           </Button>
@@ -158,7 +160,7 @@ function CabinRow({ cabin }) {
             size="small"
             variation="danger"
             onClick={() => handleDeleteCabin(id)}
-            disabled={isDeleting || isBusy}
+            disabled={isDisabled}
           >
             {isDeleting ? <SpinnerTiny /> : <HiTrash />}
           </Button>
