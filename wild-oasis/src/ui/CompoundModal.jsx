@@ -2,6 +2,7 @@ import { cloneElement, createContext, useContext, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { HiXMark } from 'react-icons/hi2';
 import styled from 'styled-components';
+import { useClickOutside } from '../hooks/useClickOutside';
 //This is to create a pop-up style space to place, to start with, our add CreateCabinForm
 const StyledModal = styled.div`
   position: fixed;
@@ -77,12 +78,16 @@ function Open({ openName, children }) {
 //The idea of using the createPortal is to move this outside of the DOM structure so that we can avoid parent elements' visibility styling having an affect
 function Modal({ children, contentName }) {
   const { closeModal, modalName } = useContext(ModalContext);
+  //use our custom hook to add the click outside of the window close functionality
+  const modalRef = useClickOutside(closeModal);
+
   //check if this is the named modal window that should be open
   if (modalName !== contentName) return null;
+
   //createPortal takes the returned JSX as it's first argument and where to place it within the DOM as it's second argument
   return createPortal(
     <Overlay>
-      <StyledModal>
+      <StyledModal ref={modalRef}>
         <Button onClick={closeModal}>
           <HiXMark />
         </Button>

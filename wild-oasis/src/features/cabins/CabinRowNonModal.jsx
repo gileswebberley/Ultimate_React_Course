@@ -10,8 +10,6 @@ import SpinnerTiny from '../../ui/SpinnerTiny';
 import { HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
 import { HiArrowCircleUp } from 'react-icons/hi';
 import toast from 'react-hot-toast';
-import CompoundModal from '../../ui/CompoundModal';
-import ConfirmDelete from '../../ui/ConfirmDelete';
 
 const TableRow = styled.div`
   display: grid;
@@ -133,58 +131,48 @@ function CabinRow({ cabin }) {
     ));
   }
 
-  //we are going to utilise our new modal window system for editing and for confirming deletion (see CabinRowNonModal for our toast based solution)
   return (
-    <TableRow role="row">
-      <Img src={imageUrl} alt="Image of this cabin" />
-      <Cabin>{name}</Cabin>
-      <div>Fits upto {maxCapacity} guests</div>
-      <Price>{formatCurrency(regularPrice)}</Price>
-      <Discount>{discount ? formatCurrency(discount) : 'n/a'}</Discount>
-      <ButtonBox>
-        <Button
-          size="small"
-          variation="primary"
-          onClick={() => handleDuplicateCabin()}
-          disabled={isDisabled}
-        >
-          {isBusy ? <SpinnerTiny /> : <HiSquare2Stack />}
-        </Button>
-        <CompoundModal>
-          <CompoundModal.Open openName="edit">
-            <Button
-              size="small"
-              variation="primary"
-              onClick={() => setShowForm((show) => !show)}
-              disabled={isDisabled}
-            >
-              <HiPencil />
-              {/* {showForm ? <HiArrowCircleUp /> : <HiPencil />} */}
-            </Button>
-          </CompoundModal.Open>
-          <CompoundModal.Modal contentName="edit">
-            <CreateCabinForm cabinToEdit={cabin} />
-          </CompoundModal.Modal>
-          <CompoundModal.Open openName="delete">
-            <Button
-              size="small"
-              variation="danger"
-              onClick={() => handleDeleteCabin(id)}
-              disabled={isDisabled}
-            >
-              {isDeleting ? <SpinnerTiny /> : <HiTrash />}
-            </Button>
-          </CompoundModal.Open>
-          <CompoundModal.Modal contentName="delete">
-            <ConfirmDelete
-              resourceName={`cabin (${cabin.name})`}
-              onConfirm={() => deleteCabinMutate(id)}
-              disabled={isDeleting}
-            />
-          </CompoundModal.Modal>
-        </CompoundModal>
-      </ButtonBox>
-    </TableRow>
+    <>
+      <TableRow role="row">
+        <Img src={imageUrl} alt="Image of this cabin" />
+        <Cabin>{name}</Cabin>
+        <div>Fits upto {maxCapacity} guests</div>
+        <Price>{formatCurrency(regularPrice)}</Price>
+        <Discount>{discount ? formatCurrency(discount) : 'n/a'}</Discount>
+        <ButtonBox>
+          <Button
+            size="small"
+            variation="primary"
+            onClick={() => setShowForm((show) => !show)}
+            disabled={isDisabled}
+          >
+            {showForm ? <HiArrowCircleUp /> : <HiPencil />}
+          </Button>
+          <Button
+            size="small"
+            variation="primary"
+            onClick={() => handleDuplicateCabin()}
+            disabled={isDisabled}
+          >
+            {isBusy ? <SpinnerTiny /> : <HiSquare2Stack />}
+          </Button>
+          <Button
+            size="small"
+            variation="danger"
+            onClick={() => handleDeleteCabin(id)}
+            disabled={isDisabled}
+          >
+            {isDeleting ? <SpinnerTiny /> : <HiTrash />}
+          </Button>
+        </ButtonBox>
+      </TableRow>
+      {showForm && (
+        <CreateCabinForm
+          closeMe={() => setShowForm(false)}
+          cabinToEdit={cabin}
+        />
+      )}
+    </>
   );
 }
 
