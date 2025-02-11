@@ -6,11 +6,11 @@ import { formatCurrency } from '../../utils/helpers';
 import Button from '../../ui/Button';
 import CreateCabinForm from './CreateCabinForm';
 import SpinnerTiny from '../../ui/SpinnerTiny';
-import { HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
 import CompoundModal from '../../ui/CompoundModal';
 import ConfirmDelete from '../../ui/ConfirmDelete';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
+import { HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
 
 const Img = styled.img`
   display: block;
