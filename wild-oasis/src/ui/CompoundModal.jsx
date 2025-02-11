@@ -99,7 +99,7 @@ function Modal({ children, contentName }) {
         </div>
       </StyledModal>
     </Overlay>,
-    document.body
+    document.getElementById('main')
   );
 }
 

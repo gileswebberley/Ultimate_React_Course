@@ -3,6 +3,7 @@ import Spinner from '../../ui/Spinner';
 import CabinRow from './CabinRow';
 import { useCabins } from './useCabins';
 import Table from '../../ui/Table';
+import Menus from '../../ui/Menus';
 
 // const Table = styled.div`
 //   border: 1px solid var(--color-grey-200);
@@ -37,7 +38,7 @@ function CabinTable() {
   if (error) return <div>ERROR: {error}</div>;
 
   return (
-    <Table columns="0.6fr 1.8fr 2.2fr 1fr 1fr minmax(8rem, 1fr)">
+    <Table columns="0.6fr 1.8fr 2.2fr 1fr 1fr 0.4fr">
       <Table.Header>
         <div></div>
         <div>Cabin</div>
@@ -46,10 +47,14 @@ function CabinTable() {
         <div>Discount</div>
         <div></div>
       </Table.Header>
-      <Table.Body
-        data={cabins}
-        render={(cabin) => <CabinRow role="row" cabin={cabin} key={cabin.id} />}
-      />
+      <Menus>
+        <Table.Body
+          data={cabins}
+          render={(cabin) => (
+            <CabinRow role="row" cabin={cabin} key={cabin.id} />
+          )}
+        />
+      </Menus>
     </Table>
   );
 }

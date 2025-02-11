@@ -16,12 +16,6 @@ const Main = styled.main`
   padding: 4rem 4.8rem 6.4rem;
   /* Make only the Main area scroll so the header and sidebar remain in place */
   overflow-y: auto;
-  /* Hide the scrollbar for the main area */
-  ::-webkit-scrollbar {
-    display: none; /*Chrome, Safari and Opera */
-  }
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
 `;
 
 const Container = styled.div`
@@ -37,7 +31,7 @@ function AppLayout() {
     <StyledAppLayout>
       <Header />
       <Sidebar />
-      <Main>
+      <Main id="main">
         <Container>
           <Outlet />
         </Container>

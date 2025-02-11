@@ -72,6 +72,13 @@ const GlobalStyles = createGlobalStyle`
 
   /* This affects all changes to background-color, for example all button hovers will transition in 0.3s */
   transition: background-color 0.3s, border 0.3s;
+
+  //hide scrollbars throughout the site to avoid the horrible affect on the layout when they appear - I think they are unneccessary with scroll wheels, trackpads, and finger controls?
+  ::-webkit-scrollbar {
+    display: none; /*Chrome, Safari and Opera */
+  }
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 html {
