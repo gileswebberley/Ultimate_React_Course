@@ -1,5 +1,11 @@
+import Menus from './Menus';
+
 function SortBy() {
-  return <div></div>;
+  return (
+    <Menus>
+      <Menus.Menu />
+    </Menus>
+  );
 }
 
 export default SortBy;
