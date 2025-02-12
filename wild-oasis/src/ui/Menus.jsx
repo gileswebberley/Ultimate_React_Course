@@ -19,7 +19,9 @@ const StyledToggle = styled.button`
   align-items: center;
   background: none;
   border: none;
-  padding: 0.4rem;
+  padding: 0.44rem 0.8rem;
+  font-weight: 500;
+  font-size: 1.4rem;
   /* border-radius: 50%; */
   border-radius: var(--border-radius-sm);
   /* transform: translateX(0.8rem); */
@@ -49,7 +51,7 @@ const StyledList = styled.ul`
   border-radius: var(--border-radius-md);
   /* Don't need the styled button we can just pass our styled buttons in as children of this list */
   display: flex;
-  flex-direction: row;
+  flex-direction: ${(props) => props.direction};
   align-items: center;
   gap: 1.2rem;
   padding: 1.2rem;
@@ -134,16 +136,17 @@ function Toggle({ menuId, label = '' }) {
  * This is essentially the actual context menu itself
  * @param {Object} props
  * @param {Component} props.children  automatically generated children prop which will contain the Menus.Button components that make up the menu itself
- * @param {String} menuId the unique name of this menu that correlates to the associated Toggle menuId
+ * @param {String} props.menuId the unique name of this menu that correlates to the associated Toggle menuId
+ * @param {String} props.direction Optional flex direction of the menu - row (default) | column
  * @returns
  * @memberof Menus
  */
-function List({ menuId, children }) {
+function List({ menuId, children, direction = 'row' }) {
   const { openId, position, close } = useContext(MenuContext);
   const outsideClickRef = useClickOutside(close, false);
   if (openId !== menuId) return null;
   return (
-    <StyledList position={position} ref={outsideClickRef}>
+    <StyledList position={position} ref={outsideClickRef} direction={direction}>
       {children}
     </StyledList>
   );
@@ -158,7 +161,11 @@ function List({ menuId, children }) {
  */
 function Button({ children }) {
   const { close } = useContext(MenuContext);
-  return <div onClick={() => close()}>{children}</div>;
+  return (
+    <div style={{ width: '100%' }} onClick={() => close()}>
+      {children}
+    </div>
+  );
 }
 
 Menus.Menu = Menu;
