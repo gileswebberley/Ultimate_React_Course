@@ -8,28 +8,51 @@ import { useSearchParams } from 'react-router-dom';
 function CabinTable() {
   //now we'll use react query who's functionality we have extracted into useCabins
   const { isLoading, error, cabins } = useCabins();
-  const [searchParams, setSearchParams] = useSearchParams();
+  //sorting and filtering are defined in the url - see the CabinTableOperations component
+  const [searchParams] = useSearchParams();
 
   if (isLoading) return <Spinner />;
 
   if (error) return <div>ERROR: {error}</div>;
 
-  const filter = searchParams.get('discount') ?? 'all';
+  //SORTING - if no sorting method is selected then sort by most recently created (namely the id)
+  const sort = searchParams.get('cabins-sort') ?? 'id';
 
+  let sortedCabins;
+  const sortSplit = sort.split('-');
+  //console.log(sortSplit);
+  const sortCat = sortSplit[0];
+  const sortDir = sortSplit[1];
+  if (sortCat === 'name') {
+    //it's a string comparison
+    sortedCabins = cabins.sort((a, b) =>
+      sortDir === 'asc'
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name)
+    );
+  } else {
+    //it's numerical comparison
+    sortedCabins = cabins.sort((a, b) =>
+      sortDir === 'asc' ? a[sortCat] - b[sortCat] : b[sortCat] - a[sortCat]
+    );
+  }
+
+  //FILTERING
+  const filter = searchParams.get('discount') ?? 'all';
   let filteredCabins;
 
   switch (filter) {
     case 'all':
-      filteredCabins = cabins;
+      filteredCabins = sortedCabins;
       break;
     case 'no-discount':
-      filteredCabins = cabins.filter((cabin) => cabin.discount === 0);
+      filteredCabins = sortedCabins.filter((cabin) => cabin.discount === 0);
       break;
     case 'with-discount':
-      filteredCabins = cabins.filter((cabin) => cabin.discount > 0);
+      filteredCabins = sortedCabins.filter((cabin) => cabin.discount > 0);
       break;
     default:
-      filteredCabins = cabins;
+      filteredCabins = sortedCabins;
   }
 
   return (

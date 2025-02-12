@@ -24,7 +24,7 @@ const SortButton = styled.button`
       color: var(--color-brand-600);
     `}
 
-  transition: all 0.3s;
+  transition: all 0.2s;
 `;
 
 function SortBy({ sortField, options, label }) {
@@ -47,7 +47,7 @@ function SortBy({ sortField, options, label }) {
             return (
               <Menus.Button key={i}>
                 <SortButton
-                  active={isActive}
+                  active={isActive || 'false'}
                   disabled={isActive}
                   onClick={() => handleClick(option.value)}
                 >
