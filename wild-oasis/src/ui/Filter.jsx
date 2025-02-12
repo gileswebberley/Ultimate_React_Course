@@ -1,4 +1,5 @@
-import styled, { css } from "styled-components";
+import { useSearchParams } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 
 const StyledFilter = styled.div`
   border: 1px solid var(--color-grey-100);
@@ -33,3 +34,34 @@ const FilterButton = styled.button`
     color: var(--color-brand-50);
   }
 `;
+function Filter({ filterField, options }) {
+  //to add our filter to the url (so it can be seen by the cabins table)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeFilter = searchParams.get(filterField) || options.at(0).value;
+
+  function handleClick(value) {
+    //create the url param (name, value)
+    searchParams.set(filterField, value);
+    //then add it to the url
+    setSearchParams(searchParams);
+  }
+
+  return (
+    <StyledFilter>
+      {options.map((option, i) => {
+        const isActive = activeFilter === option.value ? 'true' : undefined;
+        return (
+          <FilterButton
+            key={i}
+            onClick={() => handleClick(option.value)}
+            active={isActive}
+            disabled={Boolean(isActive)}
+          >
+            {option.title}
+          </FilterButton>
+        );
+      })}
+    </StyledFilter>
+  );
+}
+export default Filter;

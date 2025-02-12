@@ -76,6 +76,7 @@ function CabinRow({ cabin }) {
       <Price>{formatCurrency(regularPrice)}</Price>
       <Discount>{discount ? formatCurrency(discount) : 'n/a'}</Discount>
       <div>
+        {/* These are the two modal windows that are opened by the CompoundModal.Open components */}
         <CompoundModal>
           <CompoundModal.Modal contentName="edit">
             <CreateCabinForm cabinToEdit={cabin} />

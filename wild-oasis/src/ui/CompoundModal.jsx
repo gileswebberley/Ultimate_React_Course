@@ -14,6 +14,7 @@ const StyledModal = styled.div`
   box-shadow: var(--shadow-lg);
   padding: 3.2rem 4rem;
   transition: all 0.5s;
+  /* overflow-y: scroll; */
 `;
 //This is to blur out the background, ie the page 'behind' this modal window
 const Overlay = styled.div`
