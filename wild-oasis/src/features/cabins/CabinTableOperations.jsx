@@ -25,6 +25,8 @@ function CabinTableOperations() {
           { value: 'maxCapacity-desc', label: 'Capacity (High-Low)' },
           { value: 'discount-asc', label: 'Discount (Low-High)' },
           { value: 'discount-desc', label: 'Discount (High-Low)' },
+          { value: 'id-asc', label: 'Oldest' },
+          { value: 'id-desc', label: 'Most Recent' },
         ]}
       />
     </TableOperations>

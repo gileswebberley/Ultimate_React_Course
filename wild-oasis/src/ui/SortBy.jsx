@@ -18,7 +18,7 @@ const SortButton = styled.button`
   }
 
   ${(props) =>
-    props.active === true &&
+    props.active === 'true' &&
     css`
       background-color: var(--color-brand-200);
       color: var(--color-brand-600);
@@ -43,12 +43,12 @@ function SortBy({ sortField, options, label }) {
         <Menus.Toggle menuId={sortField} label={label} />
         <Menus.List menuId={sortField} direction="column">
           {options?.map((option, i) => {
-            const isActive = selectedSort === option.value;
+            const isActive = selectedSort === option.value ? 'true' : undefined;
             return (
               <Menus.Button key={i}>
                 <SortButton
-                  active={isActive || 'false'}
-                  disabled={isActive}
+                  active={isActive}
+                  disabled={Boolean(isActive)}
                   onClick={() => handleClick(option.value)}
                 >
                   {option.label}

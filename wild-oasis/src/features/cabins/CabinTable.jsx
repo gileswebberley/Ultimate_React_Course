@@ -17,12 +17,12 @@ function CabinTable() {
 
   //SORTING - if no sorting method is selected then sort by most recently created (namely the id)
   const sort = searchParams.get('cabins-sort') ?? 'id';
-
   let sortedCabins;
-  const sortSplit = sort.split('-');
+
+  const [sortCat, sortDir] = sort.split('-');
   //console.log(sortSplit);
-  const sortCat = sortSplit[0];
-  const sortDir = sortSplit[1];
+  // const sortCat = sortSplit[0];
+  // const sortDir = sortSplit[1];
   if (sortCat === 'name') {
     //it's a string comparison
     sortedCabins = cabins.sort((a, b) =>
