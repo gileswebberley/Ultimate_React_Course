@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 
 const SortButton = styled.button`
   text-align: center;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: 300;
   border: 1px solid var(--color-grey-200);
   background-color: var(--color-grey-100);

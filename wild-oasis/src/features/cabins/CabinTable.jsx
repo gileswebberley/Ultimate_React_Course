@@ -5,6 +5,7 @@ import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
 import { useSearchParams } from 'react-router-dom';
 
+//Example of client-side filtering and sorting
 function CabinTable() {
   //now we'll use react query who's functionality we have extracted into useCabins
   const { isLoading, error, cabins } = useCabins();
@@ -20,20 +21,19 @@ function CabinTable() {
   let sortedCabins;
 
   const [sortCat, sortDir] = sort.split('-');
+  const directionModifier = sortDir === 'asc' ? 1 : -1;
   //console.log(sortSplit);
   // const sortCat = sortSplit[0];
   // const sortDir = sortSplit[1];
   if (sortCat === 'name') {
     //it's a string comparison
-    sortedCabins = cabins.sort((a, b) =>
-      sortDir === 'asc'
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name)
+    sortedCabins = cabins.sort(
+      (a, b) => directionModifier * a.name.localeCompare(b.name)
     );
   } else {
     //it's numerical comparison
-    sortedCabins = cabins.sort((a, b) =>
-      sortDir === 'asc' ? a[sortCat] - b[sortCat] : b[sortCat] - a[sortCat]
+    sortedCabins = cabins.sort(
+      (a, b) => directionModifier * (a[sortCat] - b[sortCat])
     );
   }
 

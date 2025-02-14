@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import Logo from './Logo';
 import MainNav from './MainNav';
+import Uploader from '../data/Uploader';
 
 //now that this is within a grid layout (in StyledAppLayout) it becomes a grid-item. To make it span from row 1 to the end of the grid rows we set it as 1 / -1
 const StyledSidebar = styled.aside`
@@ -18,6 +19,7 @@ function Sidebar() {
     <StyledSidebar>
       <Logo />
       <MainNav />
+      {/* <Uploader /> */}
     </StyledSidebar>
   );
 }
