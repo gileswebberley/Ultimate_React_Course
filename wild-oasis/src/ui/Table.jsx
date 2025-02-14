@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 const StyledTable = styled.div`
   border: 1px solid var(--color-grey-200);
-
   font-size: 1.4rem;
   background-color: var(--color-grey-0);
   border-radius: 7px;
@@ -43,8 +42,10 @@ const StyledBody = styled.section`
 
 const Footer = styled.footer`
   background-color: var(--color-grey-50);
+  width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
+  align-content: center;
   padding: 1.2rem;
 
   /* This will hide the footer when it contains no child elements. Possible thanks to the parent selector :has 🎉 */

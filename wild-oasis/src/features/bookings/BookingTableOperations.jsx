@@ -16,16 +16,16 @@ function BookingTableOperations() {
       />
 
       <SortBy
-        sortField="bookings"
+        sortField="sortBy"
         label="Sort"
         options={[
-          { value: 'startDate-desc', label: 'Sort by date (recent first)' },
-          { value: 'startDate-asc', label: 'Sort by date (earlier first)' },
+          { value: 'startDate-desc', label: 'Sort by date (later-soon)' },
+          { value: 'startDate-asc', label: 'Sort by date (soon-later)' },
           {
             value: 'totalPrice-desc',
-            label: 'Sort by amount (high first)',
+            label: 'Sort by amount (high-low)',
           },
-          { value: 'totalPrice-asc', label: 'Sort by amount (low first)' },
+          { value: 'totalPrice-asc', label: 'Sort by amount (low-high)' },
         ]}
       />
     </TableOperations>
