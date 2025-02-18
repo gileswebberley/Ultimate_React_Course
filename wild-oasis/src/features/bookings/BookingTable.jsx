@@ -5,6 +5,7 @@ import Empty from '../../ui/Empty';
 import Spinner from '../../ui/Spinner';
 import { useBookings } from './useBookings';
 import Pagination from '../../ui/Pagination';
+import { IS_PAGINATED } from '../../utils/shared_constants';
 
 function BookingTable() {
   const { isLoading, bookings, count, error } = useBookings();
@@ -32,7 +33,7 @@ function BookingTable() {
           )}
         />
         <Table.Footer>
-          <Pagination resultCount={count} pageSize={5} />
+          {IS_PAGINATED.bookings && <Pagination resultCount={count} />}
         </Table.Footer>
       </Table>
     </Menus>

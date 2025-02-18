@@ -1,11 +1,13 @@
 import SortBy from '../../ui/SortBy';
 import Filter from '../../ui/Filter';
 import TableOperations from '../../ui/TableOperations';
+import { IS_PAGINATED } from '../../utils/shared_constants';
 
 function BookingTableOperations() {
   return (
     <TableOperations>
       <Filter
+        isPaginated={IS_PAGINATED.bookings}
         filterField="status"
         options={[
           { value: 'all', label: 'All' },

@@ -1,6 +1,7 @@
 import { HiChevronLeft, HiChevronRight } from 'react-icons/hi2';
 import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { PAGE_SIZE, IS_PAGINATED } from '../utils/shared_constants';
 
 const StyledPagination = styled.div`
   width: 100%;
@@ -58,28 +59,37 @@ const PaginationButton = styled.button`
     color: var(--color-brand-50);
   }
 
+  &:hover:active {
+    background-color: var(--color-grey-200);
+    color: var(--color-grey-50);
+  }
+
   &:disabled {
     background-color: var(--color-grey-200);
     color: var(--color-grey-50);
   }
+
+  &:focus {
+    outline: none;
+  }
 `;
 
-function Pagination({ resultCount, pageSize }) {
+function Pagination({ resultCount }) {
   //grab the page number from the url
   const [searchParams, setSearchParams] = useSearchParams();
-  const pageCount = Math.ceil(resultCount / pageSize);
+  const pageCount = Math.ceil(resultCount / PAGE_SIZE);
   //if there's only one page's worth of results then don't display this at all
   if (pageCount <= 1) return null;
 
   let currentPage = 1;
-  const paramPage = searchParams.get('page');
+  const paramPage = searchParams.get(IS_PAGINATED.NAME);
   if (paramPage) currentPage = Number(paramPage);
 
   const hasNext = currentPage < pageCount;
   const hasPrev = currentPage > 1;
 
   function changePage(pageNumber) {
-    searchParams.set('page', pageNumber);
+    searchParams.set(IS_PAGINATED.NAME, pageNumber);
     setSearchParams(searchParams);
   }
 
@@ -99,8 +109,8 @@ function Pagination({ resultCount, pageSize }) {
       </PaginationButton>
       <P>
         Showing
-        <span> {1 + (currentPage - 1) * pageSize} </span>to
-        <span> {hasNext ? currentPage * pageSize : resultCount} </span>of
+        <span> {1 + (currentPage - 1) * PAGE_SIZE} </span>to
+        <span> {hasNext ? currentPage * PAGE_SIZE : resultCount} </span>of
         <span> {resultCount} results</span>
       </P>
 

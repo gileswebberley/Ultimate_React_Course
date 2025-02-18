@@ -1,24 +1,30 @@
 import { getToday } from '../utils/helpers';
+import { PAGE_SIZE } from '../utils/shared_constants';
 import supabase from './supabase';
 
-export async function getBookings({ filter, sortBy }) {
+export async function getBookings({ filter, sortBy, page }) {
   //this select statement is getting the whole booking row and also the information from the linked (foreign keys) tables of guests and cabins - ie for each row it will collect the data from the cabin and guest referenced in that booking. When working with pagination we can also send a second argument to the select method which makes the query return the count as well as the data.
   let query = supabase
     .from('bookings')
     .select('*,cabins(name), guests(fullName, email)', { count: 'exact' });
 
-  //add filtering to the request if not null
+  //FILTER
   if (filter) query = query.eq(filter.field, filter.value);
-  //add sorting to the request if sortBy is not null
+  //SORT
   if (sortBy)
     query = query.order(sortBy.field, {
       ascending: sortBy.direction === 'asc',
     });
+  //PAGINATION
+  if (page) {
+    const from = (page - 1) * PAGE_SIZE;
+    const to = page * PAGE_SIZE - 1;
+    query = query.range(from, to);
+  }
 
   const { data, error, count } = await query;
 
   if (error) {
-    console.log('could not get bookings');
     throw new Error('Bookings could not be loaded');
   }
 
