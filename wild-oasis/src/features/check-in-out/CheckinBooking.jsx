@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import Checkbox from '../../ui/Checkbox';
 import { formatCurrency } from '../../utils/helpers';
 import { useCheckIn } from './useCheckIn';
+import { useSettings } from '../settings/useSettings';
 
 const Box = styled.div`
   /* Box */
@@ -26,16 +27,21 @@ const Box = styled.div`
 function CheckinBooking() {
   //the user must confirm that payment has been received before checking in
   const [isPaid, setIsPaid] = useState(false);
+  //to add breakfast to a booking when checking in
   const [lastMinuteBreakfast, setLastMinuteBreakfast] = useState(false);
+  const { isLoading: isLoadingSettings, settings } = useSettings();
   const { isLoading, booking } = useBooking();
-  const { isCheckingIn, checkIn } = useCheckIn();
+  const { isCheckingIn, checkIn, isAddingBreakfast, addBreakfastWithCheckIn } =
+    useCheckIn();
+
   useEffect(() => {
     setIsPaid(booking?.isPaid ?? false);
   }, [booking]);
 
   const moveBack = useMoveBack();
 
-  if (isLoading || isCheckingIn) return <Spinner />;
+  if (isLoading || isCheckingIn || isLoadingSettings || isAddingBreakfast)
+    return <Spinner />;
   // console.log(isPaid);
 
   const {
@@ -44,15 +50,43 @@ function CheckinBooking() {
     guests,
     totalPrice,
     cabinPrice,
+    extrasPrice,
     numGuests,
     hasBreakfast,
     numNights,
   } = booking;
 
-  function handleAddBreakfast() {}
+  const breakfastPrice =
+    Math.ceil(settings.breakfastPrice * numGuests * numNights * 100) / 100;
+
+  let priceToPay = bookingPaid ? 0 : totalPrice;
+  if (bookingPaid) {
+    priceToPay = lastMinuteBreakfast ? breakfastPrice : 0;
+  } else {
+    priceToPay = lastMinuteBreakfast ? breakfastPrice + cabinPrice : totalPrice;
+  }
+
+  function handleToggleBreakfast() {
+    if (!lastMinuteBreakfast) {
+      setLastMinuteBreakfast(true);
+      setIsPaid(false);
+    } else {
+      setLastMinuteBreakfast(false);
+    }
+  }
 
   function handleCheckin() {
-    if (isPaid) checkIn(bookingId);
+    if (isPaid) {
+      if (lastMinuteBreakfast) {
+        addBreakfastWithCheckIn({
+          bookingId,
+          breakfastPrice,
+          newPrice: cabinPrice + breakfastPrice,
+        });
+      } else {
+        checkIn(bookingId);
+      }
+    }
   }
 
   return (
@@ -64,17 +98,32 @@ function CheckinBooking() {
 
       <BookingDataBox booking={booking} />
 
-      <Box>
-        <Checkbox
-          checked={isPaid}
-          onChange={() => setIsPaid((confirm) => !confirm)}
-          disabled={booking?.isPaid ?? false}
-          id="confirm-paid"
-        >
-          I confirm that {guests.fullName} has paid {formatCurrency(totalPrice)}{' '}
-          in full
-        </Checkbox>
-      </Box>
+      {!hasBreakfast && (
+        <Box>
+          <Checkbox
+            checked={lastMinuteBreakfast}
+            onChange={handleToggleBreakfast}
+            // disabled={isAddingBreakfast}
+            id="addBreakfast"
+          >
+            Add breakfast to booking for {formatCurrency(breakfastPrice)}
+          </Checkbox>
+        </Box>
+      )}
+
+      {(!bookingPaid || lastMinuteBreakfast) && (
+        <Box>
+          <Checkbox
+            checked={isPaid}
+            onChange={() => setIsPaid((confirm) => !confirm)}
+            disabled={bookingPaid && !lastMinuteBreakfast}
+            id="confirm-paid"
+          >
+            I confirm that {guests.fullName} has paid the{' '}
+            {formatCurrency(priceToPay)} that is owed
+          </Checkbox>
+        </Box>
+      )}
 
       <ButtonGroup>
         {isPaid && (
