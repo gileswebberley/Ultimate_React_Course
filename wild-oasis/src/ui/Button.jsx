@@ -7,6 +7,10 @@ const sizes = {
     text-transform: uppercase;
     font-weight: 600;
     text-align: center;
+    & svg {
+      width: 1.6rem;
+      height: 1.6rem;
+    }
   `,
   medium: css`
     font-size: 1.4rem;
@@ -58,6 +62,11 @@ const variations = {
  */
 const Button = styled.button`
   border: none;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  white-space: nowrap;
+  width: 100%;
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-sm);
   ${(props) => sizes[props.size]}

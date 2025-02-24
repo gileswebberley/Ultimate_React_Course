@@ -23,10 +23,23 @@ export const getToday = function (options = {}) {
   return today.toISOString();
 };
 
-export const formatCurrency = (value) =>
-  new Intl.NumberFormat('en', { style: 'currency', currency: 'GBP' }).format(
-    value
-  );
+export const formatCurrency = (value) => {
+  //going to remove the fractional part if they are .00 as they are not needed
+  //apparently value | 0 is an efficient way to achieve the same as Math.floor with bitwise OR, although it might be a little bit dodgy cos it's only meant for integers. so we're saying "if the value rounded down is less than the original value then there must be a fractional part in the value"
+  if (Math.floor(value) < value) {
+    return new Intl.NumberFormat('en', {
+      style: 'currency',
+      currency: 'GBP',
+    }).format(value);
+  } else {
+    //remove those redundant decimal digits...
+    return new Intl.NumberFormat('en', {
+      style: 'currency',
+      currency: 'GBP',
+      maximumFractionDigits: 0,
+    }).format(value);
+  }
+};
 
 export const camelToFlat = (c) => {
   c = c.replace(/[A-Z]/g, ' $&');

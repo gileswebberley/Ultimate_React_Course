@@ -1,10 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getBookings } from '../../services/apiBookings';
 import { useSearchParams } from 'react-router-dom';
-import { IS_PAGINATED } from '../../utils/shared_constants';
+import { IS_PAGINATED, PAGE_SIZE } from '../../utils/shared_constants';
 //implementing our api-side filtering and sorting unlike the client side approach used in the CabinsTable
 export function useBookings(filterField = 'status') {
   const [searchParams] = useSearchParams();
+  //here for the pre-fetching
+  const queryClient = useQueryClient();
 
   //PAGINATION - added a safety system to pagination as filtering was dangerous, there is now an object in shared_constants where you can switch it on/off for given pages
   let page = IS_PAGINATED.bookings ? 1 : null;
@@ -37,6 +39,26 @@ export function useBookings(filterField = 'status') {
     queryKey: ['bookings', filter, sortByRaw, page], //this will now execute the associated queryFn whenever the filter variable's value changes (in this case when another filter button is pressed
     queryFn: () => getBookings({ filter, sortBy, page }), //remember that the queryfn can only have one argument so we have to put them both in an object
   });
+
+  //Pre-fetching using react query prefetchQuery (there is also an "infinite query for infinite scroll" functionality available so I'll look into that if I find a need in the future)
+  if (IS_PAGINATED.bookings) {
+    const pageCount = Math.ceil(count / PAGE_SIZE);
+    //Decided there's no point in getting the previous page if we just have a prev:next button set up as the previous page will already be cached
+    if (page > 1 && !IS_PAGINATED.IS_LINEAR) {
+      //pre-fetch the previous page
+      queryClient.prefetchQuery({
+        queryKey: ['bookings', filter, sortByRaw, page - 1],
+        queryFn: () => getBookings({ filter, sortBy, page: page - 1 }),
+      });
+    }
+    if (page < pageCount) {
+      //pre-fetch the next page
+      queryClient.prefetchQuery({
+        queryKey: ['bookings', filter, sortByRaw, page + 1],
+        queryFn: () => getBookings({ filter, sortBy, page: page + 1 }),
+      });
+    }
+  }
 
   return { isLoading, bookings, count, error };
 }
