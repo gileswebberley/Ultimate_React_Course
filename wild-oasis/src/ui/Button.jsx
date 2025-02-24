@@ -6,7 +6,6 @@ const sizes = {
     padding: 0.4rem 0.8rem;
     text-transform: uppercase;
     font-weight: 600;
-    text-align: center;
     & svg {
       width: 1.6rem;
       height: 1.6rem;
@@ -16,11 +15,19 @@ const sizes = {
     font-size: 1.4rem;
     padding: 1.2rem 1.6rem;
     font-weight: 500;
+    & svg {
+      width: 1.8rem;
+      height: 1.8rem;
+    }
   `,
   large: css`
     font-size: 1.6rem;
     padding: 1.2rem 2.4rem;
     font-weight: 500;
+    & svg {
+      width: 2rem;
+      height: 2rem;
+    }
   `,
 };
 
@@ -65,6 +72,8 @@ const Button = styled.button`
   display: flex;
   gap: 1rem;
   align-items: center;
+  justify-content: center;
+  //make it stay on one line and stretch to fit the space it is placed within
   white-space: nowrap;
   width: 100%;
   border-radius: var(--border-radius-sm);
