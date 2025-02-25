@@ -53,6 +53,7 @@ function App() {
         <GlobalStyles />
         <BrowserRouter>
           <Routes>
+            {/* We're going to wrap these routes in a protected one now that we have started to implement authentication */}
             <Route element={<AppLayout />}>
               <Route index element={<Navigate replace to="dashboard" />} />
               <Route path="dashboard" element={<Dashboard />} />

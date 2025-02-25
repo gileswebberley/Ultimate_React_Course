@@ -3,12 +3,14 @@ import Button from '../../ui/Button';
 import Form from '../../ui/Form';
 import Input from '../../ui/Input';
 import FormRow from '../../ui/FormRow';
-import { login } from '../../services/apiAuth';
+import SpinnerMini from '../../ui/SpinnerMini';
+import { useLogin } from './useLogin';
 
 function LoginForm() {
   //temp whilst developing
   const [email, setEmail] = useState('giles@example.com');
   const [password, setPassword] = useState('pass9486');
+  const { login, isLoggingIn } = useLogin();
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -38,7 +40,9 @@ function LoginForm() {
         />
       </FormRow>
       <FormRow orientation="vertical">
-        <Button size="large">Login</Button>
+        <Button size="large" disabled={isLoggingIn}>
+          {isLoggingIn ? <SpinnerMini /> : 'Login'}
+        </Button>
       </FormRow>
     </Form>
   );

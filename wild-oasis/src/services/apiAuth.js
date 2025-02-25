@@ -10,6 +10,6 @@ export async function login({ email, password }) {
     throw new Error(error.message);
   }
 
-  console.table(data);
+  //console.table(data);
   return data;
 }
