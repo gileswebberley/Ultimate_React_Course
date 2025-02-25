@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 //now let's setup react-query, a bit like setup for Redux or ContextAPI
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from 'react-hot-toast';
 
 import Dashboard from './pages/Dashboard';
 import Account from './pages/Account';
@@ -13,7 +14,6 @@ import Settings from './pages/Settings';
 import Users from './pages/Users';
 import GlobalStyles from './styles/GlobalStyles';
 import AppLayout from './ui/AppLayout';
-import { Toaster } from 'react-hot-toast';
 import Booking from './pages/Booking';
 import Checkin from './pages/Checkin';
 

@@ -1,21 +1,25 @@
 import styled from 'styled-components';
 import { format, isToday } from 'date-fns';
-
-import Tag from '../../ui/Tag';
-import Table from '../../ui/Table';
-
 import { formatCurrency } from '../../utils/helpers';
 import { formatDistanceFromNow } from '../../utils/helpers';
-import Menus from '../../ui/Menus';
-import { useNavigate } from 'react-router-dom';
-import Button from '../../ui/Button';
+
 import {
-  HiArrowDownOnSquare,
   HiArrowDownOnSquareStack,
   HiArrowUpOnSquareStack,
   HiEye,
+  HiTrash,
 } from 'react-icons/hi2';
+import Tag from '../../ui/Tag';
+import Table from '../../ui/Table';
+import SpinnerTiny from '../../ui/SpinnerTiny';
+import CompoundModal from '../../ui/CompoundModal';
+import ConfirmDelete from '../../ui/ConfirmDelete';
+import Menus from '../../ui/Menus';
+import Button from '../../ui/Button';
+
+import { useNavigate } from 'react-router-dom';
 import { useCheckOut } from '../check-in-out/useCheckOut';
+import { useDeleteBooking } from './useDeleteBooking';
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -61,6 +65,7 @@ function BookingRow({
   const navigate = useNavigate();
 
   const { checkOut, isCheckingOut } = useCheckOut();
+  const { deleteBookingMutate, isDeletingBooking } = useDeleteBooking();
 
   const statusToTagName = {
     unconfirmed: 'blue',
@@ -94,46 +99,68 @@ function BookingRow({
 
       <Amount>{formatCurrency(totalPrice)}</Amount>
 
-      <Menus.Menu>
-        <Menus.Toggle menuId={bookingId} />
-        <Menus.List menuId={bookingId} direction="column">
-          <Menus.Button>
-            <Button
-              variation="secondary"
-              size="small"
-              onClick={() => navigate(`../bookings/${bookingId}`)}
-            >
-              <HiEye />
-              <p>Details</p>
-            </Button>
-          </Menus.Button>
-          {status === 'unconfirmed' && (
+      {/* Putting in the modal compound component for the delete confirmation pop-up */}
+      <CompoundModal>
+        <CompoundModal.Modal contentName="delete">
+          <ConfirmDelete
+            resourceName={`booking for ${guestName}`}
+            onConfirm={() => deleteBookingMutate(bookingId)}
+            disabled={isDeletingBooking}
+          />
+        </CompoundModal.Modal>
+        <Menus.Menu>
+          <Menus.Toggle menuId={bookingId} />
+          <Menus.List menuId={bookingId} direction="column">
             <Menus.Button>
               <Button
                 variation="secondary"
                 size="small"
-                onClick={() => navigate(`../checkin/${bookingId}`)}
+                onClick={() => navigate(`../bookings/${bookingId}`)}
               >
-                <HiArrowDownOnSquareStack />
-                <p>Check-In</p>
+                <HiEye />
+                <p>Details</p>
               </Button>
             </Menus.Button>
-          )}
-          {status === 'checked-in' && (
+            {status === 'unconfirmed' && (
+              <Menus.Button>
+                <Button
+                  variation="secondary"
+                  size="small"
+                  onClick={() => navigate(`../checkin/${bookingId}`)}
+                >
+                  <HiArrowDownOnSquareStack />
+                  <p>Check-In</p>
+                </Button>
+              </Menus.Button>
+            )}
+            {status === 'checked-in' && (
+              <Menus.Button>
+                <Button
+                  variation="secondary"
+                  size="small"
+                  disabled={isCheckingOut}
+                  onClick={() => checkOut(bookingId)}
+                >
+                  <HiArrowUpOnSquareStack />
+                  <p>Check-Out</p>
+                </Button>
+              </Menus.Button>
+            )}
             <Menus.Button>
-              <Button
-                variation="secondary"
-                size="small"
-                disabled={isCheckingOut}
-                onClick={() => checkOut(bookingId)}
-              >
-                <HiArrowUpOnSquareStack />
-                <p>Check-Out</p>
-              </Button>
+              <CompoundModal.Open openName="delete">
+                <Button
+                  variation="danger"
+                  size="small"
+                  disabled={isDeletingBooking}
+                >
+                  {isDeletingBooking ? <SpinnerTiny /> : <HiTrash />}
+                  <p>Delete</p>
+                </Button>
+              </CompoundModal.Open>
             </Menus.Button>
-          )}
-        </Menus.List>
-      </Menus.Menu>
+          </Menus.List>
+        </Menus.Menu>
+      </CompoundModal>
     </Table.Row>
   );
 }
