@@ -81,7 +81,7 @@ function CheckinBooking() {
         addBreakfastWithCheckIn({
           bookingId,
           breakfastPrice,
-          newPrice: cabinPrice + breakfastPrice,
+          newTotal: cabinPrice + breakfastPrice,
         });
       } else {
         checkIn(bookingId);

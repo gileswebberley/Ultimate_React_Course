@@ -1,11 +1,13 @@
 import Filter from '../../ui/Filter';
 import SortBy from '../../ui/SortBy';
 import TableOperations from '../../ui/TableOperations';
+import { IS_PAGINATED } from '../../utils/shared_constants';
 
 function CabinTableOperations() {
   return (
     <TableOperations>
       <Filter
+        isPaginated={IS_PAGINATED.cabins}
         filterField="discount"
         options={[
           { value: 'all', label: 'All' },

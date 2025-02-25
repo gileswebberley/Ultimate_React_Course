@@ -13,6 +13,7 @@ import { useBooking } from './useBooking';
 import Spinner from '../../ui/Spinner';
 import { HiArrowDownOnSquareStack } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
+import { useCheckOut } from '../check-in-out/useCheckOut';
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -22,6 +23,7 @@ const HeadingGroup = styled.div`
 
 function BookingDetail() {
   const { isLoading, booking, error } = useBooking();
+  const { checkOut, isCheckingOut } = useCheckOut();
   const navigate = useNavigate();
   //console.table(booking);
   const moveBack = useMoveBack();
@@ -48,7 +50,7 @@ function BookingDetail() {
       </Row>
 
       <BookingDataBox booking={booking} />
-
+      {/* Allow for checking in when unconfirmed and checking out when checked in */}
       <ButtonGroup>
         {status === 'unconfirmed' && (
           <Button
@@ -57,6 +59,17 @@ function BookingDetail() {
             onClick={() => navigate(`../checkin/${bookingId}`)}
           >
             <p>Check-In</p>
+          </Button>
+        )}
+
+        {status === 'checked-in' && (
+          <Button
+            variation="primary"
+            size="medium"
+            disabled={isCheckingOut}
+            onClick={() => checkOut(bookingId)}
+          >
+            <p>Check-Out</p>
           </Button>
         )}
         <Button variation="secondary" onClick={moveBack}>

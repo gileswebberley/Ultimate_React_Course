@@ -28,11 +28,11 @@ export function useCheckIn() {
 
   const { isLoading: isAddingBreakfast, mutate: addBreakfastWithCheckIn } =
     useMutation({
-      mutationFn: ({ bookingId, breakfastPrice, newPrice }) =>
+      mutationFn: ({ bookingId, breakfastPrice, newTotal }) =>
         updateBooking(bookingId, {
           hasBreakfast: true,
           extrasPrice: breakfastPrice,
-          totalPrice: newPrice,
+          totalPrice: newTotal,
         }),
 
       onSuccess: (data) => {

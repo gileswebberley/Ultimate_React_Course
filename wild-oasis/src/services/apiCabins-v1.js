@@ -4,9 +4,9 @@ const storageUrl = `${supabaseUrl}/storage/v1/object/public/`;
 const cabinBucket = 'cabin-images';
 
 export async function getCabins() {
-  const { data, error } = await supabase
+  const { data, error, count } = await supabase
     .from('cabins')
-    .select('*')
+    .select('*', { count: 'exact' })
     .order('id', { ascending: true });
 
   if (error) {
@@ -14,7 +14,7 @@ export async function getCabins() {
     throw new Error('Could not load cabins data');
   }
 
-  return data;
+  return { data, count };
 }
 
 /**

@@ -12,8 +12,10 @@ import Button from '../../ui/Button';
 import {
   HiArrowDownOnSquare,
   HiArrowDownOnSquareStack,
+  HiArrowUpOnSquareStack,
   HiEye,
 } from 'react-icons/hi2';
+import { useCheckOut } from '../check-in-out/useCheckOut';
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -57,6 +59,9 @@ function BookingRow({
   },
 }) {
   const navigate = useNavigate();
+
+  const { checkOut, isCheckingOut } = useCheckOut();
+
   const statusToTagName = {
     unconfirmed: 'blue',
     'checked-in': 'green',
@@ -111,6 +116,19 @@ function BookingRow({
               >
                 <HiArrowDownOnSquareStack />
                 <p>Check-In</p>
+              </Button>
+            </Menus.Button>
+          )}
+          {status === 'checked-in' && (
+            <Menus.Button>
+              <Button
+                variation="secondary"
+                size="small"
+                disabled={isCheckingOut}
+                onClick={() => checkOut(bookingId)}
+              >
+                <HiArrowUpOnSquareStack />
+                <p>Check-Out</p>
               </Button>
             </Menus.Button>
           )}
