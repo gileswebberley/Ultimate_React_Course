@@ -1,18 +1,24 @@
-import { useState } from "react";
-import Button from "../../ui/Button";
-import Form from "../../ui/Form";
-import Input from "../../ui/Input";
-import FormRowVertical from "../../ui/FormRowVertical";
+import { useState } from 'react';
+import Button from '../../ui/Button';
+import Form from '../../ui/Form';
+import Input from '../../ui/Input';
+import FormRow from '../../ui/FormRow';
+import { login } from '../../services/apiAuth';
 
 function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  //temp whilst developing
+  const [email, setEmail] = useState('giles@example.com');
+  const [password, setPassword] = useState('pass9486');
 
-  function handleSubmit() {}
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!email || !password) return;
+    login({ email, password });
+  }
 
   return (
     <Form onSubmit={handleSubmit}>
-      <FormRowVertical label="Email address">
+      <FormRow orientation="vertical" label="Email address">
         <Input
           type="email"
           id="email"
@@ -21,8 +27,8 @@ function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-      </FormRowVertical>
-      <FormRowVertical label="Password">
+      </FormRow>
+      <FormRow orientation="vertical" label="Password">
         <Input
           type="password"
           id="password"
@@ -30,10 +36,10 @@ function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-      </FormRowVertical>
-      <FormRowVertical>
+      </FormRow>
+      <FormRow orientation="vertical">
         <Button size="large">Login</Button>
-      </FormRowVertical>
+      </FormRow>
     </Form>
   );
 }

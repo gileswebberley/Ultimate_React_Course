@@ -38,6 +38,7 @@ export function useBookings(filterField = 'status') {
   } = useQuery({
     queryKey: ['bookings', filter, sortByRaw, page], //this will now execute the associated queryFn whenever the filter variable's value changes (in this case when another filter button is pressed
     queryFn: () => getBookings({ filter, sortBy, page }), //remember that the queryfn can only have one argument so we have to put them both in an object
+    networkMode: 'offlineFirst', //this is to try to force an error to be thrown if user is offline
   });
 
   //Pre-fetching using react query prefetchQuery (there is also an "infinite query for infinite scroll" functionality available so I'll look into that if I find a need in the future)

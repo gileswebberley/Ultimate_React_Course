@@ -1,4 +1,9 @@
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import { useCheckOut } from '../check-in-out/useCheckOut';
+import { useMoveBack } from '../../hooks/useMoveBack';
+import { useBooking } from './useBooking';
+import { useDeleteBooking } from './useDeleteBooking';
 
 import BookingDataBox from './BookingDataBox';
 import Row from '../../ui/Row';
@@ -7,13 +12,11 @@ import Tag from '../../ui/Tag';
 import ButtonGroup from '../../ui/ButtonGroup';
 import Button from '../../ui/Button';
 import ButtonText from '../../ui/ButtonText';
-
-import { useMoveBack } from '../../hooks/useMoveBack';
-import { useBooking } from './useBooking';
 import Spinner from '../../ui/Spinner';
-import { HiArrowDownOnSquareStack } from 'react-icons/hi2';
-import { useNavigate } from 'react-router-dom';
-import { useCheckOut } from '../check-in-out/useCheckOut';
+import CompoundModal from '../../ui/CompoundModal';
+import ConfirmDelete from '../../ui/ConfirmDelete';
+import SpinnerTiny from '../../ui/SpinnerTiny';
+import { HiTrash } from 'react-icons/hi2';
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -24,13 +27,20 @@ const HeadingGroup = styled.div`
 function BookingDetail() {
   const { isLoading, booking, error } = useBooking();
   const { checkOut, isCheckingOut } = useCheckOut();
+  const { deleteBookingMutate, isDeletingBooking } = useDeleteBooking();
   const navigate = useNavigate();
   //console.table(booking);
   const moveBack = useMoveBack();
 
   if (isLoading) return <Spinner />;
 
-  const { id: bookingId, status } = booking ?? {};
+  if (error) return <div>ERROR: {error}</div>;
+
+  const {
+    id: bookingId,
+    status,
+    guests: { fullName: guestName },
+  } = booking ?? {};
 
   //within Tag these are used to dynamically create the colour name eg --color-blue-700
   const statusToTagName = {
@@ -50,32 +60,56 @@ function BookingDetail() {
       </Row>
 
       <BookingDataBox booking={booking} />
-      {/* Allow for checking in when unconfirmed and checking out when checked in */}
-      <ButtonGroup>
-        {status === 'unconfirmed' && (
-          <Button
-            variation="primary"
-            size="medium"
-            onClick={() => navigate(`../checkin/${bookingId}`)}
-          >
-            <p>Check-In</p>
-          </Button>
-        )}
 
-        {status === 'checked-in' && (
-          <Button
-            variation="primary"
-            size="medium"
-            disabled={isCheckingOut}
-            onClick={() => checkOut(bookingId)}
-          >
-            <p>Check-Out</p>
+      <CompoundModal>
+        <CompoundModal.Modal contentName="delete">
+          <ConfirmDelete
+            resourceName={`booking for ${guestName}`}
+            onConfirm={() =>
+              deleteBookingMutate(bookingId, {
+                onSettled: () => navigate(-1),
+              })
+            }
+            disabled={isDeletingBooking}
+          />
+        </CompoundModal.Modal>
+        {/* Allow for checking in when unconfirmed and checking out when checked in */}
+        <ButtonGroup>
+          {status === 'unconfirmed' && (
+            <Button
+              variation="primary"
+              size="medium"
+              onClick={() => navigate(`../checkin/${bookingId}`)}
+            >
+              <p>Check-In</p>
+            </Button>
+          )}
+
+          {status === 'checked-in' && (
+            <Button
+              variation="primary"
+              size="medium"
+              disabled={isCheckingOut}
+              onClick={() => checkOut(bookingId)}
+            >
+              <p>Check-Out</p>
+            </Button>
+          )}
+          <CompoundModal.Open openName="delete">
+            <Button
+              variation="danger"
+              size="small"
+              disabled={isDeletingBooking}
+            >
+              {isDeletingBooking ? <SpinnerTiny /> : <HiTrash />}
+              <p>Delete</p>
+            </Button>
+          </CompoundModal.Open>
+          <Button variation="secondary" onClick={moveBack}>
+            Back
           </Button>
-        )}
-        <Button variation="secondary" onClick={moveBack}>
-          Back
-        </Button>
-      </ButtonGroup>
+        </ButtonGroup>
+      </CompoundModal>
     </>
   );
 }

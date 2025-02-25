@@ -9,7 +9,7 @@ export function useDeleteBooking() {
     useMutation({
       mutationFn: (bookingId) => deleteBooking(bookingId),
       onSuccess: (data) => {
-        console.table(data);
+        // console.table(data);
         toast.success(
           `Booking for ${
             data.guests?.fullName ?? 'Anon'

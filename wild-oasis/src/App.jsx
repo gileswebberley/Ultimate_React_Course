@@ -1,8 +1,12 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 //now let's setup react-query, a bit like setup for Redux or ContextAPI
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 
 import Dashboard from './pages/Dashboard';
 import Account from './pages/Account';
@@ -19,6 +23,16 @@ import Checkin from './pages/Checkin';
 
 //now let's continue the setup of react-query
 const queryClient = new QueryClient({
+  //recommended error handling
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      if (query.state.data !== undefined) {
+        toast.error(
+          `Something went wrong with data-fetching: ${error.message}`
+        );
+      }
+    },
+  }),
   defaultOptions: {
     queries: {
       //amount of time before data is refetched

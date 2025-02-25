@@ -10,6 +10,7 @@ export function useCabins() {
   } = useQuery({
     queryKey: ['cabins'],
     queryFn: getCabins,
+    networkMode: 'offlineFirst',
   });
 
   return { isLoading, error, cabins, count };
