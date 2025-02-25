@@ -8,14 +8,24 @@ import { useLogin } from './useLogin';
 
 function LoginForm() {
   //temp whilst developing
-  const [email, setEmail] = useState('giles@example.com');
-  const [password, setPassword] = useState('pass9486');
+  const tmpEmail = 'giles@example.com';
+  const tmpPassword = 'pass9486';
+  const [email, setEmail] = useState(tmpEmail);
+  const [password, setPassword] = useState(tmpPassword);
   const { login, isLoggingIn } = useLogin();
 
   function handleSubmit(e) {
     e.preventDefault();
     if (!email || !password) return;
-    login({ email, password });
+    login(
+      { email, password },
+      {
+        onError: () => {
+          setEmail(tmpEmail);
+          setPassword('');
+        },
+      }
+    );
   }
 
   return (

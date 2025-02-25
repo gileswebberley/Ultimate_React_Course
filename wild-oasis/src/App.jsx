@@ -20,6 +20,7 @@ import GlobalStyles from './styles/GlobalStyles';
 import AppLayout from './ui/AppLayout';
 import Booking from './pages/Booking';
 import Checkin from './pages/Checkin';
+import ProtectedRoute from './ui/ProtectedRoute';
 
 //now let's continue the setup of react-query
 const queryClient = new QueryClient({
@@ -54,7 +55,13 @@ function App() {
         <BrowserRouter>
           <Routes>
             {/* We're going to wrap these routes in a protected one now that we have started to implement authentication */}
-            <Route element={<AppLayout />}>
+            <Route
+              element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }
+            >
               <Route index element={<Navigate replace to="dashboard" />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="bookings" element={<Bookings />} />
