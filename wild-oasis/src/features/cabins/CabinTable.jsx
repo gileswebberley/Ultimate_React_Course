@@ -11,6 +11,7 @@ import Pagination from '../../ui/Pagination';
 function CabinTable() {
   //now we'll use react query who's functionality we have extracted into useCabins
   const { isLoading, error, cabins, count } = useCabins();
+  let paginationCount = count;
   //sorting and filtering are defined in the url - see the CabinTableOperations component
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -54,6 +55,8 @@ function CabinTable() {
       filteredCabins = sortedCabins;
   }
 
+  paginationCount = filteredCabins.length;
+
   //Client side pagination
   if (IS_PAGINATED.cabins) {
     const currentPage = searchParams.get(IS_PAGINATED.NAME) ?? 1;
@@ -82,7 +85,7 @@ function CabinTable() {
         />
       </Menus>
       <Table.Footer>
-        {IS_PAGINATED.cabins && <Pagination resultCount={count} />}
+        {IS_PAGINATED.cabins && <Pagination resultCount={paginationCount} />}
       </Table.Footer>
     </Table>
   );
