@@ -13,7 +13,7 @@ function CabinTable() {
   const { isLoading, error, cabins, count } = useCabins();
   let paginationCount = count;
   //sorting and filtering are defined in the url - see the CabinTableOperations component
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   if (isLoading) return <Spinner />;
 

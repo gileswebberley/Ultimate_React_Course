@@ -1,5 +1,18 @@
 import supabase from './supabase';
 
+export async function signUp({ email, password }) {
+  let { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  console.log(data);
+  return data;
+}
+
 export async function login({ email, password }) {
   let { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -12,6 +25,13 @@ export async function login({ email, password }) {
 
   //console.table(data);
   return data;
+}
+
+export async function logout() {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    throw new Error(`Unable to log out because: ${error.message}`);
+  }
 }
 
 export async function getCurrentUser() {
@@ -28,11 +48,4 @@ export async function getCurrentUser() {
 
   //console.table(data);
   return data?.user ?? null;
-}
-
-export async function logout() {
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    throw new Error(`Unable to log out because: ${error.message}`);
-  }
 }
