@@ -9,6 +9,7 @@ import Button from '../../ui/Button';
 import FileInput from '../../ui/FileInput';
 import toast from 'react-hot-toast';
 import RegisteredFormInput from '../../ui/RegisteredFormInput';
+import ButtonGroup from '../../ui/ButtonGroup';
 
 const FormRow = styled.div`
   display: grid;
@@ -220,18 +221,20 @@ function CreateCabinForm({
       </FormRow>
 
       <FormRow>
-        <Button
-          variation="secondary"
-          type="reset"
-          disabled={isBusy}
-          onClick={() => {
-            reset();
-            closeMe?.();
-          }}
-        >
-          Cancel
-        </Button>
-        <Button disabled={isBusy}>{isEditing ? 'Edit' : 'Add'} Cabin</Button>
+        <ButtonGroup>
+          <Button
+            variation="secondary"
+            type="reset"
+            disabled={isBusy}
+            onClick={() => {
+              reset();
+              closeMe?.();
+            }}
+          >
+            Cancel
+          </Button>
+          <Button disabled={isBusy}>{isEditing ? 'Edit' : 'Add'} Cabin</Button>
+        </ButtonGroup>
       </FormRow>
     </Form>
   );

@@ -1,11 +1,9 @@
-import { useForm } from 'react-hook-form';
 import Button from '../../ui/Button';
 import ButtonGroup from '../../ui/ButtonGroup';
-import Form from '../../ui/Form';
-import FormRow from '../../ui/FormRow';
 import CompoundRegisteredForm from '../../ui/CompoundRegisteredForm';
 import toast from 'react-hot-toast';
 import styled, { css } from 'styled-components';
+import SimpleFormRow from '../../ui/SimpleFormRow';
 
 const FormContainer = styled.div`
   ${(props) =>
@@ -90,14 +88,14 @@ function SignupForm() {
             },
           }}
         />
-        <FormRow>
+        <SimpleFormRow>
           <ButtonGroup>
             <CompoundRegisteredForm.Reset>
               <Button variation="secondary">Cancel</Button>
             </CompoundRegisteredForm.Reset>
             <Button>Create new user</Button>
           </ButtonGroup>
-        </FormRow>
+        </SimpleFormRow>
       </CompoundRegisteredForm>
     </FormContainer>
   );
