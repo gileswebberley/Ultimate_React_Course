@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import Logout from '../features/authentication/Logout';
 
 //as we have our header component we'll name the style accordingly
 const StyledHeader = styled.header`
@@ -8,7 +9,11 @@ const StyledHeader = styled.header`
 `;
 
 function Header() {
-  return <StyledHeader>Header</StyledHeader>;
+  return (
+    <StyledHeader>
+      <Logout />
+    </StyledHeader>
+  );
 }
 
 export default Header;

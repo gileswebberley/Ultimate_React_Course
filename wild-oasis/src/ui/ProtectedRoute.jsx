@@ -25,26 +25,26 @@ function ProtectedRoute({ children }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  //step 2 - if no user redirect
+  //step 2 - if no authenticated user redirect
   useEffect(() => {
     if (!isAuthenticated && !isCheckingUser) {
+      //just in case the staleTime in react query is not zero
       queryClient.clear();
       toast.error(`You are not logged in as an authorised user`);
       navigate('../login');
     }
   }, [isAuthenticated, isCheckingUser, navigate, queryClient]);
 
+  //everything has gone well and we are an authenticated user
   if (isAuthenticated) return children;
-  //step 3 - while checking show spinner
 
+  //we are still checking but have not been redirected
   return (
     <FullPage>
       <Heading as="h2">Checking User</Heading>
       <Spinner />
     </FullPage>
   );
-
-  //step 4 - if user, render the app
 }
 
 export default ProtectedRoute;

@@ -29,3 +29,10 @@ export async function getCurrentUser() {
   //console.table(data);
   return data?.user ?? null;
 }
+
+export async function logout() {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    throw new Error(`Unable to log out because: ${error.message}`);
+  }
+}
