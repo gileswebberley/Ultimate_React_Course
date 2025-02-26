@@ -4,16 +4,25 @@ import ButtonGroup from '../../ui/ButtonGroup';
 import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
 import CompoundRegisteredForm from '../../ui/CompoundRegisteredForm';
+import toast from 'react-hot-toast';
 
 // Email regex: /\S+@\S+\.\S+/
 
 function SignupForm() {
   //we need some validation on a larger form so we'll use react-hook-form
-  const { register, formState } = useForm();
+  const { register, handleSubmit, reset, formState } = useForm();
   const { errors, isLoading } = formState;
 
+  function submitNewUser(data) {}
+
+  //errors is the same as our errors object above
+  function onError(errors) {
+    toast.error('Please check that you have filled out the form correctly');
+  }
+
   return (
-    <Form>
+    // the noValidate in the Form tag is to stop the automatic browser validation according to input field types
+    <Form noValidate onSubmit={handleSubmit(submitNewUser, onError)}>
       {/* <FormRow label="Full name" error={''}>
         <Input type="text" id="fullName" />
       </FormRow>*/}
@@ -40,6 +49,10 @@ function SignupForm() {
           labelStr="Email address"
           validationObj={{
             required: 'Please provide your email',
+            pattern: {
+              value: /\S+@\S+\.\S+/,
+              message: 'Your email appears to be invalid',
+            },
           }}
         />
 
@@ -52,6 +65,10 @@ function SignupForm() {
           labelStr="Password (min 8 characters)"
           validationObj={{
             required: 'Please provide your password',
+            minLength: {
+              value: 8,
+              message: 'Password should contain at least 8 characters',
+            },
           }}
         />
 
@@ -60,10 +77,16 @@ function SignupForm() {
         </FormRow> */}
         <CompoundRegisteredForm.Input
           type="password"
-          elementID="password"
+          elementID="passwordConfirm"
           labelStr="Repeat password"
           validationObj={{
             required: 'Please confirm your password',
+            validate: (value, fieldValues) => {
+              return (
+                value === fieldValues.password ||
+                'This appears to be different from your password'
+              );
+            },
           }}
         />
       </CompoundRegisteredForm>
