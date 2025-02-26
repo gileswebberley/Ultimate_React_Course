@@ -5,36 +5,15 @@ import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
 import CompoundRegisteredForm from '../../ui/CompoundRegisteredForm';
 import toast from 'react-hot-toast';
-import styled, { css } from 'styled-components';
-
-const FormContainer = styled.div`
-  ${(props) =>
-    props.type !== 'modal' &&
-    css`
-      padding: 2.4rem 4rem;
-
-      /* Box */
-      background-color: var(--color-grey-0);
-      border: 1px solid var(--color-grey-100);
-      border-radius: var(--border-radius-md);
-    `}
-
-  ${(props) =>
-    props.type === 'modal' &&
-    css`
-      max-width: 80rem;
-    `}
-    
-  overflow: hidden;
-  font-size: 1.4rem;
-`;
 
 // Email regex: /\S+@\S+\.\S+/
 
 function SignupForm() {
-  function submitNewUser(data) {
-    console.table(data);
-  }
+  //we need some validation on a larger form so we'll use react-hook-form
+  const { register, handleSubmit, reset, formState } = useForm();
+  const { errors, isLoading } = formState;
+
+  function submitNewUser(data) {}
 
   //errors is the same as our errors object above
   function onError(errors) {
@@ -42,12 +21,15 @@ function SignupForm() {
   }
 
   return (
-    <FormContainer>
+    // the noValidate in the Form tag is to stop the automatic browser validation according to input field types
+    <Form noValidate onSubmit={handleSubmit(submitNewUser, onError)}>
+      {/* <FormRow label="Full name" error={''}>
+        <Input type="text" id="fullName" />
+      </FormRow>*/}
       <CompoundRegisteredForm
-        // isLoading={isLoading}
-        submitFn={submitNewUser}
-        errorFn={onError}
-        defaultValues={{ fullName: 'Giles' }}
+        errors={errors}
+        isLoading={isLoading}
+        register={register}
       >
         <CompoundRegisteredForm.Input
           type="text"
@@ -57,13 +39,26 @@ function SignupForm() {
             required: 'Please provide your name',
           }}
         />
-        <CompoundRegisteredForm.Email
+
+        {/* <FormRow label="Email address" error={''}>
+          <Input type="email" id="email" />
+        </FormRow> */}
+        <CompoundRegisteredForm.Input
+          type="email"
           elementID="email"
           labelStr="Email address"
           validationObj={{
             required: 'Please provide your email',
+            pattern: {
+              value: /\S+@\S+\.\S+/,
+              message: 'Your email appears to be invalid',
+            },
           }}
         />
+
+        {/* <FormRow label="Password (min 8 characters)" error={''}>
+          <Input type="password" id="password" />
+        </FormRow> */}
         <CompoundRegisteredForm.Input
           type="password"
           elementID="password"
@@ -76,10 +71,14 @@ function SignupForm() {
             },
           }}
         />
+
+        {/* <FormRow label="Repeat password" error={''}>
+          <Input type="password" id="passwordConfirm" />
+        </FormRow> */}
         <CompoundRegisteredForm.Input
           type="password"
           elementID="passwordConfirm"
-          labelStr="Confirm password"
+          labelStr="Repeat password"
           validationObj={{
             required: 'Please confirm your password',
             validate: (value, fieldValues) => {
@@ -90,16 +89,18 @@ function SignupForm() {
             },
           }}
         />
-        <FormRow>
-          <ButtonGroup>
-            <CompoundRegisteredForm.Reset>
-              <Button variation="secondary">Cancel</Button>
-            </CompoundRegisteredForm.Reset>
-            <Button>Create new user</Button>
-          </ButtonGroup>
-        </FormRow>
       </CompoundRegisteredForm>
-    </FormContainer>
+
+      <FormRow>
+        {/* type is an HTML attribute! */}
+        <ButtonGroup>
+          <Button variation="secondary" type="reset">
+            Cancel
+          </Button>
+          <Button>Create new user</Button>
+        </ButtonGroup>
+      </FormRow>
+    </Form>
   );
 }
 
