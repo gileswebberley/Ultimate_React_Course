@@ -1,11 +1,10 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import SimpleFormRow from './SimpleFormRow';
 import Input from './Input';
 import Textarea from './Textarea';
-import { useForm } from 'react-hook-form';
 import PasswordInput from './PasswordInput';
-import { HiEye, HiEyeSlash } from 'react-icons/hi2';
 
 //basic styled components
 const Label = styled.label`
@@ -28,6 +27,7 @@ function CompoundRegisteredForm({
   errorFn,
   isLoading = null,
   defaultValues = {},
+  resetOnSubmit = true,
 }) {
   //React-hook-form usage setup -------------------
   //mode overrides the default validation behaviour of the browser (I decided when a field loses focus is the perfect time to show the validation messages as onChange produces a lot of re-renders)
@@ -39,9 +39,15 @@ function CompoundRegisteredForm({
     resetOptions: { keepErrors: false },
     defaultValues: defaultValues,
   });
-  const { errors } = formState;
+  const { errors, isSubmitSuccessful } = formState;
   //if no loading state is supplied as a prop then we will use the form's isLoading prop
   isLoading = !isLoading ? formState.isLoading : isLoading;
+
+  //reset the form after a successful submission
+  useEffect(() => {
+    if (resetOnSubmit && isSubmitSuccessful) reset();
+  }, [resetOnSubmit, isSubmitSuccessful, reset]);
+
   return (
     <form onSubmit={handleSubmit(submitFn, errorFn)}>
       <registeredFormContext.Provider
@@ -53,7 +59,7 @@ function CompoundRegisteredForm({
   );
 }
 
-//a wrapper for the form's reset button
+//a wrapper for the form's reset button so it fires the react-hook-form reset rather than just the browser's default behaviour
 function ResetButton({ children }) {
   const { reset } = useContext(registeredFormContext);
   return (
@@ -85,6 +91,11 @@ function RegisteredInput({
   if (type === 'email') {
     return <RegisteredEmailInput {...{ elementID, labelStr, validationObj }} />;
   }
+  if (type === 'password') {
+    return (
+      <RegisteredPasswordInput {...{ elementID, labelStr, validationObj }} />
+    );
+  }
 
   return (
     <SimpleFormRow>
@@ -93,10 +104,8 @@ function RegisteredInput({
         disabled={isLoading}
         type={type}
         id={elementID}
-        //defaultValue={defaultValue ?? undefined}
         {...register(elementID, validationObj)}
       />
-
       {errors?.[elementID]?.message && (
         <Error>{errors[elementID].message}</Error>
       )}
@@ -117,7 +126,6 @@ function RegisteredTextarea({ elementID, labelStr, validationObj }) {
         id={elementID}
         {...register(elementID, validationObj)}
       />
-
       {errors?.[elementID]?.message && (
         <Error>{errors[elementID].message}</Error>
       )}
@@ -147,7 +155,6 @@ function RegisteredEmailInput({ elementID, labelStr, validationObj }) {
           },
         })}
       />
-
       {errors?.[elementID]?.message && (
         <Error>{errors[elementID].message}</Error>
       )}
@@ -155,59 +162,13 @@ function RegisteredEmailInput({ elementID, labelStr, validationObj }) {
   );
 }
 
-//TODO - create a password input with visibility setting (change type from password to text)
 function RegisteredPasswordInput({ elementID, labelStr, validationObj }) {
   //grab the general form variables from our context
   const { isLoading, errors, register } = useContext(registeredFormContext);
-  // const { name, onChange, onBlur, ref } = {
-  //   ...register(elementID, validationObj),
-  // };
-  // console.log({ ...register(elementID, validationObj) });
-  //make password visible or not
-  const [isVisible, setIsVisible] = useState(false);
-  //visibility icon holder
-  const Icon = styled.span`
-    /* display: inline-block; */
-    /* position: relative; */
-    position: absolute;
-    z-index: 10;
-    /* left: -5.5rem;
-    top: 0.2rem; */
-    transform: translate(-2.6rem, 0.8rem);
-    cursor: pointer;
-    & svg {
-      width: 2.2rem;
-      height: 2.2rem;
-      color: var(--color-brand-600);
-    }
-  `;
-  const InputHolder = styled.div`
-    position: relative;
-    width: 100%;
-    /* display: inline; */
-  `;
 
   return (
     <SimpleFormRow>
       <Label htmlFor={elementID}>{labelStr}</Label>
-      {/* <InputHolder>
-        <Input
-          disabled={isLoading}
-          type={isVisible ? 'text' : 'password'}
-          //for auto-complete functionality
-          autoComplete="current-password"
-          id={elementID}
-          {...register(elementID, validationObj)}
-        ></Input>
-        <Icon
-          onClick={(e) => {
-            e.preventDefault();
-            setIsVisible((vis) => !vis);
-          }}
-        >
-          {isVisible ? <HiEye /> : <HiEyeSlash />}
-        </Icon>
-      </InputHolder> */}
       <PasswordInput
         disabled={isLoading}
         id={elementID}

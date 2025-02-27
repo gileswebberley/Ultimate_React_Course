@@ -1,9 +1,16 @@
 import supabase from './supabase';
 
-export async function signUp({ email, password }) {
-  let { data, error } = await supabase.auth.signUp({
+export async function signUp({ email, password, fullName }) {
+  console.log(`signing up: ${email}`);
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        fullName,
+        avatar: '',
+      },
+    },
   });
 
   if (error) {
@@ -43,7 +50,9 @@ export async function getCurrentUser() {
   const { data, error } = await supabase.auth.getUser();
 
   if (error) {
-    throw new Error(error.message);
+    //if a user is removed whilst logged in we were not being chucked off the site so rather than throwing an error...
+    return null;
+    // throw new Error(error.message);
   }
 
   //console.table(data);

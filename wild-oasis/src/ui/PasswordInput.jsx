@@ -33,22 +33,6 @@ const PasswordInput = forwardRef(function PasswordInput(inputProps, ref) {
         {...inputProps}
         ref={ref}
       ></Input>
-      {/* {ref ? (
-        <Input
-          type={isVisible ? 'text' : 'password'}
-          //for auto-complete functionality
-          autoComplete="current-password"
-          {...inputProps}
-          ref={ref}
-        ></Input>
-      ) : (
-        <Input
-          type={isVisible ? 'text' : 'password'}
-          //for auto-complete functionality
-          autoComplete="current-password"
-          {...inputProps}
-        ></Input>
-      )} */}
       <Icon
         onClick={(e) => {
           e.preventDefault();

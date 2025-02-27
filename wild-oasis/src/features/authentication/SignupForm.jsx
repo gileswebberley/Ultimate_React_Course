@@ -4,6 +4,7 @@ import CompoundRegisteredForm from '../../ui/CompoundRegisteredForm';
 import toast from 'react-hot-toast';
 import styled, { css } from 'styled-components';
 import SimpleFormRow from '../../ui/SimpleFormRow';
+import { useSignup } from './useSignup';
 
 const FormContainer = styled.div`
   ${(props) =>
@@ -30,8 +31,11 @@ const FormContainer = styled.div`
 // Email regex: /\S+@\S+\.\S+/
 
 function SignupForm() {
-  function submitNewUser(data) {
-    console.table(data);
+  const { signUp, isSigningUp } = useSignup();
+
+  function submitNewUser({ fullName, email, password }) {
+    //console.table(data);
+    signUp({ fullName, email, password });
   }
 
   //errors is the same as our errors object above
@@ -45,7 +49,8 @@ function SignupForm() {
         // isLoading={isLoading}
         submitFn={submitNewUser}
         errorFn={onError}
-        defaultValues={{ fullName: 'Giles' }}
+        defaultValues={{ fullName: 'Testing' }}
+        isLoading={isSigningUp}
       >
         <CompoundRegisteredForm.Input
           type="text"
@@ -63,14 +68,13 @@ function SignupForm() {
           }}
         />
         <CompoundRegisteredForm.Password
-          //type="password"
           elementID="password"
-          labelStr="Password (min 8 characters)"
+          labelStr="Password (min 6 characters)"
           validationObj={{
             required: 'Please provide your password',
             minLength: {
-              value: 8,
-              message: 'Password should contain at least 8 characters',
+              value: 6,
+              message: 'Password should contain at least 6 characters',
             },
           }}
         />
@@ -90,9 +94,11 @@ function SignupForm() {
         <SimpleFormRow>
           <ButtonGroup>
             <CompoundRegisteredForm.Reset>
-              <Button variation="secondary">Reset</Button>
+              <Button variation="secondary" disabled={isSigningUp}>
+                Reset
+              </Button>
             </CompoundRegisteredForm.Reset>
-            <Button>Create new user</Button>
+            <Button disabled={isSigningUp}>Create new user</Button>
           </ButtonGroup>
         </SimpleFormRow>
       </CompoundRegisteredForm>
