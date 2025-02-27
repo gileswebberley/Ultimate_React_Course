@@ -8,7 +8,7 @@ function Logout() {
   const { logout, isLoggingOut } = useLogout();
 
   return (
-    <ButtonGroup justify="start">
+    <ButtonGroup justify="end">
       <Button
         size="small"
         variation="secondary"

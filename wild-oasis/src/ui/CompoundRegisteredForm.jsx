@@ -1,16 +1,19 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useState } from 'react';
 import styled from 'styled-components';
 import SimpleFormRow from './SimpleFormRow';
 import Input from './Input';
 import Textarea from './Textarea';
 import { useForm } from 'react-hook-form';
+import PasswordInput from './PasswordInput';
+import { HiEye, HiEyeSlash } from 'react-icons/hi2';
 
 //basic styled components
 const Label = styled.label`
   font-weight: 500;
 `;
 
-const Error = styled.span`
+const Error = styled.div`
+  display: inline;
   font-size: 1.4rem;
   color: var(--color-red-700);
 `;
@@ -84,7 +87,7 @@ function RegisteredInput({
   }
 
   return (
-    <SimpleFormRow role="row">
+    <SimpleFormRow>
       <Label htmlFor={elementID}>{labelStr}</Label>
       <Input
         disabled={isLoading}
@@ -106,7 +109,7 @@ function RegisteredTextarea({ elementID, labelStr, validationObj }) {
   const { isLoading, errors, register } = useContext(registeredFormContext);
 
   return (
-    <SimpleFormRow role="row">
+    <SimpleFormRow>
       <Label htmlFor={elementID}>{labelStr}</Label>
       <Textarea
         disabled={isLoading}
@@ -128,7 +131,7 @@ function RegisteredEmailInput({ elementID, labelStr, validationObj }) {
   const { isLoading, errors, register } = useContext(registeredFormContext);
 
   return (
-    <SimpleFormRow role="row">
+    <SimpleFormRow>
       <Label htmlFor={elementID}>{labelStr}</Label>
       <Input
         disabled={isLoading}
@@ -153,10 +156,74 @@ function RegisteredEmailInput({ elementID, labelStr, validationObj }) {
 }
 
 //TODO - create a password input with visibility setting (change type from password to text)
+function RegisteredPasswordInput({ elementID, labelStr, validationObj }) {
+  //grab the general form variables from our context
+  const { isLoading, errors, register } = useContext(registeredFormContext);
+  // const { name, onChange, onBlur, ref } = {
+  //   ...register(elementID, validationObj),
+  // };
+  // console.log({ ...register(elementID, validationObj) });
+  //make password visible or not
+  const [isVisible, setIsVisible] = useState(false);
+  //visibility icon holder
+  const Icon = styled.span`
+    /* display: inline-block; */
+    /* position: relative; */
+    position: absolute;
+    z-index: 10;
+    /* left: -5.5rem;
+    top: 0.2rem; */
+    transform: translate(-2.6rem, 0.8rem);
+    cursor: pointer;
+    & svg {
+      width: 2.2rem;
+      height: 2.2rem;
+      color: var(--color-brand-600);
+    }
+  `;
+  const InputHolder = styled.div`
+    position: relative;
+    width: 100%;
+    /* display: inline; */
+  `;
+
+  return (
+    <SimpleFormRow>
+      <Label htmlFor={elementID}>{labelStr}</Label>
+      {/* <InputHolder>
+        <Input
+          disabled={isLoading}
+          type={isVisible ? 'text' : 'password'}
+          //for auto-complete functionality
+          autoComplete="current-password"
+          id={elementID}
+          {...register(elementID, validationObj)}
+        ></Input>
+        <Icon
+          onClick={(e) => {
+            e.preventDefault();
+            setIsVisible((vis) => !vis);
+          }}
+        >
+          {isVisible ? <HiEye /> : <HiEyeSlash />}
+        </Icon>
+      </InputHolder> */}
+      <PasswordInput
+        disabled={isLoading}
+        id={elementID}
+        {...register(elementID, validationObj)}
+      />
+      {errors?.[elementID]?.message && (
+        <Error>{errors[elementID].message}</Error>
+      )}
+    </SimpleFormRow>
+  );
+}
 
 CompoundRegisteredForm.Input = RegisteredInput;
 CompoundRegisteredForm.Textarea = RegisteredTextarea;
 CompoundRegisteredForm.Email = RegisteredEmailInput;
+CompoundRegisteredForm.Password = RegisteredPasswordInput;
 CompoundRegisteredForm.Reset = ResetButton;
 
 export default CompoundRegisteredForm;

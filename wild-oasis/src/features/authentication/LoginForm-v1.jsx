@@ -5,7 +5,6 @@ import Input from '../../ui/Input';
 import FormRow from '../../ui/FormRow';
 import SpinnerMini from '../../ui/SpinnerMini';
 import { useLogin } from './useLogin';
-import PasswordInput from '../../ui/PasswordInput';
 
 function LoginForm() {
   //temp whilst developing
@@ -42,15 +41,10 @@ function LoginForm() {
         />
       </FormRow>
       <FormRow orientation="vertical" label="Password">
-        {/* <Input
+        <Input
           type="password"
           id="password"
           autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        /> */}
-        <PasswordInput
-          id="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />

@@ -62,8 +62,8 @@ function SignupForm() {
             required: 'Please provide your email',
           }}
         />
-        <CompoundRegisteredForm.Input
-          type="password"
+        <CompoundRegisteredForm.Password
+          //type="password"
           elementID="password"
           labelStr="Password (min 8 characters)"
           validationObj={{
@@ -74,8 +74,7 @@ function SignupForm() {
             },
           }}
         />
-        <CompoundRegisteredForm.Input
-          type="password"
+        <CompoundRegisteredForm.Password
           elementID="passwordConfirm"
           labelStr="Confirm password"
           validationObj={{
@@ -91,7 +90,7 @@ function SignupForm() {
         <SimpleFormRow>
           <ButtonGroup>
             <CompoundRegisteredForm.Reset>
-              <Button variation="secondary">Cancel</Button>
+              <Button variation="secondary">Reset</Button>
             </CompoundRegisteredForm.Reset>
             <Button>Create new user</Button>
           </ButtonGroup>
