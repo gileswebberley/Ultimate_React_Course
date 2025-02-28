@@ -1,4 +1,6 @@
-import styled from "styled-components";
+import styled from 'styled-components';
+import { useUser } from './useUser';
+import SpinnerMini from '../../ui/SpinnerMini';
 
 const StyledUserAvatar = styled.div`
   display: flex;
@@ -19,3 +21,25 @@ const Avatar = styled.img`
   border-radius: 50%;
   outline: 2px solid var(--color-grey-100);
 `;
+
+export default function UserAvatar() {
+  //
+  const { user, isCheckingUser } = useUser();
+  const { fullName, avatar } = user;
+
+  return (
+    <>
+      {isCheckingUser ? (
+        <SpinnerMini />
+      ) : (
+        <StyledUserAvatar>
+          <span>{fullName || 'Guest'}</span>
+          <Avatar
+            src={avatar || 'default-user.jpg'}
+            alt={`Avatar for ${fullName}`}
+          />
+        </StyledUserAvatar>
+      )}
+    </>
+  );
+}
