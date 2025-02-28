@@ -24,11 +24,10 @@ function ProtectedRoute({ children }) {
   const { isCheckingUser, isAuthenticated } = useUser();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  // console.log(`Protected route checking user...`);
 
   //step 2 - if no authenticated user redirect
   useEffect(() => {
-    console.log(`Protected route checking user...`);
+    //console.log(`Protected route checking user...`);
     if (!isAuthenticated && !isCheckingUser) {
       //just in case the staleTime in react query is not zero
       queryClient.clear();

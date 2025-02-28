@@ -5,6 +5,9 @@ import toast from 'react-hot-toast';
 import styled, { css } from 'styled-components';
 import SimpleFormRow from '../../ui/SimpleFormRow';
 import { useSignup } from './useSignup';
+import FormRow from '../../ui/FormRow';
+import PasswordInputRef from '../../ui/PasswordInput';
+import { useState } from 'react';
 
 const FormContainer = styled.div`
   ${(props) =>
@@ -32,6 +35,8 @@ const FormContainer = styled.div`
 
 function SignupForm() {
   const { signUp, isSigningUp } = useSignup();
+  const tmpPassword = 'pass9486';
+  const [password, setPassword] = useState(tmpPassword);
 
   function submitNewUser({ fullName, email, password }) {
     //console.table(data);
@@ -91,6 +96,14 @@ function SignupForm() {
             },
           }}
         />
+        {/* For testing purposes */}
+        <FormRow label="Testing field" orientation="column">
+          <PasswordInputRef
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            ref={null}
+          />
+        </FormRow>
         <SimpleFormRow>
           <ButtonGroup>
             <CompoundRegisteredForm.Reset>

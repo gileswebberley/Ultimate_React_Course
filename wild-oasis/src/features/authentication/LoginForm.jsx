@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from '../../ui/Button';
 import Form from '../../ui/Form';
 import Input from '../../ui/Input';
@@ -6,6 +6,7 @@ import FormRow from '../../ui/FormRow';
 import SpinnerMini from '../../ui/SpinnerMini';
 import { useLogin } from './useLogin';
 import PasswordInput from '../../ui/PasswordInput';
+import { useRef } from 'react';
 
 function LoginForm() {
   //temp whilst developing
@@ -14,6 +15,7 @@ function LoginForm() {
   const [email, setEmail] = useState(tmpEmail);
   const [password, setPassword] = useState(tmpPassword);
   const { login, isLoggingIn } = useLogin();
+  //const ref = useRef(null);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -45,7 +47,9 @@ function LoginForm() {
         <PasswordInput
           id="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value);
+          }}
         />
       </FormRow>
       <FormRow orientation="vertical">

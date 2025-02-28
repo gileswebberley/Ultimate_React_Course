@@ -1,13 +1,19 @@
 import styled from 'styled-components';
-import { forwardRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import Input from './Input';
 import { HiEye, HiEyeSlash } from 'react-icons/hi2';
 
 //After a hell of a lot of head scratching it became apparent that I had to use forwardRef for this component if I wanted to be able to use it within a react-hook-form. It appears to be working as I am now getting the validation and error messages. React 19 says it is deprecating it but it seems that this will be automagically converted to accept the ref as a prop
+//For use with react-hook-forms simply treat it as any other input (ie pass through {...register(name, options)}) however for use as a controlled element make sure you include the prop ref={null}
 const PasswordInput = forwardRef(function PasswordInput(inputProps, ref) {
-  //   console.table({ ...inputProps });
-  //make password visible or not
   const [isVisible, setIsVisible] = useState(false);
+  //when using an onChange handler to set the state in the parent we are losing focus so have had to put this functionality in here, originally it was designed for use with react-hook-form
+  const focusRef = useRef(null);
+  const valuePW = focusRef.current?.['value'];
+  useEffect(() => {
+    focusRef?.current?.focus();
+  }, [valuePW]);
+
   //visibility icon holder
   const Icon = styled.span`
     position: absolute;
@@ -26,20 +32,30 @@ const PasswordInput = forwardRef(function PasswordInput(inputProps, ref) {
   `;
   return (
     <InputHolder>
-      <Input
-        type={isVisible ? 'text' : 'password'}
-        //for auto-complete functionality
-        autoComplete="current-password"
-        {...inputProps}
-        ref={ref}
-      ></Input>
+      {ref !== null ? (
+        <Input
+          type={isVisible ? 'text' : 'password'}
+          //for auto-complete functionality
+          autoComplete="current-password"
+          {...inputProps}
+          ref={ref}
+        ></Input>
+      ) : (
+        <Input
+          type={isVisible ? 'text' : 'password'}
+          //for auto-complete functionality
+          autoComplete="current-password"
+          {...inputProps}
+          ref={focusRef}
+        ></Input>
+      )}
       <Icon
         onClick={(e) => {
           e.preventDefault();
           setIsVisible((vis) => !vis);
         }}
       >
-        {isVisible ? <HiEye /> : <HiEyeSlash />}
+        {isVisible ? <HiEyeSlash /> : <HiEye />}
       </Icon>
     </InputHolder>
   );

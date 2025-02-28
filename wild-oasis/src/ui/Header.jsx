@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 import Logout from '../features/authentication/Logout';
+import { useUser } from '../features/authentication/useUser';
+import SpinnerMini from './SpinnerMini';
 
 //as we have our header component we'll name the style accordingly
 const StyledHeader = styled.header`
@@ -12,9 +14,15 @@ const StyledHeader = styled.header`
 `;
 
 function Header() {
+  const { user, isCheckingUser } = useUser();
+  if (!isCheckingUser) console.table(user);
   return (
     <StyledHeader>
-      <div>{''}</div>
+      {isCheckingUser ? (
+        <SpinnerMini />
+      ) : (
+        user?.user_metadata?.fullName ?? 'Guest'
+      )}
       <Logout />
     </StyledHeader>
   );
