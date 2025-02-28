@@ -14,8 +14,9 @@ const StyledHeader = styled.header`
 `;
 
 function Header() {
+  //get the user's name
   const { user, isCheckingUser } = useUser();
-  if (!isCheckingUser) console.table(user);
+
   return (
     <StyledHeader>
       {isCheckingUser ? (

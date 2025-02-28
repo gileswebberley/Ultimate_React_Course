@@ -84,7 +84,7 @@ function RegisteredInput({
   //grab the general form variables from our context
   const { isLoading, errors, register } = useContext(registeredFormContext);
 
-  //check that this is not being used incorrectly and safely pass on to the correct component
+  //check that this is not being used incorrectly and safely pass on to the correct component if so
   if (type === 'textarea') {
     return <RegisteredTextarea {...{ elementID, labelStr, validationObj }} />;
   }
@@ -180,6 +180,8 @@ function RegisteredPasswordInput({ elementID, labelStr, validationObj }) {
     </SimpleFormRow>
   );
 }
+
+//TODO - add checkbox and perhaps even select
 
 CompoundRegisteredForm.Input = RegisteredInput;
 CompoundRegisteredForm.Textarea = RegisteredTextarea;

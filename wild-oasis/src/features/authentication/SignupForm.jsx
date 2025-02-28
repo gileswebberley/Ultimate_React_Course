@@ -35,8 +35,6 @@ const FormContainer = styled.div`
 
 function SignupForm() {
   const { signUp, isSigningUp } = useSignup();
-  const tmpPassword = 'pass9486';
-  const [password, setPassword] = useState(tmpPassword);
 
   function submitNewUser({ fullName, email, password }) {
     //console.table(data);
@@ -96,14 +94,6 @@ function SignupForm() {
             },
           }}
         />
-        {/* For testing purposes */}
-        <FormRow label="Testing field" orientation="column">
-          <PasswordInputRef
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            ref={null}
-          />
-        </FormRow>
         <SimpleFormRow>
           <ButtonGroup>
             <CompoundRegisteredForm.Reset>

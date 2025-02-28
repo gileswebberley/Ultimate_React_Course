@@ -97,6 +97,8 @@ function App() {
               },
             },
             style: {
+              textAlign: 'center',
+              lineHeight: '130%',
               fontSize: '16px',
               maxWidth: '400px',
               padding: '16px 24px',
