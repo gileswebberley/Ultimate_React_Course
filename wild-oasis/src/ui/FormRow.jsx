@@ -29,7 +29,7 @@ const StyledFormRow = styled.div`
   ${(props) =>
     props.orientation !== 'vertical' &&
     css`
-      &:has(button) {
+      &:not(:has(label)) {
         display: flex;
         justify-content: flex-end;
         gap: 1.2rem;

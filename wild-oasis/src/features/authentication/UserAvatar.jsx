@@ -24,8 +24,14 @@ const Avatar = styled.img`
 
 export default function UserAvatar() {
   //
-  const { user, isCheckingUser } = useUser();
-  const { fullName, avatar } = user;
+  const {
+    user: {
+      user_metadata: { fullName, avatar },
+    },
+    isCheckingUser,
+  } = useUser();
+  //const { fullName, avatar } = user;
+  const displayName = fullName.split(' ').shift();
 
   return (
     <>
@@ -33,7 +39,7 @@ export default function UserAvatar() {
         <SpinnerMini />
       ) : (
         <StyledUserAvatar>
-          <span>{fullName || 'Guest'}</span>
+          <span>{displayName || 'Anon'}</span>
           <Avatar
             src={avatar || 'default-user.jpg'}
             alt={`Avatar for ${fullName}`}

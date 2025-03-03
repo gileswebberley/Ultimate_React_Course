@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 import Logout from '../features/authentication/Logout';
-import { useUser } from '../features/authentication/useUser';
-import SpinnerMini from './SpinnerMini';
 import UserAvatar from '../features/authentication/UserAvatar';
 import UserSettingsButton from './UserSettingsButton';
 
@@ -17,9 +15,6 @@ const StyledHeader = styled.header`
 `;
 
 function Header() {
-  //get the user's name
-  const { user, isCheckingUser } = useUser();
-
   return (
     <StyledHeader>
       <UserAvatar />
