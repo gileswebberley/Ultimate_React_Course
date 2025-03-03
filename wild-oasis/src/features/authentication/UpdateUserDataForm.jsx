@@ -49,26 +49,26 @@ function UpdateUserDataForm() {
     //true if changed
     const hasChangedFullName = fullName !== currentFullName && fullName !== '';
     const hasChangedAvatar = avatar !== currentAvatar && avatar;
-    //if (!hasChangedAvatar && !hasChangedFullName) return;
+    if (!hasChangedAvatar && !hasChangedFullName) return;
     let oldAvatar = null;
     if (hasChangedAvatar) {
       oldAvatar = currentAvatar;
     } else {
-      //setAvatar(() => null);
+      setAvatar(() => null);
     }
     if (!hasChangedFullName) {
       setFullName(() => null);
     }
-    //if (fullName || avatar) {
-    updateUser(
-      { fullName, avatar, oldAvatar },
-      {
-        onSuccess: () => {
-          handleReset();
-        },
-      }
-    );
-    //}
+    if (fullName || avatar) {
+      updateUser(
+        { fullName, avatar, oldAvatar },
+        {
+          onSuccess: () => {
+            handleReset();
+          },
+        }
+      );
+    }
   }
 
   //we want to reset the form to it's initial state which html form reset will not do
@@ -123,7 +123,7 @@ function UpdateUserDataForm() {
             variation="secondary"
             disabled={isUpdatingUser}
           >
-            Cancel
+            Reset
           </Button>
           <Button disabled={isUpdatingUser}>Update account</Button>
         </ButtonGroup>

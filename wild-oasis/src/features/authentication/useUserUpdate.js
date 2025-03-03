@@ -18,7 +18,6 @@ export function useUserUpdate() {
       );
       //we need this to get the header user info to update
       queryClient.setQueryData(['user'], data.user);
-      //navigate('../dashboard');
     },
     onError: (error) => {
       toast.error(`There was an error whilst trying to update the user
@@ -28,9 +27,10 @@ export function useUserUpdate() {
   const { mutate: updateUserPassword, isLoading: isUpdatingUserPassword } =
     useMutation({
       mutationFn: updateUserPasswordApi,
-      onSuccess: (user) => {
-        toast.success(`${user?.data?.fullName} password successfully updated`);
-        navigate('../dashboard');
+      onSuccess: (data) => {
+        toast.success(
+          `${data?.user?.user_metadata?.fullName} password successfully updated`
+        );
       },
       onError: (error) => {
         toast.error(`There was an error whilst trying to update the user password

@@ -124,14 +124,26 @@ export async function updateCurrentUser({ fullName, avatar, oldAvatar }) {
   let avatarUuid = v4();
   const fileName = `user${updatedUser.user.id}-avatar-${avatarUuid}`;
 
+  //upload the new avatar image
   const { error: uploadError } = await supabase.storage
     .from('avatars')
     .upload(fileName, avatar);
-  if (uploadError)
+  if (uploadError) {
     throw new Error(`Could not upload new avatar
     ERROR: ${uploadError.message}`);
+  }
 
-  //clear up any disused images
+  //update the url in the user to the new avatar image
+  const { data, error } = await supabase.auth.updateUser({
+    data: { avatar: `${avatarStorageUrl}${fileName}` },
+  });
+
+  if (error) {
+    throw new Error(`Could not update avatar url
+    ERROR: ${error.message}`);
+  }
+
+  //finally clear up the old disused avatar image
   if (oldAvatar) {
     try {
       await deleteAvatar(oldAvatar);
@@ -139,22 +151,14 @@ export async function updateCurrentUser({ fullName, avatar, oldAvatar }) {
       throw new Error(error.message);
     }
   }
-
-  const { data, error } = await supabase.auth.updateUser({
-    data: { avatar: `${avatarStorageUrl}${fileName}` },
-  });
-
-  if (error)
-    throw new Error(`Could not upload new avatar
-    ERROR: ${error.message}`);
-
   console.log(data);
   return data;
 }
 
 export async function updateUserPassword(password) {
+  console.log(password);
   const { data: passwordUpdate, error: passwordError } =
-    await supabase.auth.updateUser({ password });
+    await supabase.auth.updateUser(password);
   if (passwordError)
     throw new Error(`Password could not be updated
     ERROR: ${passwordError.message}`);
