@@ -5,6 +5,7 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
+  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -115,6 +116,7 @@ function SalesChart({ bookings, period }) {
               tickLine={{ stroke: colors.text }}
             />
             <Tooltip contentStyle={{ backgroundColor: colors.background }} />
+            <Legend />
             <Area
               dataKey="totalSales"
               type="monotone"
