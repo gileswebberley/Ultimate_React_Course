@@ -18,6 +18,7 @@ import ConfirmDelete from '../../ui/ConfirmDelete';
 import SpinnerTiny from '../../ui/SpinnerTiny';
 import { HiTrash } from 'react-icons/hi2';
 import SimpleFormRow from '../../ui/SimpleFormRow';
+import Empty from '../../ui/Empty';
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -26,7 +27,7 @@ const HeadingGroup = styled.div`
 `;
 
 function BookingDetail() {
-  const { isLoading, booking, error } = useBooking();
+  const { isLoading, booking } = useBooking();
   const { checkOut, isCheckingOut } = useCheckOut();
   const { deleteBookingMutate, isDeletingBooking } = useDeleteBooking();
   const navigate = useNavigate();
@@ -35,7 +36,13 @@ function BookingDetail() {
 
   if (isLoading) return <Spinner />;
 
-  if (error) return <div>ERROR: {error}</div>;
+  if (!booking)
+    return (
+      <Row type="horizontal">
+        <Empty resource="booking" />
+        <ButtonText onClick={moveBack}>&larr; Back</ButtonText>
+      </Row>
+    );
 
   const {
     id: bookingId,

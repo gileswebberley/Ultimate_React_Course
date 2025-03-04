@@ -43,7 +43,7 @@ const ClickBit = styled.div`
 `;
 
 function Sidebar() {
-  const { isOpen, setIsOpen } = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   function handleOpen(e) {
     e.preventDefault();
