@@ -36,7 +36,7 @@ export function useClickOutside(closeFn, listenCapturing = true) {
           listenCapturing
         );
     },
-    [closeFn]
+    [closeFn, listenCapturing]
   );
 
   return ref;
