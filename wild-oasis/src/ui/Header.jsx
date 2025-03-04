@@ -6,6 +6,8 @@ import DarkModeToggle from './DarkModeToggle';
 
 //as we have our header component we'll name the style accordingly
 const StyledHeader = styled.header`
+  /* grid-row: 1;
+  grid-column: 1/-1; */
   display: flex;
   gap: 1.6rem;
   justify-content: flex-end;
