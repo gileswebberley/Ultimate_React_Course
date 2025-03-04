@@ -15,6 +15,7 @@ import Checkbox from '../../ui/Checkbox';
 import { formatCurrency } from '../../utils/helpers';
 import { useCheckIn } from './useCheckIn';
 import { useSettings } from '../settings/useSettings';
+import SimpleFormRow from '../../ui/SimpleFormRow';
 
 const Box = styled.div`
   /* Box */
@@ -124,17 +125,18 @@ function CheckinBooking() {
           </Checkbox>
         </Box>
       )}
-
-      <ButtonGroup>
-        {isPaid && (
-          <Button disabled={!isPaid} onClick={handleCheckin}>
-            Complete check-in
+      <SimpleFormRow>
+        <ButtonGroup>
+          {isPaid && (
+            <Button disabled={!isPaid} onClick={handleCheckin}>
+              Complete check-in
+            </Button>
+          )}
+          <Button variation="secondary" onClick={moveBack}>
+            Back
           </Button>
-        )}
-        <Button variation="secondary" onClick={moveBack}>
-          Back
-        </Button>
-      </ButtonGroup>
+        </ButtonGroup>
+      </SimpleFormRow>
     </>
   );
 }

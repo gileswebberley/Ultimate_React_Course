@@ -17,6 +17,7 @@ import CompoundModal from '../../ui/CompoundModal';
 import ConfirmDelete from '../../ui/ConfirmDelete';
 import SpinnerTiny from '../../ui/SpinnerTiny';
 import { HiTrash } from 'react-icons/hi2';
+import SimpleFormRow from '../../ui/SimpleFormRow';
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -74,41 +75,43 @@ function BookingDetail() {
           />
         </CompoundModal.Modal>
         {/* Allow for checking in when unconfirmed and checking out when checked in */}
-        <ButtonGroup>
-          {status === 'unconfirmed' && (
-            <Button
-              variation="primary"
-              size="medium"
-              onClick={() => navigate(`../checkin/${bookingId}`)}
-            >
-              <p>Check-In</p>
-            </Button>
-          )}
+        <SimpleFormRow>
+          <ButtonGroup>
+            {status === 'unconfirmed' && (
+              <Button
+                variation="primary"
+                size="medium"
+                onClick={() => navigate(`../checkin/${bookingId}`)}
+              >
+                <p>Check-In</p>
+              </Button>
+            )}
 
-          {status === 'checked-in' && (
-            <Button
-              variation="primary"
-              size="medium"
-              disabled={isCheckingOut}
-              onClick={() => checkOut(bookingId)}
-            >
-              <p>Check-Out</p>
+            {status === 'checked-in' && (
+              <Button
+                variation="primary"
+                size="medium"
+                disabled={isCheckingOut}
+                onClick={() => checkOut(bookingId)}
+              >
+                <p>Check-Out</p>
+              </Button>
+            )}
+            <CompoundModal.Open openName="delete">
+              <Button
+                variation="danger"
+                size="small"
+                disabled={isDeletingBooking}
+              >
+                {isDeletingBooking ? <SpinnerTiny /> : <HiTrash />}
+                <p>Delete</p>
+              </Button>
+            </CompoundModal.Open>
+            <Button variation="secondary" onClick={moveBack}>
+              Back
             </Button>
-          )}
-          <CompoundModal.Open openName="delete">
-            <Button
-              variation="danger"
-              size="small"
-              disabled={isDeletingBooking}
-            >
-              {isDeletingBooking ? <SpinnerTiny /> : <HiTrash />}
-              <p>Delete</p>
-            </Button>
-          </CompoundModal.Open>
-          <Button variation="secondary" onClick={moveBack}>
-            Back
-          </Button>
-        </ButtonGroup>
+          </ButtonGroup>
+        </SimpleFormRow>
       </CompoundModal>
     </>
   );

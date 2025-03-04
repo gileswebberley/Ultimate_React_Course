@@ -1,4 +1,10 @@
-import styled from "styled-components";
+import styled from 'styled-components';
+import { useRecentBookings } from './useRecentBookings';
+import { useRecentStays } from './useRecentStays';
+import Spinner from '../../ui/Spinner';
+import Statistics from './Statistics';
+import { useCabins } from '../cabins/useCabins';
+import SalesChart from './SalesChart';
 
 const StyledDashboardLayout = styled.div`
   display: grid;
@@ -6,3 +12,33 @@ const StyledDashboardLayout = styled.div`
   grid-template-rows: auto 34rem auto;
   gap: 2.4rem;
 `;
+
+function DashboardLayout() {
+  const { isLoadingRecentBookings, recentBookings, numDays } =
+    useRecentBookings();
+  const { isLoadingRecentStays, recentStays, confirmedStays } =
+    useRecentStays();
+
+  //we need the number of cabins available for the occupancy rate
+  const { isLoading: isLoadingCabinCount, count: cabinsCount } = useCabins();
+  const isLoadingData =
+    isLoadingRecentBookings || isLoadingRecentStays || isLoadingCabinCount;
+
+  if (isLoadingData) return <Spinner />;
+
+  return (
+    <StyledDashboardLayout>
+      <Statistics
+        bookings={recentBookings}
+        stays={confirmedStays}
+        period={numDays}
+        cabinCount={cabinsCount}
+      />
+      <SalesChart bookings={recentBookings} period={numDays} />
+      <div>Today</div>
+      <div>duration</div>
+    </StyledDashboardLayout>
+  );
+}
+
+export default DashboardLayout;

@@ -21,6 +21,7 @@ import AppLayout from './ui/AppLayout';
 import Booking from './pages/Booking';
 import Checkin from './pages/Checkin';
 import ProtectedRoute from './ui/ProtectedRoute';
+import { DarkModeProvider } from './context/darkModeContext';
 
 //now let's continue the setup of react-query
 const queryClient = new QueryClient({
@@ -50,63 +51,66 @@ function App() {
       <QueryClientProvider client={queryClient}>
         {/* Also, we've now npm installed the devtools so we can add it as a sibling component (this creates a little icon on our page which we can click to open) */}
         <ReactQueryDevtools initialIsOpen={false} />
-        {/* add our styles as a sibling component to our routes so it's available throughout the application */}
-        <GlobalStyles />
-        <BrowserRouter>
-          <Routes>
-            {/* We're going to wrap these routes in a protected one now that we have started to implement authentication */}
-            <Route
-              element={
-                <ProtectedRoute>
-                  <AppLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate replace to="dashboard" />} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="bookings" element={<Bookings />} />
-              <Route path="bookings/:bookingId" element={<Booking />} />
-              <Route path="checkin/:bookingId" element={<Checkin />} />
-              <Route path="cabins" element={<Cabins />} />
-              <Route path="users" element={<Users />} />
-              <Route path="settings" element={<Settings />} />
-              <Route path="account" element={<Account />} />
-            </Route>
-            <Route path="login" element={<Login />} />
-            <Route path="*" element={<PageNotFound />} />
-          </Routes>
-        </BrowserRouter>
-        {/* For the more attractive notifications we have installed react-hot-toast package */}
-        <Toaster
-          position="top-center"
-          gutter={8}
-          containerStyle={{ margin: '8px' }}
-          toastOptions={{
-            success: {
-              duration: 5000,
+        {/* Now we are implementing dark mode through a context provider implementation */}
+        <DarkModeProvider>
+          {/* add our styles as a sibling component to our routes so it's available throughout the application */}
+          <GlobalStyles />
+          <BrowserRouter>
+            <Routes>
+              {/* We're going to wrap these routes in a protected one now that we have started to implement authentication */}
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Navigate replace to="dashboard" />} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="bookings" element={<Bookings />} />
+                <Route path="bookings/:bookingId" element={<Booking />} />
+                <Route path="checkin/:bookingId" element={<Checkin />} />
+                <Route path="cabins" element={<Cabins />} />
+                <Route path="users" element={<Users />} />
+                <Route path="settings" element={<Settings />} />
+                <Route path="account" element={<Account />} />
+              </Route>
+              <Route path="login" element={<Login />} />
+              <Route path="*" element={<PageNotFound />} />
+            </Routes>
+          </BrowserRouter>
+          {/* For the more attractive notifications we have installed react-hot-toast package */}
+          <Toaster
+            position="top-center"
+            gutter={8}
+            containerStyle={{ margin: '8px' }}
+            toastOptions={{
+              success: {
+                duration: 5000,
+                style: {
+                  backgroundColor: 'var(--color-green-700)',
+                  color: 'var(--color-grey-50)',
+                },
+              },
+              error: {
+                duration: 5000,
+                style: {
+                  backgroundColor: 'var(--color-red-800)',
+                  color: 'var(--color-grey-50)',
+                },
+              },
               style: {
-                backgroundColor: 'var(--color-green-700)',
+                textAlign: 'center',
+                lineHeight: '130%',
+                fontSize: '16px',
+                maxWidth: '400px',
+                padding: '16px 24px',
+                backgroundColor: 'var(--color-grey-800)',
                 color: 'var(--color-grey-50)',
               },
-            },
-            error: {
-              duration: 5000,
-              style: {
-                backgroundColor: 'var(--color-red-800)',
-                color: 'var(--color-grey-50)',
-              },
-            },
-            style: {
-              textAlign: 'center',
-              lineHeight: '130%',
-              fontSize: '16px',
-              maxWidth: '400px',
-              padding: '16px 24px',
-              backgroundColor: 'var(--color-grey-800)',
-              color: 'var(--color-grey-50)',
-            },
-          }}
-        />
+            }}
+          />
+        </DarkModeProvider>
       </QueryClientProvider>
     </>
   );

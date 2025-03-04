@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 const StyledButtonGroup = styled.nav`
   display: flex;
-  justify-content: ${(props) =>
+  justify-items: ${(props) =>
     props.justify === 'end' ? 'flex-end' : 'flex-start'};
 `;
 

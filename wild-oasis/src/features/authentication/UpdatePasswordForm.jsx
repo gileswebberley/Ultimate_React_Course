@@ -69,7 +69,7 @@ function UpdatePasswordForm() {
             validate: (value, fieldValues) => {
               return (
                 fieldValues.password === value ||
-                'This appears to be different from your password'
+                'Oops, this appears to be different from your password'
               );
             },
           }}
