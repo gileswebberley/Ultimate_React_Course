@@ -21,7 +21,7 @@ import AppLayout from './ui/AppLayout';
 import Booking from './pages/Booking';
 import Checkin from './pages/Checkin';
 import ProtectedRoute from './ui/ProtectedRoute';
-import { DarkModeProvider } from './context/darkModeContext';
+import { DarkModeProvider } from './context/DarkModeContext';
 
 //now let's continue the setup of react-query
 const queryClient = new QueryClient({
