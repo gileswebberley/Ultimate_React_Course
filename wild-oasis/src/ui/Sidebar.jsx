@@ -12,7 +12,7 @@ const transform = {
   `,
 
   closed: css`
-    transform: translate(-96%);
+    transform: translate(-94%);
     transition: ease-in-out 0.8s;
   `,
 };
@@ -20,13 +20,10 @@ const transform = {
 //now that this is within a grid layout (in StyledAppLayout) it becomes a grid-item. To make it span from row 1 to the end of the grid rows we set it as 1 / -1
 const StyledSidebar = styled.aside`
   grid-row: 1/-1;
-  /* display: flex;
-  flex-direction: column; */
   display: grid;
-  grid-template-columns: 26rem 1rem;
+  grid-template-columns: 26rem 1.5rem;
   grid-template-rows: auto 1fr;
   height: 100dvh;
-  /* width: 26rem; */
   gap: 2.2rem;
   background-color: var(--color-grey-0);
   padding: 3.2rem 0.2rem;
@@ -38,6 +35,7 @@ const StyledSidebar = styled.aside`
 
 const ClickBit = styled.div`
   background-color: var(--color-grey-300);
+  border-radius: 0.5rem;
   grid-column: 2;
   grid-row: 1/-1;
 `;
@@ -50,9 +48,18 @@ function Sidebar() {
     setIsOpen((open) => !open);
   }
   return (
-    <StyledSidebar transform={isOpen ? 'open' : 'closed'} onClick={handleOpen}>
+    <StyledSidebar
+      transform={isOpen ? 'open' : 'closed'}
+      onClick={handleOpen}
+      onMouseLeave={() => setIsOpen(false)}
+    >
       <Logo />
-      <ClickBit style={{ cursor: 'pointer' }} />
+      <ClickBit
+        style={{ cursor: 'pointer' }}
+        onMouseEnter={() => {
+          if (!isOpen) setIsOpen(true);
+        }}
+      />
       <MainNav />
       {/* <Uploader /> */}
     </StyledSidebar>

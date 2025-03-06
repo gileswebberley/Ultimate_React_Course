@@ -5,23 +5,28 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import toast, { Toaster } from 'react-hot-toast';
+import { lazy, Suspense } from 'react';
 
-import Dashboard from './pages/Dashboard';
-import Account from './pages/Account';
-import Bookings from './pages/Bookings';
-import Cabins from './pages/Cabins';
-import Login from './pages/Login';
-import PageNotFound from './pages/PageNotFound';
-import Settings from './pages/Settings';
-import Users from './pages/Users';
-import GlobalStyles from './styles/GlobalStyles';
-import AppLayout from './ui/AppLayout';
-import Booking from './pages/Booking';
-import Checkin from './pages/Checkin';
-import ProtectedRoute from './ui/ProtectedRoute';
+// import GlobalStyles from './styles/GlobalStyles';
+// import AppLayout from './ui/AppLayout';
+// import ProtectedRoute from './ui/ProtectedRoute';
 import { DarkModeProvider } from './context/DarkModeContext';
+import SpinnerFullPage from './ui/SpinnerFullPage';
+const ProtectedRoute = lazy(() => import('./ui/ProtectedRoute'));
+const AppLayout = lazy(() => import('./ui/AppLayout'));
+const GlobalStyles = lazy(() => import('./styles/GlobalStyles'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Account = lazy(() => import('./pages/Account'));
+const Bookings = lazy(() => import('./pages/Bookings'));
+const Cabins = lazy(() => import('./pages/Cabins'));
+const Login = lazy(() => import('./pages/Login'));
+const PageNotFound = lazy(() => import('./pages/PageNotFound'));
+const Settings = lazy(() => import('./pages/Settings'));
+const Users = lazy(() => import('./pages/Users'));
+const Booking = lazy(() => import('./pages/Booking'));
+const Checkin = lazy(() => import('./pages/Checkin'));
 
 //now let's continue the setup of react-query
 const queryClient = new QueryClient({
@@ -50,35 +55,38 @@ function App() {
       {/* Just like with other state management libraries we'll wrap the whole application in our new React(Tanstack)-Query query client */}
       <QueryClientProvider client={queryClient}>
         {/* Also, we've now npm installed the devtools so we can add it as a sibling component (this creates a little icon on our page which we can click to open) */}
-        <ReactQueryDevtools initialIsOpen={false} />
+        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         {/* Now we are implementing dark mode through a context provider implementation */}
         <DarkModeProvider>
+          {/* Let's break up the loading with the suspense stategy */}
           {/* add our styles as a sibling component to our routes so it's available throughout the application */}
           <GlobalStyles />
-          <BrowserRouter>
-            <Routes>
-              {/* We're going to wrap these routes in a protected one now that we have started to implement authentication */}
-              <Route
-                element={
-                  <ProtectedRoute>
-                    <AppLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<Navigate replace to="dashboard" />} />
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="bookings" element={<Bookings />} />
-                <Route path="bookings/:bookingId" element={<Booking />} />
-                <Route path="checkin/:bookingId" element={<Checkin />} />
-                <Route path="cabins" element={<Cabins />} />
-                <Route path="users" element={<Users />} />
-                <Route path="settings" element={<Settings />} />
-                <Route path="account" element={<Account />} />
-              </Route>
-              <Route path="login" element={<Login />} />
-              <Route path="*" element={<PageNotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <Suspense fallback={<SpinnerFullPage />}>
+            <BrowserRouter>
+              <Routes>
+                {/* We're going to wrap these routes in a protected one now that we have started to implement authentication */}
+                <Route
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<Navigate replace to="dashboard" />} />
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="bookings" element={<Bookings />} />
+                  <Route path="bookings/:bookingId" element={<Booking />} />
+                  <Route path="checkin/:bookingId" element={<Checkin />} />
+                  <Route path="cabins" element={<Cabins />} />
+                  <Route path="users" element={<Users />} />
+                  <Route path="settings" element={<Settings />} />
+                  <Route path="account" element={<Account />} />
+                </Route>
+                <Route path="login" element={<Login />} />
+                <Route path="*" element={<PageNotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </Suspense>
           {/* For the more attractive notifications we have installed react-hot-toast package */}
           <Toaster
             position="top-center"
