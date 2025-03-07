@@ -107,7 +107,10 @@ function CheckinBooking() {
             // disabled={isAddingBreakfast}
             id="addBreakfast"
           >
-            Add breakfast to booking for {formatCurrency(breakfastPrice)}
+            Add breakfast to booking for{' '}
+            {`${formatCurrency(
+              settings.breakfastPrice
+            )} pp/pd (${formatCurrency(breakfastPrice)})`}
           </Checkbox>
         </Box>
       )}

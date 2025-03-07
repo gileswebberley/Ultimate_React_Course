@@ -23,15 +23,9 @@ const Avatar = styled.img`
 `;
 
 export default function UserAvatar() {
-  //
-  const {
-    user: {
-      user_metadata: { fullName, avatar },
-    },
-    isCheckingUser,
-  } = useUser();
-  //const { fullName, avatar } = user;
-  const displayName = fullName.split(' ').shift();
+  const { user, isCheckingUser } = useUser();
+  const { fullName, avatar } = user?.user_metadata ?? {};
+  const displayName = fullName?.split(' ').shift();
 
   return (
     <>

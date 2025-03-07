@@ -7,15 +7,15 @@ const GlobalStyles = createGlobalStyle`
     These are CSS variables which are used with the var() css method.
     We can inject design tokens like these using the styled components 'themes' functionality (if you see $(props => props.theme) in code then that is what is being used) however css variables have become the standard way of doing the same
     */
-  /* Indigo - for dark and light modes */
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-200: #c7d2fe;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-  --color-brand-800: #3730a3;
-  --color-brand-900: #312e81;  
+  /* New green branding - for dark and light modes */
+  --color-brand-50:rgb(236, 245, 238);
+  --color-brand-100:rgb(200, 216, 203);
+  --color-brand-200:rgb(182, 220, 189);
+  --color-brand-500:rgb(131, 161, 136);
+  --color-brand-600:rgb(100, 143, 108);
+  --color-brand-700:rgb(73, 142, 85);
+  --color-brand-800:rgb(41, 114, 54);
+  --color-brand-900:rgb(27, 79, 37); 
   --border-radius-tiny: 3px;
   --border-radius-sm: 5px;
   --border-radius-md: 7px;
@@ -163,6 +163,11 @@ textarea:focus,
 select:focus {
   outline: 2px solid var(--color-brand-600);
   outline-offset: -1px;
+}
+
+input:is(:-webkit-autofill,:autofill){
+  /* I can't change the blue background in chrome but I can do this */
+  border-color: var(--color-brand-700);
 }
 
 /* Parent selector, finally 😃 */

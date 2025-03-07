@@ -9,14 +9,14 @@ import {
 import toast, { Toaster } from 'react-hot-toast';
 import { lazy, Suspense } from 'react';
 
-// import GlobalStyles from './styles/GlobalStyles';
-// import AppLayout from './ui/AppLayout';
+import GlobalStyles from './styles/GlobalStyles';
+import AppLayout from './ui/AppLayout';
 // import ProtectedRoute from './ui/ProtectedRoute';
 import { DarkModeProvider } from './context/DarkModeContext';
 import SpinnerFullPage from './ui/SpinnerFullPage';
 const ProtectedRoute = lazy(() => import('./ui/ProtectedRoute'));
-const AppLayout = lazy(() => import('./ui/AppLayout'));
-const GlobalStyles = lazy(() => import('./styles/GlobalStyles'));
+// const AppLayout = lazy(() => import('./ui/AppLayout'));
+// const GlobalStyles = lazy(() => import('./styles/GlobalStyles'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Account = lazy(() => import('./pages/Account'));
 const Bookings = lazy(() => import('./pages/Bookings'));
@@ -97,14 +97,14 @@ function App() {
                 duration: 5000,
                 style: {
                   backgroundColor: 'var(--color-green-700)',
-                  color: 'var(--color-grey-50)',
+                  color: '#f9fafb',
                 },
               },
               error: {
                 duration: 5000,
                 style: {
                   backgroundColor: 'var(--color-red-800)',
-                  color: 'var(--color-grey-50)',
+                  color: '#f9fafb',
                 },
               },
               style: {
