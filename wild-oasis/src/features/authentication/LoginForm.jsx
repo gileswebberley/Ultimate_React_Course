@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Button from '../../ui/Button';
 import Form from '../../ui/Form';
 import Input from '../../ui/Input';
@@ -6,14 +6,10 @@ import FormRow from '../../ui/FormRow';
 import SpinnerMini from '../../ui/SpinnerMini';
 import { useLogin } from './useLogin';
 import PasswordInput from '../../ui/PasswordInput';
-import { useRef } from 'react';
 
 function LoginForm() {
-  //temp whilst developing
-  const tmpEmail = 'giles@example.com';
-  const tmpPassword = 'pass9486';
-  const [email, setEmail] = useState(tmpEmail);
-  const [password, setPassword] = useState(tmpPassword);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const { login, isLoggingIn } = useLogin();
   //const ref = useRef(null);
 
@@ -24,7 +20,6 @@ function LoginForm() {
       { email, password },
       {
         onError: () => {
-          setEmail(tmpEmail);
           setPassword('');
         },
       }

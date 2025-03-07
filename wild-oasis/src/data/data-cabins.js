@@ -1,4 +1,5 @@
-import { supabaseUrl } from '../services/supabase';
+// import { supabaseUrl } from '../services/supabase';
+const supabaseUrl = process.env.SUPABASE_URL;
 
 const imageUrlUrl = `${supabaseUrl}/storage/v1/object/public/cabin-images/`;
 

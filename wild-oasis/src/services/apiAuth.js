@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
-import supabase, { supabaseUrl } from './supabase';
+import supabase from './supabase';
+const supabaseUrl = process.env.SUPABASE_URL;
 
 const avatarStorageUrl = `${supabaseUrl}/storage/v1/object/public/avatars/`;
 
