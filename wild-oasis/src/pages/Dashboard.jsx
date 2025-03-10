@@ -1,3 +1,4 @@
+import { GuestContextProvider } from '../context/GuestContext';
 import DashboardFilter from '../features/dashboard/DashboardFilter';
 import DashboardLayout from '../features/dashboard/DashboardLayout';
 import CountryInput from '../ui/CountryInput';
@@ -11,7 +12,9 @@ function Dashboard() {
         <Heading as="h1">Dashboard</Heading>
         <DashboardFilter />
       </Row>
-      <CountryInput />
+      <GuestContextProvider>
+        <CountryInput />
+      </GuestContextProvider>
       <DashboardLayout />
     </>
   );
