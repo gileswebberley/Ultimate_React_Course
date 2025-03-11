@@ -8,11 +8,12 @@ import {
 } from 'react';
 import Input from './Input';
 import styled from 'styled-components';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 //this ensures that the options box scrolls with the input
 const Container = styled.span`
   position: relative;
-  min-width: 30rem;
+  min-width: 17rem;
 `;
 
 const OptionBox = styled.span`
@@ -29,7 +30,7 @@ const OptionBox = styled.span`
 const OptionList = styled.ul`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 0.8rem;
   padding: 1.2rem;
 `;
@@ -37,6 +38,7 @@ const OptionList = styled.ul`
 const Option = styled.button`
   padding: 0.2rem 1.2rem;
   border: none;
+  width: 100%;
   background-color: var(--color-brand-100);
   color: var(--color-brand-800);
   &:focus {
@@ -66,7 +68,9 @@ const Autocompleter = forwardRef(function Autocompleter(
 
   //for positioning options under the input field
   const positionRef = useRef(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ x: 10, y: 30 });
+
+  const clickOutsideRef = useClickOutside(() => setFilteredItems([]));
 
   //set up the array of completer field from data
   const possibles = useMemo(() => {
@@ -91,9 +95,10 @@ const Autocompleter = forwardRef(function Autocompleter(
 
   //get the position of our input field so we can place the drop-down list below it
   useEffect(() => {
-    if (!positionRef) return;
+    if (!positionRef.current) {
+      return;
+    }
     const posBox = positionRef?.current?.getBoundingClientRect();
-    //console.log(posBox);
     setPosition({ x: 10, y: posBox?.height + 5 });
   }, [positionRef]);
 
@@ -131,20 +136,27 @@ const Autocompleter = forwardRef(function Autocompleter(
   return (
     <Container>
       <Input
-        // {...props}
-        placeholder="Start typing and select an option"
-        ref={ref ? ref : positionRef}
+        {...props}
+        placeholder="select an option"
+        ref={
+          ref
+            ? (e) => {
+                ref(e);
+                positionRef.current = e;
+              }
+            : positionRef
+        }
         value={inputValue}
         autoComplete="new"
         onChange={(e) => {
           console.log(`field value changed`);
-          props['field']?.onChange(e.target.value);
+          props?.onChange?.(e.target.value);
           setInputValue(e.target.value);
         }}
       />
 
       {filteredItems.length > 0 && displayItems && (
-        <OptionBox position={position}>
+        <OptionBox position={position} ref={clickOutsideRef}>
           <OptionList>
             {filteredItems
               .map((item, i) => {

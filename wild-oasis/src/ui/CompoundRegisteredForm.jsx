@@ -9,6 +9,7 @@ import PasswordInput from './PasswordInput';
 import countries_data from '../data/countries_list.json';
 import { Flag } from './Flag';
 import Autocompleter from './Autocompleter';
+import FormRow from './FormRow';
 
 const StyledCountryInput = styled.div`
   display: flex;
@@ -223,7 +224,7 @@ function RegisteredCountryInput({
   }
 
   return (
-    <SimpleFormRow>
+    <FormRow>
       <Label htmlFor={elementID}>{labelStr}</Label>
       <StyledCountryInput>
         <Controller
@@ -251,7 +252,7 @@ function RegisteredCountryInput({
       {errors?.[elementID]?.message && (
         <Error>{errors[elementID].message}</Error>
       )}
-    </SimpleFormRow>
+    </FormRow>
   );
 }
 
