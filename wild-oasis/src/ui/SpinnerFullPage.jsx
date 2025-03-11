@@ -34,7 +34,6 @@ const SpinnerFP = styled.div`
 function SpinnerFullPage() {
   return (
     <FPContainer>
-      {' '}
       <SpinnerFP />
     </FPContainer>
   );

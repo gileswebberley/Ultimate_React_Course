@@ -52,7 +52,6 @@ function SignupForm() {
         // isLoading={isLoading}
         submitFn={submitNewUser}
         errorFn={onError}
-        defaultValues={{ fullName: 'Testing' }}
         isLoading={isSigningUp}
       >
         <CompoundRegisteredForm.Input

@@ -1,10 +1,24 @@
-import { createContext, useContext, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { Controller, useController, useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import SimpleFormRow from './SimpleFormRow';
 import Input from './Input';
 import Textarea from './Textarea';
 import PasswordInput from './PasswordInput';
+//for the attempt at putting the country select in here
+import countries_data from '../data/countries_list.json';
+import { Flag } from './Flag';
+import Autocompleter from './Autocompleter';
+
+const StyledCountryInput = styled.div`
+  display: flex;
+  gap: 2rem;
+`;
+
+const CountryFlag = styled(Flag)`
+  max-width: 5rem;
+  font-size: 1rem;
+`;
 
 //basic styled components
 const Label = styled.label`
@@ -33,7 +47,7 @@ function CompoundRegisteredForm({
   //mode overrides the default validation behaviour of the browser (I decided when a field loses focus is the perfect time to show the validation messages as onChange produces a lot of re-renders)
   //reValidateMode is set to onChange by default which seems bad to me considering the comment above, so I've changed it to blur
   //resetOptions is used to clear error messages when the form is reset
-  const { register, handleSubmit, reset, formState } = useForm({
+  const { register, handleSubmit, reset, formState, control } = useForm({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
     resetOptions: { keepErrors: false },
@@ -51,7 +65,7 @@ function CompoundRegisteredForm({
   return (
     <form onSubmit={handleSubmit(submitFn, errorFn)}>
       <registeredFormContext.Provider
-        value={{ isLoading, errors, register, reset }}
+        value={{ isLoading, errors, register, reset, control }}
       >
         {children}
       </registeredFormContext.Provider>
@@ -181,12 +195,73 @@ function RegisteredPasswordInput({ elementID, labelStr, validationObj }) {
   );
 }
 
+function RegisteredCountryInput({
+  elementID,
+  labelStr,
+  validationObj,
+  indexEvent,
+}) {
+  //grab the general form variables from our context
+  const { isLoading, errors, control } = useContext(registeredFormContext);
+  const [countryIndex, setCountryIndex] = useState(null);
+  let countryObject = countries_data[countryIndex] ?? {};
+  // countryIndex !== null ? countries_data[countryIndex] : {};
+  let countryFlag = countryIndex
+    ? `https://flagcdn.com/${countryObject?.Code?.toLowerCase()}.svg`
+    : null;
+  let countryName = countryObject?.Name ?? null;
+  //const { field } = useController({ name: elementID, rules: validationObj });
+  function handleSettingEvent(e) {
+    setCountryIndex((ci) => e);
+    countryObject = countries_data[e] ?? {};
+    countryFlag = countryObject?.Code
+      ? `https://flagcdn.com/${countryObject?.Code?.toLowerCase()}.svg`
+      : null;
+    countryName = countryObject?.Name ?? null;
+    console.log(`Inside the registered country: ${e}`);
+    indexEvent(countryFlag, countryName);
+  }
+
+  return (
+    <SimpleFormRow>
+      <Label htmlFor={elementID}>{labelStr}</Label>
+      <StyledCountryInput>
+        <Controller
+          control={control}
+          rules={validationObj}
+          name={elementID}
+          render={({ field }) => (
+            <Autocompleter
+              id={elementID}
+              disabled={isLoading}
+              data={countries_data}
+              setindex={handleSettingEvent}
+              completer_field="Name"
+              {...field}
+            />
+          )}
+        />
+        {countryObject?.Code && (
+          <CountryFlag
+            src={countryFlag}
+            alt={`flag of ${countryObject?.Name}`}
+          />
+        )}
+      </StyledCountryInput>
+      {errors?.[elementID]?.message && (
+        <Error>{errors[elementID].message}</Error>
+      )}
+    </SimpleFormRow>
+  );
+}
+
 //TODO - add checkbox and perhaps even select
 
 CompoundRegisteredForm.Input = RegisteredInput;
 CompoundRegisteredForm.Textarea = RegisteredTextarea;
 CompoundRegisteredForm.Email = RegisteredEmailInput;
 CompoundRegisteredForm.Password = RegisteredPasswordInput;
+CompoundRegisteredForm.Country = RegisteredCountryInput;
 CompoundRegisteredForm.Reset = ResetButton;
 
 export default CompoundRegisteredForm;

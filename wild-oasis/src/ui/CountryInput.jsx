@@ -3,8 +3,7 @@ import countries_data from '../data/countries_list.json';
 import Autocompleter from './Autocompleter';
 import styled from 'styled-components';
 import { Flag } from './Flag';
-import { useGuestContext } from '../context/GuestContext';
-import { useFieldArray } from 'react-hook-form';
+import { useGuestApiContext } from '../context/GuestContext';
 
 const StyledCountryInput = styled.div`
   display: flex;
@@ -20,15 +19,18 @@ function CountryInput() {
   const [countryIndex, setCountryIndex] = useState(null);
   const countryObject = countries_data[countryIndex] ?? {};
   // countryIndex !== null ? countries_data[countryIndex] : {};
-  const countryFlag = `https://flagcdn.com/${countryObject?.Code?.toLowerCase()}.svg`;
-  const countryName = countryObject?.Name;
-  const { setNationality, setCountryFlag } = useGuestContext();
+  const countryFlag = countryIndex
+    ? `https://flagcdn.com/${countryObject?.Code?.toLowerCase()}.svg`
+    : null;
+  const countryName = countryObject?.Name ?? null;
+  const { setCountry } = useGuestApiContext();
+
+  //   console.log('COUNTRY INPUT...');
 
   useEffect(() => {
-    if (countryIndex === null) return;
-    setNationality(countryName);
-    setCountryFlag(countryFlag);
-  }, [countryFlag, countryIndex, countryName, setCountryFlag, setNationality]);
+    if (!countryFlag || !countryName) setCountry('', '');
+    setCountry(countryName, countryFlag);
+  }, [countryFlag, countryName, setCountry]);
 
   return (
     <StyledCountryInput>
@@ -36,6 +38,7 @@ function CountryInput() {
         data={countries_data}
         setindex={setCountryIndex}
         completer_field="Name"
+        ref={null}
       />
       {countryObject?.Code && (
         <CountryFlag src={countryFlag} alt={`flag of ${countryObject?.Name}`} />

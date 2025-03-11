@@ -1,18 +1,25 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import Input from './Input';
 import styled from 'styled-components';
 
 //this ensures that the options box scrolls with the input
-const Container = styled.div`
+const Container = styled.span`
   position: relative;
   min-width: 30rem;
 `;
 
-const OptionBox = styled.div`
+const OptionBox = styled.span`
   position: absolute;
   z-index: 10;
   width: fit-content;
-  background-color: var(--color-grey-0);
+  background-color: var(--color-brand-50);
   box-shadow: var(--shadow-lg);
   border-radius: var(--border-radius-md);
   left: ${(props) => props.position.x}px;
@@ -30,7 +37,7 @@ const OptionList = styled.ul`
 const Option = styled.button`
   padding: 0.2rem 1.2rem;
   border: none;
-  background-color: var(--color-brand-50);
+  background-color: var(--color-brand-100);
   color: var(--color-brand-800);
   &:focus {
     background-color: var(--color-brand-800);
@@ -40,20 +47,14 @@ const Option = styled.button`
     background-color: var(--color-brand-200);
   }
 `;
+
 //data is an array of objects with a completer field eg [{name, other_data}] might use 'name' as the autocomplete field (this is what is displayed and compared to)
 //options_length - number of filtered results that will be shown in the options
 //setindex - callback function that passes the index of the selected item back to it's parent
-function Autocompleter({
-  data,
-  completer_field,
-  options_length = 5,
-  setindex = null,
-}) {
-  const possibles = useMemo(
-    () => data.map((item) => item[completer_field]),
-    [data, completer_field]
-  );
-
+const Autocompleter = forwardRef(function Autocompleter(
+  { data, completer_field, options_length = 5, setindex = null, ...props },
+  ref
+) {
   //active item will be the index of the selected possibility
   const [activeItem, setActiveItem] = useState(null);
   //the value of the controlled input element
@@ -67,11 +68,33 @@ function Autocompleter({
   const positionRef = useRef(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
+  //set up the array of completer field from data
+  const possibles = useMemo(() => {
+    return data.map((item) => item[completer_field]);
+  }, [data, completer_field]);
+
+  //I was trying to get a datalist alternative working hence the useCallback
+  const handleSelect = useCallback(
+    (e) => {
+      e.preventDefault?.();
+      const value = e.target.value;
+      const indexForSelection = possibles.indexOf(value);
+      setInputValue(value);
+      setFilteredItems([]);
+      setDisplayItems(false);
+      setActiveItem(indexForSelection);
+      //if the callback function has been passed in then execute it with the array index of the selected element
+      setindex?.(indexForSelection);
+    },
+    [possibles, setindex]
+  );
+
   //get the position of our input field so we can place the drop-down list below it
   useEffect(() => {
-    const posBox = positionRef?.current.getBoundingClientRect();
+    if (!positionRef) return;
+    const posBox = positionRef?.current?.getBoundingClientRect();
     //console.log(posBox);
-    setPosition({ x: 10, y: posBox.height + 5 });
+    setPosition({ x: 10, y: posBox?.height + 5 });
   }, [positionRef]);
 
   //handle the input changing and create the options
@@ -105,28 +128,19 @@ function Autocompleter({
     setFilteredItems(validOptions);
   }, [inputValue, possibles, setindex, displayItems, activeItem]);
 
-  function handleSelect(e) {
-    e.preventDefault();
-    const value = e.target.value;
-    const indexForSelection = possibles.indexOf(value);
-    setInputValue(value);
-    setFilteredItems([]);
-    setDisplayItems(false);
-    setActiveItem(indexForSelection);
-    //if the callback function has been passed in then execute it with the array index of the selected element
-    setindex?.(indexForSelection);
-  }
-
   return (
     <Container>
       <Input
+        // {...props}
         placeholder="Start typing and select an option"
-        ref={positionRef}
-        autoComplete="off"
-        autoCorrect="off"
+        ref={ref ? ref : positionRef}
         value={inputValue}
-        id="country"
-        onChange={(e) => setInputValue(e.target.value)}
+        autoComplete="new"
+        onChange={(e) => {
+          console.log(`field value changed`);
+          props['field']?.onChange(e.target.value);
+          setInputValue(e.target.value);
+        }}
       />
 
       {filteredItems.length > 0 && displayItems && (
@@ -148,6 +162,6 @@ function Autocompleter({
       )}
     </Container>
   );
-}
+});
 
 export default Autocompleter;
