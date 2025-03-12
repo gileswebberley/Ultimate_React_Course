@@ -7,6 +7,8 @@ import toast from 'react-hot-toast';
 import { useGuestApiContext } from '../../context/GuestContext';
 //for the attempt at putting the country select in here
 import countries_data from '../../data/countries_list.json';
+import FormRow from '../../ui/FormRow';
+import CountryInput from '../../ui/CountryInput';
 
 const StyledGuestForm = styled.div`
   padding: 2.4rem 4rem;
