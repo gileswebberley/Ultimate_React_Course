@@ -1,12 +1,10 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { Controller, useController, useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import SimpleFormRow from './SimpleFormRow';
 import Input from './Input';
 import Textarea from './Textarea';
 import PasswordInput from './PasswordInput';
-//for the attempt at putting the country select in here
-import countries_data from '../data/countries_list.json';
 import { Flag } from './Flag';
 import Autocompleter from './Autocompleter';
 import FormRow from './FormRow';
@@ -45,6 +43,7 @@ function CompoundRegisteredForm({
   resetOnSubmit = true,
 }) {
   //React-hook-form usage setup -------------------
+  //control is for creating controlled components (like the country selector)
   //mode overrides the default validation behaviour of the browser (I decided when a field loses focus is the perfect time to show the validation messages as onChange produces a lot of re-renders)
   //reValidateMode is set to onChange by default which seems bad to me considering the comment above, so I've changed it to blur
   //resetOptions is used to clear error messages when the form is reset
@@ -201,27 +200,26 @@ function RegisteredCountryInput({
   labelStr,
   validationObj,
   indexEvent,
+  data,
 }) {
   //grab the general form variables from our context
   const { isLoading, errors, control } = useContext(registeredFormContext);
   const [countryIndex, setCountryIndex] = useState(null);
-  let countryObject = countries_data[countryIndex] ?? {};
+  let countryObject = data[countryIndex] ?? {};
   // countryIndex !== null ? countries_data[countryIndex] : {};
   let countryFlag = countryIndex
     ? `https://flagcdn.com/${countryObject?.Code?.toLowerCase()}.svg`
     : null;
   let countryName = countryObject?.Name ?? null;
-  //const { field } = useController({ name: elementID, rules: validationObj });
+
   function handleSettingEvent(e) {
     setCountryIndex((ci) => e);
-    countryObject = countries_data[e] ?? {};
-    countryFlag = countryObject?.Code
-      ? `https://flagcdn.com/${countryObject?.Code?.toLowerCase()}.svg`
-      : null;
-    countryName = countryObject?.Name ?? null;
-    console.log(`Inside the registered country: ${e}`);
-    indexEvent(countryFlag, countryName);
   }
+
+  //when the country index is set then pass up the name and flag to the parent component
+  useEffect(() => {
+    indexEvent(countryName, countryFlag);
+  }, [countryIndex, countryFlag, countryName, indexEvent]);
 
   return (
     <FormRow>
@@ -235,14 +233,14 @@ function RegisteredCountryInput({
             <Autocompleter
               id={elementID}
               disabled={isLoading}
-              data={countries_data}
+              data={data}
               setindex={handleSettingEvent}
               completer_field="Name"
               {...field}
             />
           )}
         />
-        {countryObject?.Code && (
+        {countryFlag && (
           <CountryFlag
             src={countryFlag}
             alt={`flag of ${countryObject?.Name}`}

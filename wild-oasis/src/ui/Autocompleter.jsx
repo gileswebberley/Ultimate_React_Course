@@ -70,6 +70,7 @@ const Autocompleter = forwardRef(function Autocompleter(
   const positionRef = useRef(null);
   const [position, setPosition] = useState({ x: 10, y: 30 });
 
+  //using our hook from earlier to clear the options list
   const clickOutsideRef = useClickOutside(() => setFilteredItems([]));
 
   //set up the array of completer field from data
@@ -87,10 +88,8 @@ const Autocompleter = forwardRef(function Autocompleter(
       setFilteredItems([]);
       setDisplayItems(false);
       setActiveItem(indexForSelection);
-      //if the callback function has been passed in then execute it with the array index of the selected element
-      setindex?.(indexForSelection);
     },
-    [possibles, setindex]
+    [possibles]
   );
 
   //get the position of our input field so we can place the drop-down list below it
@@ -99,7 +98,7 @@ const Autocompleter = forwardRef(function Autocompleter(
       return;
     }
     const posBox = positionRef?.current?.getBoundingClientRect();
-    setPosition({ x: 10, y: posBox?.height + 5 });
+    setPosition({ x: 0, y: posBox?.height + 5 });
   }, [positionRef]);
 
   //handle the input changing and create the options
@@ -109,11 +108,11 @@ const Autocompleter = forwardRef(function Autocompleter(
       setFilteredItems([]);
       setDisplayItems(true);
       setActiveItem(null);
-      setindex?.(null);
       return;
     } //or an option has been selected but then a char or more has been deleted
     else if (inputValue.length !== possibles[activeItem]?.length) {
       setDisplayItems(true);
+      setActiveItem(null);
     } //or if we have already made our selection (ie set displayItems to false) but there are still other options (this is to get rid of longer names that start with the name selected eg united states [minor outlying islands] )
     else if (!displayItems) {
       return;
@@ -131,9 +130,15 @@ const Autocompleter = forwardRef(function Autocompleter(
     }
     setDisplayItems(true);
     setFilteredItems(validOptions);
-  }, [inputValue, possibles, setindex, displayItems, activeItem]);
+  }, [inputValue, possibles, displayItems, activeItem]);
+
+  //keep the parent synced to the active item (data array index)
+  useEffect(() => {
+    setindex?.(activeItem);
+  }, [activeItem, setindex]);
 
   return (
+    // The ternary operator in the ref declaration is the technique to allow the ref to be forwarded (hence the forwardRef declaration of this component) from a react-hook-form but also shared with a local one (in this case positionRef). Also worth noting that the props are spread at the beginning so that the onChange can be over-written in they are coming from a RHF.
     <Container>
       <Input
         {...props}
@@ -146,10 +151,11 @@ const Autocompleter = forwardRef(function Autocompleter(
               }
             : positionRef
         }
+        defaultValue={props?.defaultValue}
         value={inputValue}
         autoComplete="new"
         onChange={(e) => {
-          console.log(`field value changed`);
+          //console.log(`field value changed`);
           props?.onChange?.(e.target.value);
           setInputValue(e.target.value);
         }}

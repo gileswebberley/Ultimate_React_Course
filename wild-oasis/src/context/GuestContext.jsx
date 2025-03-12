@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-  useReducer,
-  useState,
-} from 'react';
+import { createContext, useContext, useMemo, useReducer } from 'react';
 
 const GuestContext = createContext();
 const GuestApiContext = createContext();
@@ -37,12 +31,6 @@ function reducer(state, action) {
 }
 
 function GuestContextProvider({ children }) {
-  //   const [fullName, setFullName] = useState('');
-  //   const [guestEmail, setGuestEmail] = useState('');
-  //   const [nationalId, setNationalId] = useState('');
-  //   const [nationality, setNationality] = useState('');
-  //   const [countryFlag, setCountryFlag] = useState('');
-
   const [state, dispatch] = useReducer(reducer, initialState);
   //seperating concerns, so put the setter functions in one context and the readable state in the other
   const api = useMemo(() => {

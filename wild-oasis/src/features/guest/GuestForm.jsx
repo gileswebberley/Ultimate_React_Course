@@ -1,16 +1,10 @@
 import styled from 'styled-components';
 import CompoundRegisteredForm from '../../ui/CompoundRegisteredForm';
-import CountryInput from '../../ui/CountryInput';
-import FormRow from '../../ui/FormRow';
 import SimpleFormRow from '../../ui/SimpleFormRow';
 import ButtonGroup from '../../ui/ButtonGroup';
 import Button from '../../ui/Button';
 import toast from 'react-hot-toast';
-import {
-  useGuestApiContext,
-  useGuestContext,
-} from '../../context/GuestContext';
-import { useState } from 'react';
+import { useGuestApiContext } from '../../context/GuestContext';
 //for the attempt at putting the country select in here
 import countries_data from '../../data/countries_list.json';
 
@@ -33,13 +27,13 @@ function GuestForm() {
   function handleSelect(cn, cf) {
     countryName = cn;
     countryFlag = cf;
-    console.log(
-      `Guest form getting country info: ${countryName} : ${countryFlag}`
-    );
   }
 
   function onSubmit(data) {
-    if (!countryName || !countryFlag) return;
+    if (!countryName || !countryFlag) {
+      toast.error('Please select your country from the options');
+      return;
+    }
     setCountry(countryName, countryFlag);
     setName(data.fullName);
     setEmail(data.email);
@@ -65,6 +59,7 @@ function GuestForm() {
           labelStr="Which country are you from"
           validationObj={{ required: 'Please select your country' }}
           indexEvent={handleSelect}
+          data={countries_data}
         />
         <CompoundRegisteredForm.Input
           elementID="fullName"
