@@ -72,7 +72,13 @@ function reducer(state, action) {
   }
 }
 
-function useAutocompleter({ data, completer_field }) {
+/**
+ *
+ * @param {JSON} data a JSON formatted array of searchable objects
+ * @param {String} completer_field data is an array of objects with a completer field eg [{name, other_field}] might use 'name' as the autocomplete field (this is what is compared to to produce state.filteredItems)
+ * @returns
+ */
+export default function useAutocompleter(data, completer_field) {
   const [{ inputValue, filteredItems, activeItem, displayItems }, dispatch] =
     useReducer(reducer, initialState);
 
@@ -82,15 +88,31 @@ function useAutocompleter({ data, completer_field }) {
   }, [data, completer_field]);
 
   //I was trying to get a datalist alternative working hence the useCallback
-  const handleSelect = useCallback((e) => {
-    e.preventDefault?.();
-    const value = e.target.value;
-    const indexForSelection = possibles.indexOf(value);
-    dispatch({
-      type: ActionTypes.ON_SELECT,
-      payload: { input: value, index: indexForSelection },
-    });
-  });
+  const handleSelect = useCallback(
+    (e) => {
+      e.preventDefault?.();
+      const value = e.target.value;
+      const indexForSelection = possibles.indexOf(value);
+      dispatch({
+        type: ActionTypes.ON_SELECT,
+        payload: { input: value, index: indexForSelection },
+      });
+      return value;
+    },
+    [possibles]
+  );
+
+  const setInput = useCallback((input) => {
+    dispatch({ type: ActionTypes.SET_INPUT, payload: input });
+  }, []);
+
+  const clearInput = useCallback(() => {
+    dispatch({ type: ActionTypes.EMPTY_INPUT });
+  }, []);
+
+  const clearFiltered = useCallback(() => {
+    dispatch({ type: ActionTypes.EMPTY_FILTERED });
+  }, []);
 
   //handle the input changing and create the options
   useEffect(() => {
@@ -117,4 +139,12 @@ function useAutocompleter({ data, completer_field }) {
     }
     dispatch({ type: ActionTypes.SHOW_OPTIONS, payload: validOptions });
   }, [inputValue, possibles, displayItems, activeItem]);
+
+  return {
+    handleSelect,
+    clearFiltered,
+    clearInput,
+    setInput,
+    state: { inputValue, filteredItems, activeItem, displayItems },
+  };
 }
