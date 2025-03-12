@@ -6,16 +6,9 @@ import GuestForm from '../features/guest/GuestForm';
 import Header from '../ui/Header';
 
 const GuestLayout = styled.main`
-  /* position: fixed;
-  top: 0;
-  left: 0;
-  width: 90%;
-  height: 90%;
-  margin: 5% 5%; */
   min-height: 100vh;
   display: grid;
   grid-template-columns: 68rem;
-  /* grid-template-rows: 10rem 0.2fr auto; */
   align-content: center;
   justify-content: center;
 

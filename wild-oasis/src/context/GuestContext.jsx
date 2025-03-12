@@ -50,7 +50,7 @@ function GuestContextProvider({ children }) {
     return { setName, setEmail, setNationalId, setCountry };
   }, [dispatch]);
 
-  console.table(state);
+  //console.table(state);
 
   return (
     <GuestApiContext.Provider value={api}>

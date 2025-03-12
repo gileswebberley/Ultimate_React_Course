@@ -7,8 +7,7 @@ import toast from 'react-hot-toast';
 import { useGuestApiContext } from '../../context/GuestContext';
 //for the attempt at putting the country select in here
 import countries_data from '../../data/countries_list.json';
-import FormRow from '../../ui/FormRow';
-import CountryInput from '../../ui/CountryInput';
+import Heading from '../../ui/Heading';
 
 const StyledGuestForm = styled.div`
   padding: 2.4rem 4rem;
@@ -21,8 +20,7 @@ const StyledGuestForm = styled.div`
 
 function GuestForm() {
   const isAddingGuest = false;
-  //const { nationality, countryFlag } = useGuestContext();
-  const { setName, setEmail, setCountry } = useGuestApiContext();
+  const { setName, setEmail, setCountry, setNationalId } = useGuestApiContext();
   let countryName = null,
     countryFlag = null;
 
@@ -39,6 +37,7 @@ function GuestForm() {
     setCountry(countryName, countryFlag);
     setName(data.fullName);
     setEmail(data.email);
+    setNationalId(data.nationalId);
   }
 
   function onError(error) {
@@ -47,9 +46,6 @@ function GuestForm() {
   }
   return (
     <StyledGuestForm>
-      {/* <FormRow label="Which country are you from">
-        <CountryInput />
-      </FormRow> */}
       <CompoundRegisteredForm
         submitFn={onSubmit}
         errorFn={onError}
@@ -73,6 +69,12 @@ function GuestForm() {
           elementID="email"
           labelStr="Email address"
           validationObj={{ required: 'Please provide your email' }}
+        />
+        <Heading as="h4">Optional:</Heading>
+        <CompoundRegisteredForm.Input
+          elementID="nationalId"
+          labelStr="National ID / Passport #"
+          //   validationObj={{ required: 'Please provide your name' }}
         />
         <SimpleFormRow>
           <ButtonGroup>

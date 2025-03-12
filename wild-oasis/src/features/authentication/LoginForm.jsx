@@ -6,6 +6,7 @@ import FormRow from '../../ui/FormRow';
 import SpinnerMini from '../../ui/SpinnerMini';
 import { useLogin } from './useLogin';
 import PasswordInput from '../../ui/PasswordInput';
+import toast from 'react-hot-toast';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -15,11 +16,15 @@ function LoginForm() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!email || !password) return;
+    if (!email || !password) {
+      toast.error('Please enter your email and password');
+      return;
+    }
     login(
       { email, password },
       {
         onError: () => {
+          //toast.error('Your email and password do not match our details');
           setPassword('');
         },
       }

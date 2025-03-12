@@ -25,10 +25,6 @@ const PasswordInput = forwardRef(function PasswordInput(inputProps, ref) {
   const [isVisible, setIsVisible] = useState(false);
   //when using an onChange handler to set the state in the parent we are losing focus so have had to put this functionality in here, originally it was designed for use with react-hook-form
   const focusRef = useRef(null);
-  const valuePW = focusRef.current?.['value'];
-  useEffect(() => {
-    focusRef?.current?.focus();
-  }, [valuePW]);
 
   return (
     <InputHolder>
@@ -37,12 +33,20 @@ const PasswordInput = forwardRef(function PasswordInput(inputProps, ref) {
         //for auto-complete functionality
         autoComplete="current-password"
         {...inputProps}
-        ref={ref ? ref : focusRef}
+        ref={
+          ref
+            ? (e) => {
+                ref(e);
+                focusRef.current = e;
+              }
+            : focusRef
+        }
       ></Input>
       <Icon
         onClick={(e) => {
           e.preventDefault();
           setIsVisible((vis) => !vis);
+          focusRef?.current?.focus();
         }}
       >
         {isVisible ? <HiEyeSlash /> : <HiEye />}

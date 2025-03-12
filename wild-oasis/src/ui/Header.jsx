@@ -4,6 +4,7 @@ import UserAvatar from '../features/authentication/UserAvatar';
 import UserSettingsButton from './UserSettingsButton';
 import DarkModeToggle from './DarkModeToggle';
 import { useUser } from '../features/authentication/useUser';
+import Login from '../features/authentication/Login';
 
 //as we have our header component we'll name the style accordingly
 const StyledHeader = styled.header`
@@ -22,12 +23,14 @@ function Header() {
   const { isAuthenticated } = useUser();
   return (
     <StyledHeader>
-      {isAuthenticated && (
+      {isAuthenticated ? (
         <>
           <UserAvatar />
           <UserSettingsButton />
           <Logout />
         </>
+      ) : (
+        <Login />
       )}
       <DarkModeToggle />
     </StyledHeader>
