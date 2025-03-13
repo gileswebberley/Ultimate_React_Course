@@ -14,7 +14,7 @@ export async function signUp({ email, password, fullName }) {
     options: {
       data: {
         fullName,
-        avatar: '',
+        avatar: `${avatarStorageUrl}default-user.jpg`,
       },
     },
   });

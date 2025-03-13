@@ -1,8 +1,9 @@
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import Input from './Input';
 import styled from 'styled-components';
 import { useClickOutside } from '../hooks/useClickOutside';
-import useAutocompleter from '../hooks/useAutocompleter';
+import { useAutocompleter } from '../hooks/useAutocompleter';
+import { useListLooper } from '../hooks/useListLooper';
 
 //this ensures that the options box scrolls with the input
 const Container = styled.span`
@@ -64,16 +65,6 @@ const Autocompleter = forwardRef(function Autocompleter(
   const positionRef = useRef(null);
   const [position, setPosition] = useState({ x: 10, y: 30 });
 
-  //using our hook from earlier to clear the options list
-  const clickOutsideRef = useClickOutside(() => clearFiltered());
-
-  //I was trying to get a datalist alternative working hence the useCallback
-  function onSelect(e) {
-    const value = handleSelect(e);
-    //keep it synced if used in RHF
-    props?.onChange?.(value);
-  }
-
   //get the position of our input field so we can place the drop-down list below it
   useEffect(() => {
     if (!positionRef.current) {
@@ -82,6 +73,11 @@ const Autocompleter = forwardRef(function Autocompleter(
     const posBox = positionRef?.current?.getBoundingClientRect();
     setPosition({ x: 0, y: posBox?.height + 5 });
   }, [positionRef]);
+
+  //using our hook from earlier to clear the options list
+  const clickOutsideRef = useClickOutside(() => clearFiltered());
+
+  const { containerRef, inputFieldRef, optionBoxRef } = useListLooper();
 
   //keep the parent synced to the active item (data array index)
   useEffect(() => {
@@ -99,9 +95,16 @@ const Autocompleter = forwardRef(function Autocompleter(
     }
   }, [props, inputValue, clearInput]);
 
+  //I was trying to get a datalist alternative working hence the useCallback
+  function onSelect(e) {
+    const value = handleSelect(e);
+    //keep it synced if used in RHF
+    props?.onChange?.(value);
+  }
+
   return (
     // The ternary operator in the ref initialisation is the technique to allow the ref to be forwarded (hence the forwardRef declaration of this component) from a react-hook-form but also shared with a local one (in this case positionRef). Also worth noting that the props are spread at the beginning so that the onChange can be over-written in they are coming from a RHF.
-    <Container>
+    <Container ref={containerRef}>
       <Input
         {...props}
         placeholder="select an option"
@@ -110,6 +113,7 @@ const Autocompleter = forwardRef(function Autocompleter(
             ? (e) => {
                 ref(e);
                 positionRef.current = e;
+                inputFieldRef.current = e;
               }
             : positionRef
         }
@@ -119,11 +123,18 @@ const Autocompleter = forwardRef(function Autocompleter(
           props?.onChange?.(e.target.value);
           setInput(e.target.value);
         }}
+        list="options"
       />
 
       {filteredItems.length > 0 && displayItems && (
-        <OptionBox position={position} ref={clickOutsideRef}>
-          <OptionList>
+        <OptionBox
+          position={position}
+          ref={(el) => {
+            optionBoxRef.current = el;
+            clickOutsideRef.current = el;
+          }}
+        >
+          <OptionList id="options">
             {filteredItems
               .map((item, i) => {
                 return (

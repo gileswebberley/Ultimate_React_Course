@@ -99,14 +99,14 @@ function App() {
                 duration: 5000,
                 style: {
                   backgroundColor: 'var(--color-green-700)',
-                  color: '#f9fafb',
+                  color: 'var(--color-green-100)',
                 },
               },
               error: {
                 duration: 5000,
                 style: {
                   backgroundColor: 'var(--color-red-800)',
-                  color: '#f9fafb',
+                  color: 'var(--color-red-100)',
                 },
               },
               style: {

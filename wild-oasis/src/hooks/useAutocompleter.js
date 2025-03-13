@@ -78,7 +78,7 @@ function reducer(state, action) {
  * @param {String} completer_field data is an array of objects with a completer field eg [{name, other_field}] might use 'name' as the autocomplete field (this is what is compared to to produce state.filteredItems)
  * @returns
  */
-export default function useAutocompleter(data, completer_field) {
+export function useAutocompleter(data, completer_field) {
   const [{ inputValue, filteredItems, activeItem, displayItems }, dispatch] =
     useReducer(reducer, initialState);
 
