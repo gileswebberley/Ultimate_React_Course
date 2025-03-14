@@ -47,11 +47,20 @@ function Sidebar() {
     e.preventDefault();
     setIsOpen((open) => !open);
   }
+
+  function handleLeave(e) {
+    if (e.clientX < 0 || e.clientY < 0 || e.clientY > window.innerHeight) {
+      //to avoid immediately closing if the mouse goes too far to the left when opening, also thought I may as well keep it open if the mouse goes into the toolbar or dev-tools
+      console.log(`Mouse left the browser`);
+      return;
+    }
+    setIsOpen(false);
+  }
   return (
     <StyledSidebar
       transform={isOpen ? 'open' : 'closed'}
       onClick={handleOpen}
-      onMouseLeave={() => setIsOpen(false)}
+      onMouseLeave={handleLeave}
     >
       <Logo />
       <ClickBit

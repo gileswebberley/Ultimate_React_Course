@@ -91,11 +91,11 @@ function CabinRow({ cabin }) {
           {/* Ok, let's get this compound modal menu going */}
           <Menus.Menu>
             <Menus.Toggle menuId={id} />
-            <Menus.List menuId={id}>
+            <Menus.List direction="column" menuId={id}>
               <Menus.Button>
                 <CompoundModal.Open openName="edit">
                   <Button
-                    size="medium"
+                    size="small"
                     variation="primary"
                     disabled={isDisabled}
                   >
@@ -105,7 +105,7 @@ function CabinRow({ cabin }) {
               </Menus.Button>
               <Menus.Button>
                 <Button
-                  size="medium"
+                  size="small"
                   variation="primary"
                   onClick={() => handleDuplicateCabin()}
                   disabled={isDisabled}
@@ -115,11 +115,7 @@ function CabinRow({ cabin }) {
               </Menus.Button>
               <Menus.Button>
                 <CompoundModal.Open openName="delete">
-                  <Button
-                    size="medium"
-                    variation="danger"
-                    disabled={isDisabled}
-                  >
+                  <Button size="small" variation="danger" disabled={isDisabled}>
                     {isDeleting ? <SpinnerTiny /> : <HiTrash />}
                   </Button>
                 </CompoundModal.Open>

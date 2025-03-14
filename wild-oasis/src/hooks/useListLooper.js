@@ -49,7 +49,7 @@ export function useListLooper() {
           return;
         }
         //...and if not check if we're focussed on one of the Options
-        if (selectedChildRef.current.firstChild === document.activeElement) {
+        if (selectedChildRef.current?.firstChild === document.activeElement) {
           if (selectedChildRef.current.nextSibling) {
             selectedChildRef.current = selectedChildRef.current.nextSibling;
             selectedChildRef.current.firstChild.focus();
@@ -86,6 +86,25 @@ export function useListLooper() {
 
       if (e.code === 'Enter') {
         selectedChildRef.current = null;
+      }
+
+      //make sure a combination of tab presses and arrow buttons doesn't mess this up
+      if (e.code === 'Tab') {
+        //if there's no list then the user wants to use the tab key as expected to move to the next tabbable element, otherwise they are interacting with this list
+        if (optionBoxRef.current !== null) {
+          e.preventDefault();
+        }
+        //otherwise we'll loop through as if it is the down arrow key
+        if (
+          inputFieldRef.current === document.activeElement ||
+          selectedChildRef.current?.nextSibling
+        ) {
+          //   e.preventDefault();
+          handleKeyPress({ code: 'ArrowDown' });
+        } else {
+          inputFieldRef.current.focus();
+          //selectedChildRef.current = null;
+        }
       }
     },
     [optionBoxRef]
