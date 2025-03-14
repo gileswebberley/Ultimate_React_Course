@@ -7,6 +7,7 @@ import { subtractDates } from '../utils/helpers';
 import { bookings } from './data-bookings';
 import { cabins } from './data-cabins';
 import { guests } from './data-guests';
+import { getSettings } from '../services/apiSettings';
 
 // const originalSettings = {
 //   minBookingLength: 3,
@@ -46,12 +47,16 @@ async function createBookings() {
     .from('guests')
     .select('id')
     .order('id');
-  const allGuestIds = guestsIds.map((cabin) => cabin.id);
+  const allGuestIds = guestsIds.map((guest) => guest.id);
   const { data: cabinsIds } = await supabase
     .from('cabins')
     .select('id')
     .order('id');
   const allCabinIds = cabinsIds.map((cabin) => cabin.id);
+
+  //add in the breakfast price from settings as it is hardcoded in the original
+  const { breakfastPrice } = await getSettings();
+  console.log(`Breakfast costs ${breakfastPrice}`);
 
   const finalBookings = bookings.map((booking) => {
     // Here relying on the order of cabins, as they don't have and ID yet
@@ -59,7 +64,7 @@ async function createBookings() {
     const numNights = subtractDates(booking.endDate, booking.startDate);
     const cabinPrice = numNights * (cabin.regularPrice - cabin.discount);
     const extrasPrice = booking.hasBreakfast
-      ? numNights * 15 * booking.numGuests
+      ? numNights * breakfastPrice * booking.numGuests
       : 0; // hardcoded breakfast price
     const totalPrice = cabinPrice + extrasPrice;
 
@@ -129,23 +134,25 @@ function Uploader() {
     <div
       style={{
         marginTop: 'auto',
-        backgroundColor: '#e0e7ff',
-        padding: '8px',
-        borderRadius: '5px',
+        backgroundColor: 'var(--color-grey-200)',
+        padding: '12px',
+        borderRadius: '15px',
         textAlign: 'center',
         display: 'flex',
         flexDirection: 'column',
         gap: '8px',
+        width: 'fit-content',
+        placeSelf: 'center',
       }}
     >
       <h3>SAMPLE DATA</h3>
 
-      <Button onClick={uploadAll} disabled={isLoading}>
+      {/* <Button onClick={uploadAll} disabled={isLoading}>
         Upload ALL
-      </Button>
+      </Button> */}
 
       <Button onClick={uploadBookings} disabled={isLoading}>
-        Upload bookings ONLY
+        Re-seed Bookings
       </Button>
     </div>
   );

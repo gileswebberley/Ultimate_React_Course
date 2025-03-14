@@ -12,7 +12,6 @@ function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, isLoggingIn } = useLogin();
-  //const ref = useRef(null);
 
   function handleSubmit(e) {
     e.preventDefault();

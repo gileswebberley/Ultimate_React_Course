@@ -1,3 +1,4 @@
+import { v4 } from 'uuid';
 import supabase from './supabase';
 const supabaseUrl = process.env.SUPABASE_URL;
 
@@ -117,7 +118,7 @@ async function uploadCabinImage(imageFile) {
     return { path: filename, fullPath: filepath, id: null };
   }
   //make sure the image name is formatted correctly for uploading
-  const imgName = `${Math.random()}-${imageFile.name}`.replaceAll('/', '_');
+  const imgName = `${v4()}-${imageFile.name}`.replaceAll('/', '_');
   console.log(`Image ${imgName} is a new file and so will be uploaded...`);
   //upload the image to our supabase bucket called cabin-images, if it's already in the bucket it will be a url to an already existing one which this function will take care of
   const { data: uploadData, error: uploadError } = await supabase.storage

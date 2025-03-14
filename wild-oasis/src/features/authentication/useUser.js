@@ -12,6 +12,8 @@ export function useUser() {
   return {
     user,
     isCheckingUser,
-    isAuthenticated: user?.role === 'authenticated' ?? false,
+    isAuthenticated:
+      (user?.role === 'authenticated' && !user?.is_anonymous) ?? false,
+    isAnonymous: user?.is_anonymous ?? false,
   };
 }

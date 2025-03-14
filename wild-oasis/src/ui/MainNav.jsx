@@ -8,6 +8,7 @@ import {
   HiOutlineHomeModern,
   HiOutlineUsers,
 } from 'react-icons/hi2';
+import Uploader from '../data/Uploader';
 
 const NavList = styled.ul`
   display: flex;
@@ -31,13 +32,19 @@ const StyledNavLink = styled(NavLink)`
   }
 
   /* This works because react-router places the active class on the active NavLink */
-  &:hover,
-  &:active,
-  &.active:link,
-  &.active:visited {
+  &:hover {
     color: var(--color-grey-800);
     background-color: var(--color-grey-50);
     border-radius: var(--border-radius-sm);
+  }
+  &:active,
+  &.active:link,
+  &.active:visited {
+    color: var(--color-brand-800);
+    background-color: var(--color-brand-50);
+    border-radius: var(--border-radius-sm);
+    transform: translateX(5px);
+    /* transition: transform ease-in 0.2s; */
   }
   /* This is to control the icons from the react-icon package */
   & svg {

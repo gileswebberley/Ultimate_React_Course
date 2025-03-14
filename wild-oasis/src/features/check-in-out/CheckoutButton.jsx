@@ -5,7 +5,7 @@ function CheckoutButton({ bookingId }) {
   const { isCheckingOut, checkOut } = useCheckOut();
   return (
     <Button
-      variation="primary"
+      variation="danger"
       size="small"
       disabled={isCheckingOut}
       onClick={() => checkOut(bookingId)}
