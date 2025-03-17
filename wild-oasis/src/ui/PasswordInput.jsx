@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 import Input from './Input';
 import { HiEye, HiEyeSlash } from 'react-icons/hi2';
 

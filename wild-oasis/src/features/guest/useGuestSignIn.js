@@ -1,14 +1,17 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { signInGuest as signInGuestApi } from '../../services/apiAuth';
 import toast from 'react-hot-toast';
 
 export function useGuestSignIn() {
-  const { mutate: signInGuest, isLoading: isCreatingGuest } = useMutation({
-    mutationFn: ({ fullName, email }) => signInGuestApi({ fullName, email }),
+  const queryClient = useQueryClient();
+  const { mutate: signInGuest, isLoading: isSigningInGuest } = useMutation({
+    mutationFn: ({ fullName, email, avatar }) =>
+      signInGuestApi({ fullName, email, avatar }),
     onSuccess: (data) => {
       toast.success(
         `Welcome ${data.user?.user_metadata?.fullName} as our guest`
       );
+      queryClient.setQueryData(['user'], data.user);
       //navigate('../dashboard');
     },
     onError: (err) => {
@@ -17,5 +20,5 @@ export function useGuestSignIn() {
     },
   });
 
-  return { signInGuest, isCreatingGuest };
+  return { signInGuest, isSigningInGuest };
 }

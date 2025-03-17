@@ -1,13 +1,13 @@
 import styled from 'styled-components';
 
-import Form from '../../ui/Form';
-import Button from '../../ui/Button';
-import FileInput from '../../ui/FileInput';
+import Form from '../ui/Form';
+import Button from '../ui/Button';
+import FileInput from '../ui/FileInput';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createCabin } from '../../services/apiCabins';
 import toast from 'react-hot-toast';
-import RegisteredFormInput from '../../ui/RegisteredFormInput';
+import RegisteredFormInput from '../ui/RegisteredFormInput';
 
 const FormRow = styled.div`
   display: grid;

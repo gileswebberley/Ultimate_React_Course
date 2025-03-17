@@ -20,13 +20,18 @@ const StyledHeader = styled.header`
 `;
 
 function Header() {
-  const { isAuthenticated } = useUser();
+  const { isAuthenticated, isAnonymous } = useUser();
   return (
     <StyledHeader>
       {isAuthenticated ? (
         <>
           <UserAvatar />
           <UserSettingsButton />
+          <Logout />
+        </>
+      ) : isAnonymous ? (
+        <>
+          <UserAvatar />
           <Logout />
         </>
       ) : (

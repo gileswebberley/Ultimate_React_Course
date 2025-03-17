@@ -1,12 +1,12 @@
 import styled from 'styled-components';
 import { useState } from 'react';
-import { useCreateEditCabin } from './useCreateEditCabin';
-import { useDeleteCabin } from './useDeleteCabin';
-import { formatCurrency } from '../../utils/helpers';
+import { useCreateEditCabin } from '../features/cabins/useCreateEditCabin';
+import { useDeleteCabin } from '../features/cabins/useDeleteCabin';
+import { formatCurrency } from '../utils/helpers';
 
-import Button from '../../ui/Button';
-import CreateCabinForm from './CreateCabinForm';
-import SpinnerTiny from '../../ui/SpinnerTiny';
+import Button from '../ui/Button';
+import CreateCabinForm from '../features/cabins/CreateCabinForm';
+import SpinnerTiny from '../ui/SpinnerTiny';
 import { HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
 import { HiArrowCircleUp } from 'react-icons/hi';
 import toast from 'react-hot-toast';
@@ -74,7 +74,7 @@ const ConfirmButtons = styled.div`
   gap: 10px;
   padding-top: 20px;
 `;
-
+//This contains the toast custom confirm
 function CabinRow({ cabin }) {
   const [showForm, setShowForm] = useState(false);
   //extracted the deletion to a custom hook because it uses a couple of hooks

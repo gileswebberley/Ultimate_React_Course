@@ -8,6 +8,8 @@ import { useGuestApiContext } from '../../context/GuestContext';
 //for the attempt at putting the country select in here
 import countries_data from '../../data/countries_list.json';
 import Heading from '../../ui/Heading';
+import { useGuestSignIn } from './useGuestSignIn';
+import { useNavigate } from 'react-router-dom';
 
 const StyledGuestForm = styled.div`
   padding: 2.4rem 4rem;
@@ -19,8 +21,9 @@ const StyledGuestForm = styled.div`
 `;
 
 function GuestForm() {
-  const isAddingGuest = false;
+  const { signInGuest, isSigningInGuest } = useGuestSignIn();
   const { setName, setEmail, setCountry, setNationalId } = useGuestApiContext();
+  const navigate = useNavigate();
   let countryName = null,
     countryFlag = null;
 
@@ -38,6 +41,18 @@ function GuestForm() {
     setName(data.fullName);
     setEmail(data.email);
     setNationalId(data.nationalId);
+    signInGuest(
+      {
+        fullName: data.fullName,
+        email: data.email,
+        avatar: countryFlag,
+      },
+      {
+        onSuccess: () => {
+          // navigate('../book-cabin');
+        },
+      }
+    );
   }
 
   function onError(error) {
@@ -49,7 +64,7 @@ function GuestForm() {
       <CompoundRegisteredForm
         submitFn={onSubmit}
         errorFn={onError}
-        isLoading={isAddingGuest}
+        isLoading={isSigningInGuest}
         resetOnSubmit={false}
       >
         <CompoundRegisteredForm.Country
@@ -79,11 +94,11 @@ function GuestForm() {
         <SimpleFormRow>
           <ButtonGroup>
             <CompoundRegisteredForm.Reset>
-              <Button variation="secondary" disabled={isAddingGuest}>
+              <Button variation="secondary" disabled={isSigningInGuest}>
                 Reset
               </Button>
             </CompoundRegisteredForm.Reset>
-            <Button disabled={isAddingGuest}>Continue</Button>
+            <Button disabled={isSigningInGuest}>Continue</Button>
           </ButtonGroup>
         </SimpleFormRow>
       </CompoundRegisteredForm>

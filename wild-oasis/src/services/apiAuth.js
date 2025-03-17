@@ -5,9 +5,9 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const avatarStorageUrl = `${supabaseUrl}/storage/v1/object/public/avatars/`;
 
 //so we can have non-users creating bookings, view cabins, and create themselves as guests (ie guests) we're going to add anonymous sign-ins (isAuthenticated in useUser now checks for the is_anonymous property of user)
-export async function signInGuest({ fullName, email }) {
+export async function signInGuest({ fullName, email, avatar }) {
   const { data, error } = await supabase.auth.signInAnonymously({
-    options: { data: { fullName, email } },
+    options: { data: { fullName, email, avatar } },
   });
   if (error) {
     throw new Error(`Guest sign in failed for ${fullName}

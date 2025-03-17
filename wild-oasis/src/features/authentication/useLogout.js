@@ -10,8 +10,9 @@ export function useLogout() {
     mutationFn: logoutApi,
     onSuccess: () => {
       //clear out the user from any react query cache
-      queryClient.removeQueries('user');
-      navigate('../login', { replace: true });
+      queryClient.setQueryData(['user'], null);
+      queryClient.removeQueries(['user']);
+      navigate('../guest', { replace: true });
     },
   });
   return { logout, isLoggingOut };
