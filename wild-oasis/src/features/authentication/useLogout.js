@@ -12,6 +12,7 @@ export function useLogout() {
       //clear out the user from any react query cache
       queryClient.setQueryData(['user'], null);
       queryClient.removeQueries(['user']);
+      //now we've started making the public site let's go there on logout
       navigate('../', { replace: true });
     },
   });

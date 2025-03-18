@@ -18,7 +18,10 @@ function Login() {
     <LoginLayout>
       <Logo />
       <Heading as="h1" style={{ textAlign: 'center' }}>
-        Log in to your account
+        Admin Login
+      </Heading>
+      <Heading as="h3" style={{ textAlign: 'center' }}>
+        Registered Users Please Enter Your Details
       </Heading>
       <LoginForm />
     </LoginLayout>

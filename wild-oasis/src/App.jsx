@@ -16,7 +16,7 @@ import { DarkModeProvider } from './context/DarkModeContext';
 import SpinnerFullPage from './ui/SpinnerFullPage';
 import GuestForm from './features/guest/GuestForm';
 import Welcome from './pages/Welcome';
-import GuestLayout from './ui/Guest Layout';
+import GuestLayout from './ui/GuestLayout';
 const ProtectedRoute = lazy(() => import('./ui/ProtectedRoute'));
 // const AppLayout = lazy(() => import('./ui/AppLayout'));
 // const GlobalStyles = lazy(() => import('./styles/GlobalStyles'));

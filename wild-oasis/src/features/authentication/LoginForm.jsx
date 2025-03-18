@@ -45,6 +45,7 @@ function LoginForm() {
       <FormRow orientation="vertical" label="Password">
         <PasswordInput
           id="password"
+          autoComplete="current-password"
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);

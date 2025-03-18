@@ -21,6 +21,9 @@ const GlobalStyles = createGlobalStyle`
   --border-radius-md: 7px;
   --border-radius-lg: 9px;
 
+  /* For the guest site's background image */
+  --bg-blur-amount: 5px;
+
 &, &.light-mode{
   /* Grey */
   --color-grey-0: #fff;

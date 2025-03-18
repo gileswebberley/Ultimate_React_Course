@@ -1,23 +1,24 @@
 import styled from 'styled-components';
-import Logout from '../features/authentication/Logout';
 import UserAvatar from '../features/authentication/UserAvatar';
-import UserSettingsButton from './UserSettingsButton';
 import DarkModeToggle from './DarkModeToggle';
 import { useUser } from '../features/authentication/useUser';
 import Login from '../features/authentication/Login';
-import Logo from './Logo';
+import LogoSmall from './LogoSmall';
 
 //as we have our header component we'll name the style accordingly
 const StyledHeader = styled.header`
   /* grid-row: 1;
   grid-column: 1/-1; */
   display: flex;
-  gap: 1.6rem;
-  justify-content: flex-end;
-  align-items: center;
-  background-color: var(--color-grey-0);
-  padding: 1.2rem 4.8rem;
-  border-bottom: 1px solid var(--color-grey-100);
+  /* gap: 1.6rem; */
+  justify-content: space-between;
+  align-items: flex-end;
+  background: linear-gradient(
+    30deg,
+    var(--color-brand-900) 40%,
+    var(--color-brand-500)
+  );
+  border-bottom: 3px solid var(--color-yellow-700);
 `;
 
 const HeaderNav = styled.div`
@@ -25,31 +26,18 @@ const HeaderNav = styled.div`
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
+  padding: 1.2rem 2.8rem;
 `;
 
-const HeaderLogo = styled.div`
-  transform: scale(0.7) translate(0, -80%);
-  height: 3rem;
-`;
-
-function Header() {
-  const { isAuthenticated, isAnonymous } = useUser();
+function GuestHeader() {
+  const { isAnonymous } = useUser();
   return (
     <StyledHeader>
-      <HeaderLogo>
-        <Logo />
-      </HeaderLogo>
+      <LogoSmall />
       <HeaderNav>
-        {isAuthenticated ? (
+        {isAnonymous ? (
           <>
             <UserAvatar />
-            <UserSettingsButton />
-            <Logout />
-          </>
-        ) : isAnonymous ? (
-          <>
-            <UserAvatar />
-            {/* <Logout /> */}
           </>
         ) : (
           <Login />
@@ -60,4 +48,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default GuestHeader;

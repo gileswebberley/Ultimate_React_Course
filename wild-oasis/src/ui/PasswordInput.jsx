@@ -31,7 +31,6 @@ const PasswordInput = forwardRef(function PasswordInput(inputProps, ref) {
       <Input
         type={isVisible ? 'text' : 'password'}
         //for auto-complete functionality
-        autoComplete="current-password"
         {...inputProps}
         ref={
           ref
