@@ -1,9 +1,6 @@
 import styled, { css } from 'styled-components';
 import { GuestContextProvider } from '../features/guest/GuestContext';
-import Logo from './Logo';
-import Header from './Header';
 import { Outlet } from 'react-router-dom';
-import GuestForm from '../features/guest/GuestForm';
 import GuestHeader from './GuestHeader';
 import { useDarkMode } from '../context/DarkModeContext';
 

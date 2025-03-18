@@ -4,12 +4,13 @@ import SimpleFormRow from '../../ui/SimpleFormRow';
 import ButtonGroup from '../../ui/ButtonGroup';
 import Button from '../../ui/Button';
 import toast from 'react-hot-toast';
-import { useGuestApiContext } from './GuestContext';
+import { useGuestApiContext, useGuestContext } from './GuestContext';
 //for the attempt at putting the country select in here
 import countries_data from '../../data/countries_list.json';
 import Heading from '../../ui/Heading';
 import { useGuestSignIn } from './useGuestSignIn';
 import { useNavigate } from 'react-router-dom';
+import SlideInY from '../../ui/SlideInY';
 
 const StyledGuestForm = styled.div`
   padding: 2.4rem 4rem;
@@ -32,7 +33,9 @@ const FormTitle = styled.div`
 function GuestForm() {
   const { signInGuest, isSigningInGuest } = useGuestSignIn();
   const { setName, setEmail, setCountry, setNationalId } = useGuestApiContext();
-  const navigate = useNavigate();
+  const { fullName: guestName } = useGuestContext();
+  // console.log(`guest: ${guestName}`);
+  // const navigate = useNavigate();
   let countryName = null,
     countryFlag = null;
 
@@ -69,7 +72,7 @@ function GuestForm() {
         ${error.message ? 'ERROR: ' + error.message : ''}`);
   }
   return (
-    <>
+    <SlideInY>
       <FormTitle>
         <Heading as="h1" style={{ textAlign: 'center' }}>
           Please tell us about yourself so we can start your booking
@@ -80,7 +83,8 @@ function GuestForm() {
           submitFn={onSubmit}
           errorFn={onError}
           isLoading={isSigningInGuest}
-          resetOnSubmit={false}
+          // resetOnSubmit={false}
+          defaultValues={{ fullName: guestName }}
         >
           <CompoundRegisteredForm.Country
             elementID="country"
@@ -118,7 +122,7 @@ function GuestForm() {
           </SimpleFormRow>
         </CompoundRegisteredForm>
       </StyledGuestForm>
-    </>
+    </SlideInY>
   );
 }
 

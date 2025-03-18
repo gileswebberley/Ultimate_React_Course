@@ -2,8 +2,10 @@ import styled from 'styled-components';
 import UserAvatar from '../features/authentication/UserAvatar';
 import DarkModeToggle from './DarkModeToggle';
 import { useUser } from '../features/authentication/useUser';
-import Login from '../features/authentication/Login';
 import LogoSmall from './LogoSmall';
+import GuestLogin from '../features/guest/GuestLogin';
+import Login from '../features/authentication/Login';
+import Logout from '../features/authentication/Logout';
 
 //as we have our header component we'll name the style accordingly
 const StyledHeader = styled.header`
@@ -21,12 +23,19 @@ const StyledHeader = styled.header`
   border-bottom: 3px solid var(--color-yellow-700);
 `;
 
-const HeaderNav = styled.div`
+const HeaderNav = styled.nav`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 1.2rem 2.2rem;
+`;
+const HeaderNavSection = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
-  padding: 1.2rem 2.8rem;
 `;
 
 function GuestHeader() {
@@ -35,14 +44,18 @@ function GuestHeader() {
     <StyledHeader>
       <LogoSmall />
       <HeaderNav>
-        {isAnonymous ? (
-          <>
-            <UserAvatar />
-          </>
-        ) : (
+        <HeaderNavSection>
+          <DarkModeToggle />
           <Login />
+        </HeaderNavSection>
+        {isAnonymous ? (
+          <HeaderNavSection>
+            <UserAvatar />
+            <Logout />
+          </HeaderNavSection>
+        ) : (
+          <GuestLogin />
         )}
-        <DarkModeToggle />
       </HeaderNav>
     </StyledHeader>
   );

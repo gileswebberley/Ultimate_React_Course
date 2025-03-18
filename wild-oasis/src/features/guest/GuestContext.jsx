@@ -1,4 +1,11 @@
-import { createContext, useContext, useMemo, useReducer } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+} from 'react';
+import { useUser } from '../authentication/useUser';
 
 const GuestContext = createContext();
 const GuestApiContext = createContext();
@@ -31,6 +38,7 @@ function reducer(state, action) {
 }
 
 function GuestContextProvider({ children }) {
+  const { user, isCheckingUser, isAnonymous } = useUser();
   const [state, dispatch] = useReducer(reducer, initialState);
   //seperating concerns, so put the setter functions in one context and the readable state in the other
   const api = useMemo(() => {
@@ -50,7 +58,17 @@ function GuestContextProvider({ children }) {
     return { setName, setEmail, setNationalId, setCountry };
   }, [dispatch]);
 
-  //console.table(state);
+  //in case a reload clears the context but the guest has already filled out the form
+  useEffect(() => {
+    if (isCheckingUser) return;
+    if (isAnonymous) {
+      console.log(user);
+      dispatch({ type: 'setName', payload: user.user_metadata.fullName });
+      dispatch({ type: 'setEmail', payload: user.user_metadata.email });
+    }
+  }, [user, isCheckingUser, isAnonymous]);
+
+  console.table(state);
 
   return (
     <GuestApiContext.Provider value={api}>
