@@ -5,9 +5,12 @@ import UserSettingsButton from './UserSettingsButton';
 import DarkModeToggle from './DarkModeToggle';
 import { useUser } from '../features/authentication/useUser';
 import Login from '../features/authentication/Login';
+import Logo from './Logo';
 
 //as we have our header component we'll name the style accordingly
 const StyledHeader = styled.header`
+  /* grid-row: 1;
+  grid-column: 1/-1; */
   display: flex;
   gap: 1.6rem;
   justify-content: flex-end;
@@ -24,16 +27,29 @@ const HeaderNav = styled.div`
   gap: 0.8rem;
 `;
 
+const HeaderLogo = styled.div`
+  transform: scale(0.7) translate(0, -80%);
+  height: 3rem;
+`;
+
 function Header() {
-  const { isAuthenticated } = useUser();
+  const { isAuthenticated, isAnonymous } = useUser();
   return (
     <StyledHeader>
+      <HeaderLogo>
+        <Logo />
+      </HeaderLogo>
       <HeaderNav>
         {isAuthenticated ? (
           <>
             <UserAvatar />
             <UserSettingsButton />
             <Logout />
+          </>
+        ) : isAnonymous ? (
+          <>
+            <UserAvatar />
+            {/* <Logout /> */}
           </>
         ) : (
           <Login />

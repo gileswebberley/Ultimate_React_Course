@@ -24,6 +24,7 @@ const Heading = styled.h1`
     `}
     
   line-height: 1.4;
+  text-wrap: balance;
 `;
 
 export default Heading;

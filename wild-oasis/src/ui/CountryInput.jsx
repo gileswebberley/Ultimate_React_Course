@@ -3,7 +3,7 @@ import countries_data from '../data/countries_list.json';
 import Autocompleter from './Autocompleter';
 import styled from 'styled-components';
 import { Flag } from './Flag';
-import { useGuestApiContext } from '../context/GuestContext';
+import { useGuestApiContext } from '../features/guest/GuestContext';
 
 const StyledCountryInput = styled.div`
   display: flex;

@@ -14,7 +14,9 @@ import AppLayout from './ui/AppLayout';
 // import ProtectedRoute from './ui/ProtectedRoute';
 import { DarkModeProvider } from './context/DarkModeContext';
 import SpinnerFullPage from './ui/SpinnerFullPage';
-import Guest from './pages/Guest';
+import GuestForm from './features/guest/GuestForm';
+import Welcome from './pages/Welcome';
+import GuestLayout from './ui/Guest Layout';
 const ProtectedRoute = lazy(() => import('./ui/ProtectedRoute'));
 // const AppLayout = lazy(() => import('./ui/AppLayout'));
 // const GlobalStyles = lazy(() => import('./styles/GlobalStyles'));
@@ -65,6 +67,11 @@ function App() {
           <Suspense fallback={<SpinnerFullPage />}>
             <BrowserRouter>
               <Routes>
+                <Route element={<GuestLayout />}>
+                  <Route index element={<Navigate replace to="welcome" />} />
+                  <Route path="welcome" element={<Welcome />} />
+                  <Route path="guest" element={<GuestForm />} />
+                </Route>
                 {/* We're going to wrap these routes in a protected one now that we have started to implement authentication */}
                 <Route
                   element={
@@ -83,7 +90,6 @@ function App() {
                   <Route path="settings" element={<Settings />} />
                   <Route path="account" element={<Account />} />
                 </Route>
-                <Route path="guest" element={<Guest />} />
                 <Route path="login" element={<Login />} />
                 <Route path="*" element={<PageNotFound />} />
               </Routes>

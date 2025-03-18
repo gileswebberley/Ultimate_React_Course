@@ -12,7 +12,7 @@ export function useLogout() {
       //clear out the user from any react query cache
       queryClient.setQueryData(['user'], null);
       queryClient.removeQueries(['user']);
-      navigate('../guest', { replace: true });
+      navigate('../', { replace: true });
     },
   });
   return { logout, isLoggingOut };
