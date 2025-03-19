@@ -12,6 +12,7 @@ const StyledHeader = styled.header`
   /* grid-row: 1;
   grid-column: 1/-1; */
   display: flex;
+  position: relative;
   /* gap: 1.6rem; */
   justify-content: space-between;
   align-items: flex-end;

@@ -31,7 +31,7 @@ function AppLayout() {
     <StyledAppLayout>
       <Header />
       <Sidebar />
-      <Main id="main">
+      <Main>
         <Container>
           <Outlet />
         </Container>

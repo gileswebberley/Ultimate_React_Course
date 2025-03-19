@@ -58,17 +58,22 @@ function GuestContextProvider({ children }) {
     return { setName, setEmail, setNationalId, setCountry };
   }, [dispatch]);
 
-  //in case a reload clears the context but the guest has already filled out the form
-  useEffect(() => {
-    if (isCheckingUser) return;
-    if (isAnonymous) {
-      console.log(user);
-      dispatch({ type: 'setName', payload: user.user_metadata.fullName });
-      dispatch({ type: 'setEmail', payload: user.user_metadata.email });
-    }
-  }, [user, isCheckingUser, isAnonymous]);
+  // //in case a reload clears the context but the guest has already filled out the form
+  // useEffect(() => {
+  //   if (isCheckingUser) return;
+  //   if (isAnonymous) {
+  //     const data = user.user_metadata;
+  //     dispatch({ type: 'setName', payload: data.fullName });
+  //     dispatch({ type: 'setEmail', payload: data.email });
+  //     dispatch({
+  //       type: 'setCountry',
+  //       payload: { country: data.country, flag: data.avatar },
+  //     });
+  //     dispatch({ type: 'setNationalId', payload: data.nationalId });
+  //   }
+  // }, [user, isCheckingUser, isAnonymous]);
 
-  console.table(state);
+  // console.table(state);
 
   return (
     <GuestApiContext.Provider value={api}>

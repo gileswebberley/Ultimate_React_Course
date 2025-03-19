@@ -5,8 +5,14 @@ import toast from 'react-hot-toast';
 export function useGuestSignIn() {
   const queryClient = useQueryClient();
   const { mutate: signInGuest, isLoading: isSigningInGuest } = useMutation({
-    mutationFn: ({ fullName, email, avatar }) =>
-      signInGuestApi({ fullName, email, avatar }),
+    mutationFn: ({ fullName, email, avatar, country, nationalId }) =>
+      signInGuestApi({
+        fullName,
+        email,
+        avatar,
+        country,
+        nationalId,
+      }),
     onSuccess: (data) => {
       toast.success(
         `Welcome ${data.user?.user_metadata?.fullName} as our guest`

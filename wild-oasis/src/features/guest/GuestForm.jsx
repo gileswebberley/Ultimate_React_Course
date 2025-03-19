@@ -33,7 +33,11 @@ const FormTitle = styled.div`
 function GuestForm() {
   const { signInGuest, isSigningInGuest } = useGuestSignIn();
   const { setName, setEmail, setCountry, setNationalId } = useGuestApiContext();
-  const { fullName: guestName } = useGuestContext();
+  const {
+    fullName: guestName,
+    email: guestEmail,
+    nationalId: guestNId,
+  } = useGuestContext();
   // console.log(`guest: ${guestName}`);
   // const navigate = useNavigate();
   let countryName = null,
@@ -58,6 +62,8 @@ function GuestForm() {
         fullName: data.fullName,
         email: data.email,
         avatar: countryFlag,
+        country: countryName,
+        nationalId: data.nationalId,
       },
       {
         onSuccess: () => {
@@ -84,7 +90,11 @@ function GuestForm() {
           errorFn={onError}
           isLoading={isSigningInGuest}
           // resetOnSubmit={false}
-          defaultValues={{ fullName: guestName }}
+          // defaultValues={{
+          //   fullName: guestName,
+          //   email: guestEmail,
+          //   nationalId: guestNId,
+          // }}
         >
           <CompoundRegisteredForm.Country
             elementID="country"

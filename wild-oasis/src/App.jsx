@@ -17,6 +17,7 @@ import SpinnerFullPage from './ui/SpinnerFullPage';
 import GuestForm from './features/guest/GuestForm';
 import Welcome from './pages/Welcome';
 import GuestLayout from './ui/GuestLayout';
+import SlideInTest from './features/guest/SlideInTest';
 const ProtectedRoute = lazy(() => import('./ui/ProtectedRoute'));
 // const AppLayout = lazy(() => import('./ui/AppLayout'));
 // const GlobalStyles = lazy(() => import('./styles/GlobalStyles'));
@@ -71,6 +72,7 @@ function App() {
                   <Route index element={<Navigate replace to="welcome" />} />
                   <Route path="welcome" element={<Welcome />} />
                   <Route path="guest" element={<GuestForm />} />
+                  <Route path="test" element={<SlideInTest />} />
                 </Route>
                 {/* We're going to wrap these routes in a protected one now that we have started to implement authentication */}
                 <Route

@@ -5,50 +5,44 @@ import GuestHeader from './GuestHeader';
 import { useDarkMode } from '../context/DarkModeContext';
 
 const StyledGuestLayout = styled.div`
-  min-height: fit-content;
-  height: 100vh;
-  /* max-height: 100dvh; */
   display: grid;
   grid-template-columns: 1fr;
-  /* header content footer(optional) */
-  grid-template-rows: auto 1fr auto;
-  /* gap: 2rem; */
-  /* background-color: var(--color-grey-50); */
+  grid-template-rows: auto 1fr;
+  height: 100vh;
 `;
 
 const Main = styled.main`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 4rem 4rem;
   overflow-y: auto;
-  position: relative;
-  &::before {
-    content: '';
-    position: fixed;
-    z-index: -1;
-    width: 120%;
-    height: 120%;
-    ${(props) =>
-      props.$dark
-        ? css`
-            background-image: url('./wild-oasis-bg.jpg');
-            filter: brightness(40%) blur(var(--bg-blur-amount));
-          `
-        : css`
-            background-image: url('./wild-oasis-bg.jpg');
-            filter: contrast(30%) brightness(160%) blur(var(--bg-blur-amount));
-          `}
+`;
 
-    transform: scale(101%, 101%);
-    background-attachment: fixed;
-    background-size: cover;
-  }
+const BackgroundImage = styled.div`
+  position: fixed;
+  z-index: -1;
+  width: 110vw;
+  height: 110vh;
+  ${(props) =>
+    props.$dark
+      ? css`
+          background-image: url('./wild-oasis-bg.jpg');
+          filter: brightness(40%) blur(var(--bg-blur-amount));
+        `
+      : css`
+          background-image: url('./wild-oasis-bg.jpg');
+          filter: contrast(30%) brightness(160%) blur(var(--bg-blur-amount));
+        `}
+
+  transform: scale(101%, 101%) translate(-5vw, -5vh);
+  background-attachment: fixed;
+  background-size: cover;
 `;
 
 const PageContent = styled.main`
-  height: fit-content;
-  align-self: center;
-  justify-self: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto; /* didn't work so put in the height instead to get content vertically centred*/
+  /* height: 100%; */
 `;
 
 function GuestLayout() {
@@ -58,11 +52,12 @@ function GuestLayout() {
       <GuestContextProvider>
         <StyledGuestLayout>
           <GuestHeader />
-          <Main $dark={isDarkMode}>
+          <Main>
             <PageContent>
               <Outlet />
             </PageContent>
           </Main>
+          <BackgroundImage $dark={isDarkMode} />
         </StyledGuestLayout>
       </GuestContextProvider>
     </>

@@ -1,17 +1,33 @@
-import styled from 'styled-components';
+import { useInView } from 'react-intersection-observer';
+import styled, { css } from 'styled-components';
 
-const SlideInY = styled.div`
+const SlideInYTransition = styled.div`
+  opacity: 0;
+  transition: opacity 1.8s ease-out;
+  ${(props) =>
+    props.$inView &&
+    css`
+      opacity: 1;
+    `};
   @keyframes slide-in {
     0% {
-      opacity: 0;
-      transform: translateY(68rem);
+      transform: translateY(110dvh);
     }
     100% {
-      opacity: 1;
       transform: translateY(0);
     }
   }
-  animation: slide-in 1s ease-out;
+
+  animation: ${(props) => (props.$inView ? 'slide-in 1.2s ease-out' : '')};
 `;
 
+function SlideInY({ children }) {
+  const { ref, inView } = useInView({ triggerOnce: true });
+  // console.log(inView);
+  return (
+    <SlideInYTransition $inView={inView} ref={ref}>
+      {children}
+    </SlideInYTransition>
+  );
+}
 export default SlideInY;
