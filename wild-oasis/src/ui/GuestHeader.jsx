@@ -40,16 +40,16 @@ const HeaderNavSection = styled.div`
 `;
 
 function GuestHeader() {
-  const { isAnonymous } = useUser();
+  const { isAuthenticated, isAnonymous } = useUser();
   return (
     <StyledHeader>
       <LogoSmall />
       <HeaderNav>
         <HeaderNavSection>
           <DarkModeToggle />
-          <Login />
+          {!isAuthenticated && <Login />}
         </HeaderNavSection>
-        {isAnonymous ? (
+        {isAnonymous || isAuthenticated ? (
           <HeaderNavSection>
             <UserAvatar />
             <Logout />

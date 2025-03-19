@@ -31,7 +31,8 @@ function AppLayout() {
     <StyledAppLayout>
       <Header />
       <Sidebar />
-      <Main>
+      {/* The id here is used by the CompoundModal as the element to createPortal */}
+      <Main id="main">
         <Container>
           <Outlet />
         </Container>

@@ -16,7 +16,7 @@ const StyledGuestForm = styled.div`
   padding: 2.4rem 4rem;
 
   /* Box */
-  width: 68rem;
+  max-width: 68rem;
   place-self: center;
   background-color: var(--color-grey-0);
   border: 1px solid var(--color-grey-100);
@@ -26,7 +26,7 @@ const StyledGuestForm = styled.div`
 
 const FormTitle = styled.div`
   padding-bottom: 2.4rem;
-  width: 68rem;
+  max-width: 68rem;
   place-self: center;
 `;
 

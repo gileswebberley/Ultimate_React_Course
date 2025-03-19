@@ -13,13 +13,23 @@ const StyledUserAvatar = styled.div`
 
 const Avatar = styled.img`
   display: block;
-  width: 4rem;
+  /* width: 4rem; */
   width: 3.6rem;
   aspect-ratio: 1;
   object-fit: cover;
   object-position: center;
   border-radius: 50%;
   outline: 2px solid var(--color-grey-100);
+  background-color: var(--color-grey-600);
+  z-index: 2;
+`;
+
+const NameBox = styled.span`
+  background-color: var(--color-grey-100);
+  padding: 0.4rem 2.8rem 0.4rem 1.4rem;
+  margin-right: -3.4rem;
+  border-radius: 10rem;
+  z-index: 1;
 `;
 
 export default function UserAvatar() {
@@ -33,7 +43,7 @@ export default function UserAvatar() {
         <SpinnerMini />
       ) : (
         <StyledUserAvatar>
-          <span>{displayName || 'Anon'}</span>
+          <NameBox>{displayName || 'Anon'}</NameBox>
           <Avatar
             src={avatar || 'default-user.jpg'}
             alt={`Avatar for ${fullName}`}

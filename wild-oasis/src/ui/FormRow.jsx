@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components';
-
+//'24rem 1fr 1.2fr'
 const StyledFormRow = styled.div`
   display: grid;
   align-items: center;
@@ -9,6 +9,11 @@ const StyledFormRow = styled.div`
   gap: ${(props) => (props.orientation === 'vertical' ? '0.8rem' : '2.4rem')};
 
   padding: 1.2rem 0;
+  //convert to a column on small screens
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
 
   &:first-child {
     padding-top: 0;

@@ -16,7 +16,7 @@ function Logout() {
         disabled={isLoggingOut}
       >
         {isLoggingOut ? <SpinnerTiny /> : <HiArrowRightOnRectangle />}
-        Log-Out
+        {/* Log-Out */}
       </Button>
     </ButtonGroup>
   );

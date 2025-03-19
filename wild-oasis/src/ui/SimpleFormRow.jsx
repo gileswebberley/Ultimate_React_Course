@@ -4,9 +4,16 @@ const SimpleFormRow = styled.div`
   display: grid;
   align-items: center;
   grid-template-columns: 24rem 1.2fr 1fr;
+
   gap: 2.4rem;
 
   padding: 1.2rem 0;
+
+  //convert to a column on small screens
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
 
   &:first-child {
     padding-top: 0;
