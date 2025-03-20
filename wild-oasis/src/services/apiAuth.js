@@ -23,7 +23,42 @@ export async function signInGuest({
   }
 
   //CREATE THEM AS A GUEST - I think this would make sense as they would then be linkable when they create their booking? I guess I would have to then update their anonymous uder data to include their guest id?
-  return data;
+  const newGuest = {
+    fullName,
+    email,
+    nationalID: nationalId,
+    nationality: country,
+    countryFlag: avatar,
+  };
+  const { data: guestData, error: guestError } = await supabase
+    .from('guests')
+    .insert(newGuest)
+    .select()
+    .single();
+
+  if (guestError) {
+    throw new Error(`Guest creation failed: 
+      ERROR: ${guestError.message}`);
+  }
+
+  const { data: updateData, error: updateError } =
+    await supabase.auth.updateUser({
+      data: { guestId: guestData.id },
+    });
+
+  if (updateError) {
+    throw new Error(`Guest user update failed: 
+        ERROR: ${updateError.message}`);
+  }
+  // console.log('NEW GUEST DATA');
+  // console.table(guestData);
+  // console.log('UPDATED USER DATA');
+  // console.table(updateData);
+
+  //TODO - at some point maybe add the chance for them to become a fully fledged user so they can sign back in to check their booking details, although I think I would have to learn to implement user roles etc to do that....
+
+  //Now return the user data just like with a normal sign in, but now this user holds the id to their corresponding guest row in our guests table (good for collecting emails and then confirmation could be sent to them)
+  return updateData;
 }
 
 export async function signUp({ email, password, fullName }) {

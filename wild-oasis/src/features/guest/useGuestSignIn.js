@@ -15,7 +15,7 @@ export function useGuestSignIn() {
       }),
     onSuccess: (data) => {
       toast.success(
-        `Welcome ${data.user?.user_metadata?.fullName} as our guest`
+        `Welcome ${data.user?.user_metadata?.fullName} (${data.user?.user_metadata?.guestId}) as our guest`
       );
       queryClient.setQueryData(['user'], data.user);
       //navigate('../dashboard');
