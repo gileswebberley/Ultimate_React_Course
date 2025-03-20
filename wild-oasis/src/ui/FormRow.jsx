@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import { bp_sizes } from '../styles/breakpoints';
 //'24rem 1fr 1.2fr'
 const StyledFormRow = styled.div`
   display: grid;
@@ -10,7 +11,7 @@ const StyledFormRow = styled.div`
 
   padding: 1.2rem 0;
   //convert to a column on small screens
-  @media (max-width: 480px) {
+  @media ${bp_sizes.sm} {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr auto;
   }

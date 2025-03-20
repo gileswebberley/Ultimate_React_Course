@@ -20,6 +20,7 @@ const GlobalStyles = createGlobalStyle`
   --border-radius-sm: 5px;
   --border-radius-md: 7px;
   --border-radius-lg: 9px;
+  --border-radius-xl: 14px;
 
   /* For the guest site's background image */
   --bg-blur-amount: 5px;
@@ -129,7 +130,7 @@ html {
 
 body {
   font-family: "Poppins", sans-serif;
-  color: var(--color-grey-700);
+  color: var(--color-grey-900);
 
   transition: color 0.3s, background-color 0.3s;
   min-height: 100vh;

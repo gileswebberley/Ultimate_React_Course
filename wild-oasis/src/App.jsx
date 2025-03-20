@@ -8,18 +8,20 @@ import {
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import toast, { Toaster } from 'react-hot-toast';
 import { lazy, Suspense } from 'react';
+import { DarkModeProvider } from './context/DarkModeContext';
 
 import GlobalStyles from './styles/GlobalStyles';
-import AppLayout from './ui/AppLayout';
-// import ProtectedRoute from './ui/ProtectedRoute';
-import { DarkModeProvider } from './context/DarkModeContext';
-import SpinnerFullPage from './ui/SpinnerFullPage';
-import GuestForm from './features/guest/GuestForm';
-import Welcome from './pages/Welcome';
+// import AppLayout from './ui/AppLayout';
 import GuestLayout from './ui/GuestLayout';
+// import ProtectedRoute from './ui/ProtectedRoute';
+import SpinnerFullPage from './ui/SpinnerFullPage';
+import Welcome from './pages/Welcome';
 import SlideInTest from './features/guest/SlideInTest';
+import CabinDetails from './pages/CabinDetails';
+// import CreateGuest from './pages/CreateGuest';
+const CreateGuest = lazy(() => import('./pages/CreateGuest'));
 const ProtectedRoute = lazy(() => import('./ui/ProtectedRoute'));
-// const AppLayout = lazy(() => import('./ui/AppLayout'));
+const AppLayout = lazy(() => import('./ui/AppLayout'));
 // const GlobalStyles = lazy(() => import('./styles/GlobalStyles'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Account = lazy(() => import('./pages/Account'));
@@ -71,8 +73,8 @@ function App() {
                 <Route element={<GuestLayout />}>
                   <Route index element={<Navigate replace to="welcome" />} />
                   <Route path="welcome" element={<Welcome />} />
-                  <Route path="guest" element={<GuestForm />} />
-                  <Route path="test" element={<SlideInTest />} />
+                  <Route path="guest" element={<CreateGuest />} />
+                  <Route path="cabin-details" element={<CabinDetails />} />
                 </Route>
                 {/* We're going to wrap these routes in a protected one now that we have started to implement authentication */}
                 <Route
@@ -82,7 +84,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 >
-                  <Route index element={<Navigate replace to="dashboard" />} />
+                  {/* <Route index element={<Navigate replace to="dashboard" />} /> */}
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="bookings" element={<Bookings />} />
                   <Route path="bookings/:bookingId" element={<Booking />} />

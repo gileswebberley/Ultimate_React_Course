@@ -3,9 +3,10 @@ import CabinRow from './CabinRow';
 import { useCabins } from './useCabins';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
-import { useSearchParams } from 'react-router-dom';
+// import { useSearchParams } from 'react-router-dom';
 import { IS_PAGINATED, PAGE_SIZE } from '../../utils/shared_constants';
 import Pagination from '../../ui/Pagination';
+import { useCabinFilters } from './useCabinFilters';
 
 //Example of client-side filtering and sorting
 function CabinTable() {
@@ -13,47 +14,48 @@ function CabinTable() {
   const { isLoading, error, cabins, count } = useCabins();
   let paginationCount = count;
   //sorting and filtering are defined in the url - see the CabinTableOperations component
-  const [searchParams] = useSearchParams();
+  // const [searchParams] = useSearchParams();
+  let { filteredCabins, searchParams } = useCabinFilters(cabins ?? {});
 
   if (isLoading) return <Spinner />;
 
   if (error) return <div>ERROR: {error}</div>;
 
-  //SORTING - if no sorting method is selected then sort by most recently created (namely the id)
-  const sort = searchParams.get('cabins-sort') ?? 'id';
-  let sortedCabins;
+  // //SORTING - if no sorting method is selected then sort by most recently created (namely the id)
+  // const sort = searchParams.get('cabins-sort') ?? 'id';
+  // let sortedCabins;
 
-  const [sortCat, sortDir] = sort.split('-');
-  const directionModifier = sortDir === 'asc' ? 1 : -1;
-  if (sortCat === 'name') {
-    //it's a string comparison
-    sortedCabins = cabins.sort(
-      (a, b) => directionModifier * a.name.localeCompare(b.name)
-    );
-  } else {
-    //it's numerical comparison
-    sortedCabins = cabins.sort(
-      (a, b) => directionModifier * (a[sortCat] - b[sortCat])
-    );
-  }
+  // const [sortCat, sortDir] = sort.split('-');
+  // const directionModifier = sortDir === 'asc' ? 1 : -1;
+  // if (sortCat === 'name') {
+  //   //it's a string comparison
+  //   sortedCabins = cabins.sort(
+  //     (a, b) => directionModifier * a.name.localeCompare(b.name)
+  //   );
+  // } else {
+  //   //it's numerical comparison
+  //   sortedCabins = cabins.sort(
+  //     (a, b) => directionModifier * (a[sortCat] - b[sortCat])
+  //   );
+  // }
 
-  //FILTERING
-  const filter = searchParams.get('discount') ?? 'all';
-  let filteredCabins;
+  // //FILTERING
+  // const filter = searchParams.get('discount') ?? 'all';
+  // let filteredCabins;
 
-  switch (filter) {
-    case 'all':
-      filteredCabins = sortedCabins;
-      break;
-    case 'no-discount':
-      filteredCabins = sortedCabins.filter((cabin) => cabin.discount === 0);
-      break;
-    case 'with-discount':
-      filteredCabins = sortedCabins.filter((cabin) => cabin.discount > 0);
-      break;
-    default:
-      filteredCabins = sortedCabins;
-  }
+  // switch (filter) {
+  //   case 'all':
+  //     filteredCabins = sortedCabins;
+  //     break;
+  //   case 'no-discount':
+  //     filteredCabins = sortedCabins.filter((cabin) => cabin.discount === 0);
+  //     break;
+  //   case 'with-discount':
+  //     filteredCabins = sortedCabins.filter((cabin) => cabin.discount > 0);
+  //     break;
+  //   default:
+  //     filteredCabins = sortedCabins;
+  // }
 
   paginationCount = filteredCabins.length;
 

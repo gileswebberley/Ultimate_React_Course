@@ -44,8 +44,10 @@ const BackgroundImage = styled.div`
 // box-sizing and min-height seemed to make this a solid content holder that centres evryything vertically and horizontally - phew :/
 const PageContent = styled.main`
   display: flex;
+  flex-direction: column;
   box-sizing: content-box;
   height: 100%;
+  width: 100%;
   min-height: fit-content;
   justify-content: center;
   align-items: center;
@@ -58,7 +60,7 @@ function GuestLayout() {
       <GuestContextProvider>
         <StyledGuestLayout>
           <GuestHeader />
-          <Main>
+          <Main id="main">
             <PageContent>
               <Outlet />
             </PageContent>

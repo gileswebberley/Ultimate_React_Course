@@ -81,7 +81,8 @@ function GuestForm() {
     <SlideInY>
       <FormTitle>
         <Heading as="h1" style={{ textAlign: 'center' }}>
-          Please tell us about yourself so we can start your booking
+          Please tell us about yourself so we can set you up as a guest and find
+          you your perfect break
         </Heading>
       </FormTitle>
       <StyledGuestForm>
@@ -89,12 +90,6 @@ function GuestForm() {
           submitFn={onSubmit}
           errorFn={onError}
           isLoading={isSigningInGuest}
-          // resetOnSubmit={false}
-          // defaultValues={{
-          //   fullName: guestName,
-          //   email: guestEmail,
-          //   nationalId: guestNId,
-          // }}
         >
           <CompoundRegisteredForm.Country
             elementID="country"
