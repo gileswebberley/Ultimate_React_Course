@@ -5,6 +5,7 @@ import CompoundRegisteredForm from '../../ui/CompoundRegisteredForm';
 import toast from 'react-hot-toast';
 import styled, { css } from 'styled-components';
 import SimpleFormRow from '../../ui/SimpleFormRow';
+import FormRow from '../../ui/FormRow';
 
 const FormContainer = styled.div`
   ${(props) =>
@@ -74,8 +75,8 @@ function UpdatePasswordForm() {
             },
           }}
         />
-        <SimpleFormRow>
-          <ButtonGroup>
+        <FormRow>
+          <ButtonGroup justify="end">
             <CompoundRegisteredForm.Reset>
               <Button variation="secondary" disabled={isUpdating}>
                 Reset
@@ -83,7 +84,7 @@ function UpdatePasswordForm() {
             </CompoundRegisteredForm.Reset>
             <Button disabled={isUpdating}>Update Password</Button>
           </ButtonGroup>
-        </SimpleFormRow>
+        </FormRow>
       </CompoundRegisteredForm>
     </FormContainer>
   );

@@ -1,22 +1,21 @@
 import { useNavigate } from 'react-router-dom';
 import Button from '../../ui/Button';
 import ButtonGroup from '../../ui/ButtonGroup';
-import { HiArrowRightEndOnRectangle } from 'react-icons/hi2';
+import { HiChartBar } from 'react-icons/hi2';
 
-function GuestLogin() {
+function UserHome() {
   const navigate = useNavigate();
   return (
     <ButtonGroup justify="end">
       <Button
         size="small"
         variation="secondary"
-        onClick={() => navigate('../guest')}
+        onClick={() => navigate('../dashboard')}
       >
-        <HiArrowRightEndOnRectangle />
-        Sign-In
+        <HiChartBar />
       </Button>
     </ButtonGroup>
   );
 }
 
-export default GuestLogin;
+export default UserHome;

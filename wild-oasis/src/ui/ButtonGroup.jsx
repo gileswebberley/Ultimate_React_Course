@@ -11,6 +11,7 @@ const ButtonSet = styled.nav`
   flex-wrap: none;
   gap: 1.2rem;
   width: fit-content;
+  justify-self: flex-end;
 `;
 // set justify prop to change positioning, ie 'end' for the right and 'start' for the left
 function ButtonGroup({ children, justify = 'end' }) {

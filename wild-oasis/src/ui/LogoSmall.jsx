@@ -15,10 +15,14 @@ const Img = styled.img`
 //for use in guest header
 function LogoSmall() {
   const navigate = useNavigate();
+  const { isDarkMode } = useDarkMode();
 
   return (
     <StyledLogo onClick={() => navigate('../', { replace: true })}>
-      <Img src="./logo-dark.png" alt="Logo" />
+      <Img
+        src={isDarkMode ? './logo-light.png' : './logo-dark.png'}
+        alt="Logo"
+      />
     </StyledLogo>
   );
 }

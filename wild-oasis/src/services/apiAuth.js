@@ -21,6 +21,8 @@ export async function signInGuest({
     throw new Error(`Guest sign in failed for ${fullName}
       ERROR: ${error.message}`);
   }
+
+  //CREATE THEM AS A GUEST - I think this would make sense as they would then be linkable when they create their booking? I guess I would have to then update their anonymous uder data to include their guest id?
   return data;
 }
 

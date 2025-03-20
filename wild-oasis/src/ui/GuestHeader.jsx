@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import UserAvatar from '../features/authentication/UserAvatar';
 import DarkModeToggle from './DarkModeToggle';
 import { useUser } from '../features/authentication/useUser';
@@ -6,21 +6,31 @@ import LogoSmall from './LogoSmall';
 import GuestLogin from '../features/guest/GuestLogin';
 import Login from '../features/authentication/Login';
 import Logout from '../features/authentication/Logout';
+import UserHome from '../features/authentication/UserHome';
+import { useDarkMode } from '../context/DarkModeContext';
 
-//as we have our header component we'll name the style accordingly
+//I made the dark mode change the baground gradient because it looked better with the theme affected buttons
 const StyledHeader = styled.header`
-  /* grid-row: 1;
-  grid-column: 1/-1; */
   display: flex;
   position: relative;
-  /* gap: 1.6rem; */
   justify-content: space-between;
   align-items: flex-end;
-  background: linear-gradient(
-    30deg,
-    var(--color-brand-900) 40%,
-    var(--color-brand-500)
-  );
+  ${(props) =>
+    props.$dark
+      ? css`
+          background: linear-gradient(
+            120deg,
+            var(--color-brand-500) 40%,
+            var(--color-brand-900)
+          );
+        `
+      : css`
+          background: linear-gradient(
+            30deg,
+            var(--color-brand-900) 40%,
+            var(--color-brand-500)
+          );
+        `}
   border-bottom: 3px solid var(--color-yellow-700);
 `;
 
@@ -41,14 +51,11 @@ const HeaderNavSection = styled.div`
 
 function GuestHeader() {
   const { isAuthenticated, isAnonymous } = useUser();
+  const { isDarkMode } = useDarkMode();
   return (
-    <StyledHeader>
+    <StyledHeader $dark={isDarkMode}>
       <LogoSmall />
       <HeaderNav>
-        <HeaderNavSection>
-          <DarkModeToggle />
-          {!isAuthenticated && <Login />}
-        </HeaderNavSection>
         {isAnonymous || isAuthenticated ? (
           <HeaderNavSection>
             <UserAvatar />
@@ -57,6 +64,10 @@ function GuestHeader() {
         ) : (
           <GuestLogin />
         )}
+        <HeaderNavSection>
+          {!isAuthenticated ? <Login /> : <UserHome />}
+          <DarkModeToggle />
+        </HeaderNavSection>
       </HeaderNav>
     </StyledHeader>
   );
