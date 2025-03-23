@@ -46,6 +46,7 @@ const StyledList = styled.ul`
   position: absolute;
   z-index: 10;
   width: fit-content;
+  height: fit-content;
   background-color: var(--color-grey-0);
   box-shadow: var(--shadow-lg);
   border-radius: var(--border-radius-md);

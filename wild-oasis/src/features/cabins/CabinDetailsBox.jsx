@@ -3,6 +3,8 @@ import SlideInY from '../../ui/SlideInY';
 import Heading from '../../ui/Heading';
 import { bp_sizes } from '../../styles/breakpoints';
 import { formatCurrency } from '../../utils/helpers';
+import { useBookingDates } from '../bookings/useBookingDates';
+import SpinnerMini from '../../ui/SpinnerMini';
 
 const StyledCabinDetailsBox = styled.div`
   display: block;
@@ -10,6 +12,7 @@ const StyledCabinDetailsBox = styled.div`
   border-radius: var(--border-radius-xl);
   padding: 3rem;
   min-width: 26rem;
+  max-width: 68rem;
 `;
 
 const DetailsLayout = styled.article`
@@ -27,7 +30,7 @@ const DetailsLayout = styled.article`
 const DetailsRow = styled.div`
   display: grid;
   /* background-color: var(--color-grey-0); */
-  grid-template-columns: auto 30rem;
+  grid-template-columns: auto 1fr;
   grid-template-rows: 1fr;
   gap: 0.9rem;
   border-top: 2px solid var(--color-grey-500);
@@ -55,6 +58,11 @@ const Paragraph = styled.p`
 `;
 
 function CabinDetailsBox({ cabin }) {
+  // console.log(cabin.id);
+  const { isLoading, error, bookingDates } = useBookingDates(cabin.id);
+
+  if (error) return <div>ERROR: {error}</div>;
+
   return (
     <SlideInY>
       <StyledCabinDetailsBox>
@@ -75,6 +83,7 @@ function CabinDetailsBox({ cabin }) {
             <Heading as="h3">
               {formatCurrency(cabin.regularPrice)} per night
             </Heading>
+            {isLoading ? <SpinnerMini /> : null}
           </DetailsRow>
         </DetailsLayout>
       </StyledCabinDetailsBox>

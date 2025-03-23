@@ -2,6 +2,19 @@ import { getToday } from '../utils/helpers';
 import { PAGE_SIZE } from '../utils/shared_constants';
 import supabase from './supabase';
 
+export async function getBookingDatesByCabinId({ cabinId }) {
+  // console.log(`eq by...${cabinId}`);
+  const { data, error } = await supabase
+    .from('bookings')
+    .select('startDate,endDate')
+    .eq('cabinID', cabinId);
+  if (error) {
+    throw new Error(`Cabin dates failed: ${error.message}`);
+  }
+  console.log(data);
+  return data;
+}
+
 export async function getBookings({ filter, sortBy, page }) {
   //this select statement is getting the whole booking row and also the information from the linked (foreign keys) tables of guests and cabins - ie for each row it will collect the data from the cabin and guest referenced in that booking. When working with pagination we can also send a second argument to the select method which makes the query return the count as well as the data.
   let query = supabase

@@ -10,7 +10,9 @@ const Container = styled.div`
   max-width: 68rem;
   display: grid;
   gap: 3rem;
-  text-align: center;
+  & p {
+    text-align: justify;
+  }
   grid-template-rows: auto 1fr auto;
   padding: 2.4rem 4rem;
   background-color: var(--color-grey-100-alpha);
@@ -39,15 +41,15 @@ function Welcome() {
           you to reconnect with nature and create cherished memories together.
         </p>
         <ButtonGroup>
-          {!loggedIn ? (
-            <Button onClick={() => navigate('../guest')}>
-              Start Your Booking
-            </Button>
-          ) : (
-            <Button onClick={() => navigate('../cabin-details')}>
-              View Our Cabins
-            </Button>
-          )}
+          {/* {!loggedIn ? ( */}
+          <Button onClick={() => navigate('../guest')}>
+            Start Your Booking
+          </Button>
+          {/* ) : ( */}
+          <Button onClick={() => navigate('../cabin-details')}>
+            View Our Cabins
+          </Button>
+          {/* )} */}
         </ButtonGroup>
       </Container>
     </SlideInY>
