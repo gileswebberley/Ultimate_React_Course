@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Logo from './Logo';
 import MainNav from './MainNav';
 import Uploader from '../data/Uploader';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 //going to try to make this a collapsing menu
 const transform = {
@@ -40,6 +41,7 @@ const ClickBit = styled.div`
 
 function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const clickOutsideRef = useClickOutside(() => setIsOpen(false));
 
   function handleOpen(e) {
     //for use in tablets where there is no mouse tracking to open it and also to make it close when a menu item is clicked
@@ -57,8 +59,9 @@ function Sidebar() {
   return (
     <StyledSidebar
       transform={isOpen ? 'open' : 'closed'}
-      onClick={handleOpen}
+      onPointerDown={handleOpen}
       onMouseLeave={handleLeave}
+      ref={clickOutsideRef}
     >
       <Logo />
       <ClickBit

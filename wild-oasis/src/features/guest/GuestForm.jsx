@@ -39,7 +39,7 @@ function GuestForm() {
     nationalId: guestNId,
   } = useGuestContext();
   // console.log(`guest: ${guestName}`);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   let countryName = null,
     countryFlag = null;
 
@@ -67,7 +67,7 @@ function GuestForm() {
       },
       {
         onSuccess: () => {
-          // navigate('../book-cabin');
+          navigate('../cabin-details');
         },
       }
     );

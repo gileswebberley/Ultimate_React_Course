@@ -74,7 +74,7 @@ const Button = styled.button`
   gap: 1rem;
   align-items: center;
   justify-content: center;
-  //make it stay on one line and stretch to fit the space it is placed within
+  //make it stay on one line and stretch to fit the space in menus
   white-space: nowrap;
   width: 100%;
   border-radius: var(--border-radius-sm);
