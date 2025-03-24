@@ -36,6 +36,12 @@ export function fromToday(numDays, withTime = false) {
 }
 
 //I created this originally for use in the CabinDatePicker so we can check if today is booked and if so move our start date onto, well, the next clear date (ie the first date after today that isn't booked). It took me quite a while to find that I couldn't use array.includes and to find that toDateString removed the problem of different times on the same date
+/**
+ *
+ * @param {Array<Date>} reservedDatesArray all of the dates that are unavailable (ie already booked)
+ * @param {Date} date The date to check against reservedDatesArray (set to today if undefined)
+ * @returns {Date} The next un-reserved date after the date passed in
+ */
 export function getNextClearDate(reservedDatesArray, date = new Date()) {
   const searchDate = date.toDateString();
   function iterateDate() {
@@ -50,7 +56,7 @@ export function getNextClearDate(reservedDatesArray, date = new Date()) {
     }
   }
   iterateDate();
-  console.log(`next clear date after ${searchDate} is: ${date.toDateString()}`);
+  // console.log(`next clear date after ${searchDate} is: ${date.toDateString()}`);
   return date;
 }
 
