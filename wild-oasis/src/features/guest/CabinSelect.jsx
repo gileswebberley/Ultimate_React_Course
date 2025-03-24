@@ -6,9 +6,12 @@ import { useCabins } from '../cabins/useCabins';
 import { useCabinFilters } from '../cabins/useCabinFilters';
 import Heading from '../../ui/Heading';
 import CabinSelectSort from './CabinSelectSort';
+import SlideInY from '../../ui/SlideInY';
 
 const StyledCabinSelect = styled.div`
   display: flex;
+  /* min-height: 0 is to fix a firefox quirk where the cabins were scrolling off the top of the page */
+  min-height: 0;
   flex-wrap: wrap;
   justify-content: center;
   gap: 3rem;

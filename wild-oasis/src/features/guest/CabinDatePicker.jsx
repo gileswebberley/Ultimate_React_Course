@@ -1,7 +1,8 @@
-import { addDays, eachDayOfInterval, parseISO } from 'date-fns';
+import { eachDayOfInterval } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
-import DatePicker from 'react-datepicker';
 import { getNextClearDate } from '../../utils/helpers';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 function CabinDatePicker({ reservedDates }) {
   const [startDate, setStartDate] = useState();

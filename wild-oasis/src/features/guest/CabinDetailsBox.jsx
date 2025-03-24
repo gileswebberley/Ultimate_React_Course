@@ -5,9 +5,6 @@ import { bp_sizes } from '../../styles/breakpoints';
 import { formatCurrency } from '../../utils/helpers';
 import { useBookingDates } from '../bookings/useBookingDates';
 import SpinnerMini from '../../ui/SpinnerMini';
-import { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import CabinDatePicker from './CabinDatePicker';
 
 const StyledCabinDetailsBox = styled.div`
@@ -16,10 +13,10 @@ const StyledCabinDetailsBox = styled.div`
   border-radius: var(--border-radius-xl);
   padding: 3rem;
   min-width: 26rem;
-  max-width: 68rem;
+  max-width: 88rem;
 `;
 
-const DetailsLayout = styled.article`
+const DetailsLayout = styled.section`
   display: flex;
   flex-direction: column;
   /* justify-content: flex-end;
@@ -31,15 +28,15 @@ const DetailsLayout = styled.article`
   border-radius: var(--border-radius-sm);
 `;
 
-const DetailsRow = styled.div`
+const DetailsRow = styled.article`
   display: grid;
-  /* background-color: var(--color-grey-0); */
+  /* background-color: red; */
   grid-template-columns: auto 1fr;
   grid-template-rows: 1fr;
   gap: 0.9rem;
   border-top: 2px solid var(--color-grey-500);
   color: var(--color-grey-800);
-  padding-top: 1rem;
+  padding: 1rem;
   @media ${bp_sizes.sm} {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
@@ -88,12 +85,12 @@ function CabinDetailsBox({ cabin }) {
             <Heading as="h3">
               {formatCurrency(cabin.regularPrice)} per night
             </Heading>
+            {isLoading ? (
+              <SpinnerMini />
+            ) : (
+              <CabinDatePicker reservedDates={bookingDates} />
+            )}
           </DetailsRow>
-          {isLoading ? (
-            <SpinnerMini />
-          ) : (
-            <CabinDatePicker reservedDates={bookingDates} />
-          )}
         </DetailsLayout>
       </StyledCabinDetailsBox>
     </SlideInY>

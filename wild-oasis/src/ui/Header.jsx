@@ -9,7 +9,7 @@ import Login from '../features/guest/GuestLogin';
 //as we have our header component we'll name the style accordingly
 const StyledHeader = styled.header`
   display: flex;
-  gap: 1.6rem;
+  position: relative;
   justify-content: flex-end;
   align-items: center;
   background-color: var(--color-grey-0);
@@ -17,10 +17,10 @@ const StyledHeader = styled.header`
   border-bottom: 1px solid var(--color-grey-100);
 `;
 
-const HeaderNav = styled.div`
+const HeaderNavSection = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 0.8rem;
 `;
 
@@ -28,7 +28,7 @@ function Header() {
   const { isAuthenticated } = useUser();
   return (
     <StyledHeader>
-      <HeaderNav>
+      <HeaderNavSection>
         {isAuthenticated ? (
           <>
             <UserAvatar />
@@ -39,7 +39,7 @@ function Header() {
           <Login />
         )}
         <DarkModeToggle />
-      </HeaderNav>
+      </HeaderNavSection>
     </StyledHeader>
   );
 }

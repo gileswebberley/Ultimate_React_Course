@@ -1,9 +1,16 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const StyledButtonGroup = styled.nav`
-  display: block;
+  display: flex;
   width: 100%;
-  text-align: ${(props) => (props.justify === 'end' ? 'right' : 'left')};
+  ${(props) =>
+    props.$justify === 'end'
+      ? css`
+          justify-content: flex-end;
+        `
+      : css`
+          justify-content: flex-start;
+        `};
 `;
 
 const ButtonSet = styled.nav`
@@ -11,12 +18,11 @@ const ButtonSet = styled.nav`
   gap: 1.2rem;
   width: 100%;
   max-width: fit-content;
-  justify-self: flex-end;
 `;
 // set justify prop to change positioning, ie 'end' for the right and 'start' for the left
 function ButtonGroup({ children, justify = 'end' }) {
   return (
-    <StyledButtonGroup>
+    <StyledButtonGroup $justify={justify}>
       <ButtonSet>{children}</ButtonSet>
     </StyledButtonGroup>
   );

@@ -14,7 +14,7 @@ const StyledGuestLayout = styled.div`
 //This keeps the header from scrolling so just the contents do, and I've switched off scrollbars in the global styles
 const Main = styled.main`
   padding: 4rem 4rem;
-  overflow-y: auto;
+  overflow-y: auto !important;
 `;
 
 //This is so I could apply filters to what was originally just the background-image of Main
