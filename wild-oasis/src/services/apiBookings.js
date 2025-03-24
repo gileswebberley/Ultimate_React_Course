@@ -11,7 +11,7 @@ export async function getBookingDatesByCabinId({ cabinId }) {
   if (error) {
     throw new Error(`Cabin dates failed: ${error.message}`);
   }
-  console.log(data);
+  // console.log(data);
   return data;
 }
 

@@ -1,11 +1,10 @@
 import styled from 'styled-components';
 import Empty from '../../ui/Empty';
 import Spinner from '../../ui/Spinner';
-import CabinDetailsBox from '../cabins/CabinDetailsBox';
+import CabinDetailsBox from './CabinDetailsBox';
 import { useCabins } from '../cabins/useCabins';
 import { useCabinFilters } from '../cabins/useCabinFilters';
 import Heading from '../../ui/Heading';
-import CabinTableOperations from '../cabins/CabinTableOperations';
 import CabinSelectSort from './CabinSelectSort';
 
 const StyledCabinSelect = styled.div`
@@ -18,7 +17,7 @@ const StyledCabinSelect = styled.div`
 
 function CabinSelect() {
   const { isLoading, cabins, error, count } = useCabins();
-  let paginationCount = count;
+  // let paginationCount = count;
   //sorting and filtering are defined in the url - see the CabinTableOperations component
   // const [searchParams] = useSearchParams();
   let { filteredCabins } = useCabinFilters(cabins ?? {});

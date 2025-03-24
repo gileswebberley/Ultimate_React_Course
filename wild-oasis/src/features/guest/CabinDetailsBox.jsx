@@ -5,6 +5,10 @@ import { bp_sizes } from '../../styles/breakpoints';
 import { formatCurrency } from '../../utils/helpers';
 import { useBookingDates } from '../bookings/useBookingDates';
 import SpinnerMini from '../../ui/SpinnerMini';
+import { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import CabinDatePicker from './CabinDatePicker';
 
 const StyledCabinDetailsBox = styled.div`
   display: block;
@@ -51,6 +55,7 @@ const CabinImg = styled.img`
 
 const Paragraph = styled.p`
   text-wrap: balance;
+  text-align: justify;
 
   overflow: auto;
   word-wrap: normal;
@@ -83,8 +88,12 @@ function CabinDetailsBox({ cabin }) {
             <Heading as="h3">
               {formatCurrency(cabin.regularPrice)} per night
             </Heading>
-            {isLoading ? <SpinnerMini /> : null}
           </DetailsRow>
+          {isLoading ? (
+            <SpinnerMini />
+          ) : (
+            <CabinDatePicker reservedDates={bookingDates} />
+          )}
         </DetailsLayout>
       </StyledCabinDetailsBox>
     </SlideInY>

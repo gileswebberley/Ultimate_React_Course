@@ -1,4 +1,10 @@
-import { formatDistance, parseISO, differenceInDays } from 'date-fns';
+import {
+  formatDistance,
+  parseISO,
+  differenceInDays,
+  add,
+  addDays,
+} from 'date-fns';
 
 // We want to make this function work for both Date objects and strings (which come from Supabase)
 export const subtractDates = (dateStr1, dateStr2) =>
@@ -22,6 +28,31 @@ export const getToday = function (options = {}) {
   else today.setUTCHours(0, 0, 0, 0);
   return today.toISOString();
 };
+
+export function fromToday(numDays, withTime = false) {
+  const date = add(new Date(), { days: numDays });
+  if (!withTime) date.setUTCHours(0, 0, 0, 0);
+  return date.toISOString().slice(0, -1);
+}
+
+//I created this originally for use in the CabinDatePicker so we can check if today is booked and if so move our start date onto, well, the next clear date (ie the first date after today that isn't booked). It took me quite a while to find that I couldn't use array.includes and to find that toDateString removed the problem of different times on the same date
+export function getNextClearDate(reservedDatesArray, date = new Date()) {
+  const searchDate = date.toDateString();
+  function iterateDate() {
+    if (
+      reservedDatesArray.some((d) => {
+        return d.toDateString() === date.toDateString();
+      })
+    ) {
+      //   console.log(`date exists...`);
+      date = addDays(date, 1);
+      iterateDate();
+    }
+  }
+  iterateDate();
+  console.log(`next clear date after ${searchDate} is: ${date.toDateString()}`);
+  return date;
+}
 
 export const formatCurrency = (value) => {
   //going to remove the fractional part if they are .00 as they are not needed
