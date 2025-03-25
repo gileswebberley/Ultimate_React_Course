@@ -6,10 +6,15 @@ import { formatCurrency } from '../../utils/helpers';
 import { useBookingDates } from '../bookings/useBookingDates';
 import SpinnerMini from '../../ui/SpinnerMini';
 import CabinDatePicker from './CabinDatePicker';
+import CabinSketchHeading from '../../ui/CabinSketchHeading';
+import GuestParagraph from '../../ui/GuestParagraph';
+import { useUser } from '../authentication/useUser';
+import Button from '../../ui/Button';
+import { useNavigate } from 'react-router-dom';
 
 const StyledCabinDetailsBox = styled.div`
   display: block;
-  background-color: var(--color-grey-100);
+  background-color: var(--color-grey-100-alpha);
   border-radius: var(--border-radius-xl);
   padding: 3rem;
   min-width: 26rem;
@@ -25,7 +30,7 @@ const DetailsLayout = styled.section`
   padding: 2rem;
   color: var(--color-green-700);
   background-color: var(--color-grey-50);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius-md);
 `;
 
 const DetailsRow = styled.article`
@@ -34,7 +39,7 @@ const DetailsRow = styled.article`
   grid-template-columns: auto 1fr;
   grid-template-rows: 1fr;
   gap: 0.9rem;
-  border-top: 2px solid var(--color-grey-500);
+  border-top: 2px solid var(--color-green-700);
   color: var(--color-grey-800);
   padding: 1rem;
   @media ${bp_sizes.sm} {
@@ -50,17 +55,24 @@ const CabinImg = styled.img`
   width: 28rem;
 `;
 
-const Paragraph = styled.p`
-  text-wrap: balance;
-  text-align: justify;
-
+const Paragraph = styled(GuestParagraph)`
   overflow: auto;
-  word-wrap: normal;
   height: 19rem;
+`;
+
+const HeadingContainer = styled.span`
+  display: flex;
+  justify-content: space-between;
+  //convert to a column on small screens
+  @media ${bp_sizes.sm} {
+    flex-direction: column;
+  }
 `;
 
 function CabinDetailsBox({ cabin }) {
   // console.log(cabin.id);
+  const navigate = useNavigate();
+  const { isAuthenticated, isAnonymous } = useUser();
   const { isLoading, error, bookingDates } = useBookingDates(cabin.id);
 
   if (error) return <div>ERROR: {error}</div>;
@@ -69,9 +81,14 @@ function CabinDetailsBox({ cabin }) {
     <SlideInY>
       <StyledCabinDetailsBox>
         <DetailsLayout>
-          <Heading as="h2">
-            {cabin.name} for {cabin.maxCapacity} Guests
-          </Heading>
+          <HeadingContainer>
+            <CabinSketchHeading as="h2">
+              {cabin.name} for {cabin.maxCapacity} Guests
+            </CabinSketchHeading>
+            <CabinSketchHeading as="h3">
+              {formatCurrency(cabin.regularPrice - cabin.discount)} per night
+            </CabinSketchHeading>
+          </HeadingContainer>
           <DetailsRow>
             <CabinImg
               src={cabin.imageUrl}
@@ -81,19 +98,21 @@ function CabinDetailsBox({ cabin }) {
               <Paragraph>{cabin.description}</Paragraph>
             </div>
           </DetailsRow>
-          <DetailsRow>
-            <Heading as="h3">
-              {formatCurrency(cabin.regularPrice)} per night
-            </Heading>
-            {isLoading ? (
-              <SpinnerMini />
-            ) : (
-              <CabinDatePicker
-                reservedDates={bookingDates}
-                cabinId={cabin.id}
-              />
-            )}
-          </DetailsRow>
+          {isLoading ? (
+            <SpinnerMini />
+          ) : isAuthenticated || isAnonymous ? (
+            <CabinDatePicker reservedDates={bookingDates} cabinId={cabin.id} />
+          ) : (
+            <Button
+              size="small"
+              variation="secondary"
+              $guest={true}
+              onClick={() => navigate('../guest')}
+            >
+              Please Sign Up To Book <br /> or check availability
+            </Button>
+          )}
+          {/* </DetailsRow> */}
         </DetailsLayout>
       </StyledCabinDetailsBox>
     </SlideInY>

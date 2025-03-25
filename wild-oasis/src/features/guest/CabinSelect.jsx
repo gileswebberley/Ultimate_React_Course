@@ -7,6 +7,7 @@ import { useCabinFilters } from '../cabins/useCabinFilters';
 import Heading from '../../ui/Heading';
 import CabinSelectSort from './CabinSelectSort';
 import SlideInY from '../../ui/SlideInY';
+import CabinSketchHeading from '../../ui/CabinSketchHeading';
 
 const StyledCabinSelect = styled.div`
   display: flex;
@@ -31,7 +32,9 @@ function CabinSelect() {
 
   return (
     <>
-      <Heading as="h1">Let&#39;s Find Your Perfect Cabin</Heading>
+      <CabinSketchHeading as="h1">
+        Let&#39;s Find Your Perfect Cabin
+      </CabinSketchHeading>
       {/* <CabinTableOperations /> */}
       <CabinSelectSort />
       <StyledCabinSelect>

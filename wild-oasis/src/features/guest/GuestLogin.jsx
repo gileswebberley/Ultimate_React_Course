@@ -10,6 +10,7 @@ function GuestLogin() {
       <Button
         size="small"
         variation="secondary"
+        $guest={true}
         onClick={() => navigate('../guest')}
       >
         <HiArrowRightEndOnRectangle />

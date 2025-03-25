@@ -4,7 +4,7 @@ import SpinnerTiny from '../../ui/SpinnerTiny';
 import ButtonGroup from '../../ui/ButtonGroup';
 import { useLogout } from './useLogout';
 
-function Logout() {
+function Logout({ guest = false }) {
   const { logout, isLoggingOut } = useLogout();
 
   return (
@@ -14,6 +14,7 @@ function Logout() {
         variation="secondary"
         onClick={logout}
         disabled={isLoggingOut}
+        $guest={guest}
       >
         {isLoggingOut ? <SpinnerTiny /> : <HiArrowRightOnRectangle />}
         {/* Log-Out */}

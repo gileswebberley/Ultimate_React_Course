@@ -4,7 +4,7 @@ import ButtonGroup from './ButtonGroup';
 import { useDarkMode } from '../context/DarkModeContext';
 import { useRef } from 'react';
 
-function DarkModeToggle() {
+function DarkModeToggle({ guest = false }) {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const focusRef = useRef(null);
 
@@ -22,6 +22,7 @@ function DarkModeToggle() {
         onClick={handleClick}
         size="small"
         variation="secondary"
+        $guest={guest}
       >
         {isDarkMode ? <HiOutlineSun /> : <HiOutlineMoon />}
       </Button>

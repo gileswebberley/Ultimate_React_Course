@@ -8,13 +8,15 @@ import Login from '../features/authentication/Login';
 import Logout from '../features/authentication/Logout';
 import UserHome from '../features/authentication/UserHome';
 import { useDarkMode } from '../context/DarkModeContext';
+import { bp_sizes } from '../styles/breakpoints';
+import CabinSketchHeading from './CabinSketchHeading';
 
 //I made the dark mode change the baground gradient because it looked better with the theme affected buttons
 const StyledHeader = styled.header`
   display: flex;
   position: relative;
   justify-content: space-between;
-  align-items: flex-end;
+  /* align-items: flex-end; */
   padding-left: 3%;
   ${(props) =>
     props.$dark
@@ -50,24 +52,39 @@ const HeaderNavSection = styled.div`
   gap: 0.8rem;
 `;
 
+const HeaderTagline = styled.span`
+  color: var(--color-brown);
+  transform: rotate(0.5deg) translateY(2.5rem);
+  @media (${bp_sizes.lg}) {
+    display: none;
+  }
+`;
+
 function GuestHeader() {
   const { isAuthenticated, isAnonymous } = useUser();
   const { isDarkMode } = useDarkMode();
   return (
     <StyledHeader $dark={isDarkMode}>
       <LogoSmall />
+      <HeaderTagline>
+        <CabinSketchHeading style={{ color: 'var(--color-brown)' }} as="h1">
+          Not All Who Wander Are Lost
+        </CabinSketchHeading>
+      </HeaderTagline>
       <HeaderNav>
-        {isAnonymous || isAuthenticated ? (
+        {(isAnonymous || isAuthenticated) && (
           <HeaderNavSection>
-            <UserAvatar />
-            <Logout />
+            <UserAvatar guest={true} />
+            <Logout guest={true} />
           </HeaderNavSection>
-        ) : (
-          <GuestLogin />
         )}
         <HeaderNavSection>
-          {!isAuthenticated ? <Login /> : <UserHome />}
-          <DarkModeToggle />
+          {!isAuthenticated ? (
+            <Login guest={true} />
+          ) : (
+            <UserHome guest={true} />
+          )}
+          <DarkModeToggle guest={true} />
         </HeaderNavSection>
       </HeaderNav>
     </StyledHeader>

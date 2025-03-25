@@ -11,14 +11,17 @@ import Heading from '../../ui/Heading';
 import { useGuestSignIn } from './useGuestSignIn';
 import { useNavigate } from 'react-router-dom';
 import SlideInY from '../../ui/SlideInY';
+import CabinSketchHeading from '../../ui/CabinSketchHeading';
+import GuestTitleArea from '../../ui/GuestTitleArea';
 
 const StyledGuestForm = styled.div`
   padding: 2.4rem 4rem;
 
   /* Box */
-  max-width: 68rem;
-  place-self: center;
-  background-color: var(--color-grey-0);
+  width: 100%;
+  max-width: 78rem;
+  justify-self: center;
+  background-color: var(--color-grey-100-alpha);
   border: 1px solid var(--color-grey-100);
   border-radius: var(--border-radius-md);
   margin-top: 2rem;
@@ -26,18 +29,18 @@ const StyledGuestForm = styled.div`
 
 const FormTitle = styled.div`
   padding-bottom: 2.4rem;
-  max-width: 68rem;
+  max-width: 78rem;
   place-self: center;
 `;
 
 function GuestForm() {
   const { signInGuest, isSigningInGuest } = useGuestSignIn();
   const { setName, setEmail, setCountry, setNationalId } = useGuestApiContext();
-  const {
-    fullName: guestName,
-    email: guestEmail,
-    nationalId: guestNId,
-  } = useGuestContext();
+  // const {
+  //   fullName: guestName,
+  //   email: guestEmail,
+  //   nationalId: guestNId,
+  // } = useGuestContext();
   // console.log(`guest: ${guestName}`);
   const navigate = useNavigate();
   let countryName = null,
@@ -79,12 +82,17 @@ function GuestForm() {
   }
   return (
     <SlideInY>
-      <FormTitle>
-        <Heading as="h1" style={{ textAlign: 'center' }}>
-          Please tell us about yourself so we can set you up as a guest and find
-          you your perfect break
-        </Heading>
-      </FormTitle>
+      <GuestTitleArea>
+        <CabinSketchHeading as="h1" style={{ textAlign: 'center' }}>
+          Please tell us about yourself so we can set you up as a guest and plan
+          your perfect break
+        </CabinSketchHeading>
+        <br />
+        <CabinSketchHeading as="h4">
+          rest assured we will not use your details for spam and we certainly
+          won't ever pass them onto third parties
+        </CabinSketchHeading>
+      </GuestTitleArea>
       <StyledGuestForm>
         <CompoundRegisteredForm
           submitFn={onSubmit}
@@ -109,7 +117,11 @@ function GuestForm() {
             labelStr="Email address"
             validationObj={{ required: 'Please provide your email' }}
           />
-          <Heading as="h4">Optional:</Heading>
+          <Heading as="h4">
+            Optional
+            <br />
+            <i>let us know when you arrive</i>
+          </Heading>
           <CompoundRegisteredForm.Input
             elementID="nationalId"
             labelStr="National ID / Passport #"

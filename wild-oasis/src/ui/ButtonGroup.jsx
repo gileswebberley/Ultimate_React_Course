@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import { bp_sizes } from '../styles/breakpoints';
 
 const StyledButtonGroup = styled.nav`
   display: flex;
@@ -18,6 +19,9 @@ const ButtonSet = styled.nav`
   gap: 1.2rem;
   width: 100%;
   max-width: fit-content;
+  @media (${bp_sizes.sm}) {
+    flex-direction: column;
+  }
 `;
 // set justify prop to change positioning, ie 'end' for the right and 'start' for the left
 function ButtonGroup({ children, justify = 'end' }) {

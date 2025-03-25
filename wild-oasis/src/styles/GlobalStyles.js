@@ -15,7 +15,8 @@ const GlobalStyles = createGlobalStyle`
   --color-brand-600:rgb(100, 143, 108);
   --color-brand-700:rgb(73, 142, 85);
   --color-brand-800:rgb(41, 114, 54);
-  --color-brand-900:rgb(27, 79, 37); 
+  --color-brand-900:rgb(27, 79, 37);
+  --color-brown: #5e2e05; 
   --border-radius-tiny: 3px;
   --border-radius-sm: 5px;
   --border-radius-md: 7px;
@@ -133,6 +134,11 @@ html {
 body {
   font-family: "Poppins", sans-serif;
   color: var(--color-grey-900);
+  //stop words from being broken as standard  
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
 
   transition: color 0.3s, background-color 0.3s;
   min-height: 100vh;

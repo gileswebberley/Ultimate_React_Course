@@ -3,6 +3,8 @@ import styled, { css } from 'styled-components';
 
 const SlideInYTransition = styled.div`
   opacity: 0;
+  max-width: fit-content;
+  justify-content: center;
   transition: opacity 1.8s ease-out;
   ${(props) =>
     props.$inView &&

@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components';
 
+//$guest prop introduced to re-use components in the guest site as they were a bit ugly with the standard colours
 const sizes = {
   small: css`
     font-size: 1.2rem;
@@ -81,6 +82,14 @@ const Button = styled.button`
   box-shadow: var(--shadow-sm);
   ${(props) => sizes[props.size]}
   ${(props) => variations[props.variation]}
+  ${(props) =>
+    props.$guest &&
+    props.variation === 'secondary' &&
+    css`
+      background-color: var(--color-yellow-100);
+      color: var(--color-yellow-700);
+      border: 1px solid var(--color-green-700);
+    `}
 `;
 
 //now that we're using the props functionality we'll set up some defaults like so, this way if we don't pass in the expected props it will fallback onto this styling
