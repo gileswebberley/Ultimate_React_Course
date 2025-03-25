@@ -15,6 +15,7 @@ const StyledHeader = styled.header`
   position: relative;
   justify-content: space-between;
   align-items: flex-end;
+  padding-left: 3%;
   ${(props) =>
     props.$dark
       ? css`
