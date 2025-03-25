@@ -208,75 +208,75 @@ img {
   filter: grayscale(var(--image-grayscale)) opacity(var(--image-opacity));
 }
 
-//taking over the styling of react-datepicker when it's inline
+//taking over the styling of react-datepicker when it's inline - this has suddenly stopped working!! It seems that adding !important to everything has forced the overrides to take effect again :/
 .react-datepicker {
-  font-family: "Poppins", helvetica, arial, sans-serif;
-  font-size: inherit;
-  background-color: var(--color-brand-600);
-  color: #000;
-  border: 2px solid var(--color-brand-600);
-  border-radius: var(--border-radius-sm);
-  display: inline-block;
-  position: relative;
-  line-height: inherit;
+  font-family: "Poppins", helvetica, arial, sans-serif !important;
+  font-size: inherit !important;
+  background-color: var(--color-brand-600) !important;
+  color: #000 !important;
+  border: 2px solid var(--color-brand-600) !important;
+  border-radius: var(--border-radius-sm) !important;
+  display: inline-block !important;
+  position: relative !important;
+  line-height: inherit !important;
 }
 .react-datepicker__month-container {
-  float: none;
-  color:var(--color-brand-900);
+  float: none !important;
+  color:var(--color-brand-900) !important;
 }
 .react-datepicker__current-month {
-  margin-top: 0;
-  color: #000;
-  font-weight: bold;
-  font-size: 1.6rem;
+  margin-top: 0 !important;
+  color: #000 !important;
+  font-weight: bold !important;
+  font-size: 1.6rem !important;
 }
 
 .react-datepicker__day-name,
 .react-datepicker__day,
 .react-datepicker__time-name {
-  color: #000;
-  display: inline-block;
-  width: 2.7rem;
-  text-align: center;
+  color: #000 !important;
+  display: inline-block !important;
+  width: 2.7rem !important;
+  text-align: center !important;
 }
 .react-datepicker__day:not([aria-disabled=true]):hover{
-  border-radius: 0.3rem;
-  background-color:var(--color-grey-400);
+  border-radius: 0.3rem !important;
+  background-color:var(--color-grey-400) !important;
 }
 
 .react-datepicker__day--today{
-  font-weight: 600;
-  color: var(--color-green-100);
-  border: 1px dotted var(--color-green-100);
+  font-weight: 600 !important;
+  color: var(--color-green-100) !important;
+  border: 1px dotted var(--color-green-100) !important;
 }
 
 .react-datepicker__day--selected, .react-datepicker__day--in-selecting-range, .react-datepicker__day--in-range{
-  border-radius: 0.3rem;
-  background-color: #216ba5;
-  color: #fff;
+  border-radius: 0.3rem !important;
+  background-color: #216ba5 !important;
+  color: #fff !important;
 }
 
 .react-datepicker__day--selected:not([aria-disabled=true]):hover, .react-datepicker__day--in-selecting-range:not([aria-disabled=true]):hover, .react-datepicker__day--in-range:not([aria-disabled=true]):hover{
-  background-color:#85a9c5;
+  background-color:#85a9c5 !important;
 }
 
 .react-datepicker__day--in-selecting-range:not(.react-datepicker__day--in-range){
-  background-color: rgba(33, 107, 165, 0.5);
+  background-color: rgba(33, 107, 165, 0.5) !important;
 }
 
 .react-datepicker__day--disabled{
-  cursor: default;
-  color: var(--color-red-700);
-  text-decoration: line-through;
+  cursor: default !important;
+  color: var(--color-red-700) !important;
+  text-decoration: line-through !important;
 }
 
 .react-datepicker__header {
   /* text-align: center; */
-  background-color: var()(--color-brand-50);
-  border-bottom: 1px solid #aeaeae;
-  border-top-left-radius: 0.3rem;
-  padding: 8px 0;
-  position: relative;
+  background-color: var(--color-brand-50) !important;
+  border-bottom: 1px solid #aeaeae !important;
+  border-top-left-radius: 0.3rem !important;
+  padding: 8px 0 !important;
+  position: relative !important;
 }
 
 `;

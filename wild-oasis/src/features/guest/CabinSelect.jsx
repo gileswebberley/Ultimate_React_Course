@@ -31,7 +31,7 @@ function CabinSelect() {
 
   return (
     <>
-      <Heading as="h1">Our Cabins</Heading>
+      <Heading as="h1">Let&#39;s Find Your Perfect Cabin</Heading>
       {/* <CabinTableOperations /> */}
       <CabinSelectSort />
       <StyledCabinSelect>
