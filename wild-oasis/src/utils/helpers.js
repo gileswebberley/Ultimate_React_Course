@@ -60,6 +60,13 @@ export function getNextClearDate(reservedDatesArray, date = new Date()) {
   return date;
 }
 
+export const dateFormatterLong = new Intl.DateTimeFormat('en-GB', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
 export const formatCurrency = (value) => {
   //going to remove the fractional part if they are .00 as they are not needed
   //apparently value | 0 is an efficient way to achieve the same as Math.floor with bitwise OR, although it might be a little bit dodgy cos it's only meant for integers. so we're saying "if the value rounded down is less than the original value then there must be a fractional part in the value"

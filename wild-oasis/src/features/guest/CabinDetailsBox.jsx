@@ -88,7 +88,10 @@ function CabinDetailsBox({ cabin }) {
             {isLoading ? (
               <SpinnerMini />
             ) : (
-              <CabinDatePicker reservedDates={bookingDates} />
+              <CabinDatePicker
+                reservedDates={bookingDates}
+                cabinId={cabin.id}
+              />
             )}
           </DetailsRow>
         </DetailsLayout>

@@ -1,30 +1,58 @@
-import { addDays, eachDayOfInterval } from 'date-fns';
+import {
+  areIntervalsOverlapping,
+  differenceInCalendarDays,
+  eachDayOfInterval,
+} from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
-import { getNextClearDate } from '../../utils/helpers';
+import { dateFormatterLong, getNextClearDate } from '../../utils/helpers';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import Input from '../../ui/Input';
 import { useSettings } from '../settings/useSettings';
 import SpinnerMini from '../../ui/SpinnerMini';
 import toast from 'react-hot-toast';
+import Button from '../../ui/Button';
+import styled from 'styled-components';
+import Heading from '../../ui/Heading';
+import { useGuestApiContext, useGuestContext } from './GuestContext';
 
-function CabinDatePicker({ reservedDates }) {
-  const [availDate, setAvailDate] = useState(null);
+const DateContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const DateRangeHeading = styled(Heading)`
+  text-align: center;
+  color: var(--color-green-700);
+`;
+
+function flattenDateRange(dateRangeObject) {
+  return dateRangeObject
+    .map((dateRange) =>
+      eachDayOfInterval({
+        start: dateRange.startDate,
+        end: dateRange.endDate,
+      })
+    )
+    .flat();
+}
+
+function CabinDatePicker({ reservedDates, cabinId }) {
+  const [availDate, setAvailDate] = useState();
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   //get the settings cos we've got a maximum booking length to implement
   const { isLoading, error, settings } = useSettings();
+  const { setStay } = useGuestApiContext();
+  //   const {
+  //     startDate: savedStart,
+  //     endDate: savedEnd,
+  //     cabinID: savedId,
+  //   } = useGuestContext();
+
   //we want to block out all the days that are already booked so they cannot be selected - I'm creating a flat array of all the dates so I can use an includes statement
   const allBookedDates = useMemo(
-    () =>
-      reservedDates
-        .map((dateRange) =>
-          eachDayOfInterval({
-            start: dateRange.startDate,
-            end: dateRange.endDate,
-          })
-        )
-        .flat(),
+    () => flattenDateRange(reservedDates),
     [reservedDates]
   );
 
@@ -36,11 +64,19 @@ function CabinDatePicker({ reservedDates }) {
     [reservedDates]
   );
 
+  //decided to make the default selected day into the first unbooked day after today because otherwise it was just randomly selecting today by default I think
   useEffect(() => {
     const clearDate = getNextClearDate(allBookedDates);
-
     setAvailDate(clearDate);
   }, [allBookedDates]);
+
+  //if there's already a stay selected we'll put it back on the calendar - this is not what I wanted and seemed a little redundant once I'd developed it
+  //   useEffect(() => {
+  //     if (+savedId === +cabinId && !startDate && !endDate) {
+  //       setStartDate(savedStart);
+  //       setEndDate(savedEnd);
+  //     }
+  //   }, [cabinId, endDate, savedEnd, savedId, savedStart, startDate]);
 
   if (isLoading) return <SpinnerMini />;
   if (error)
@@ -56,24 +92,105 @@ function CabinDatePicker({ reservedDates }) {
     // setAvailDate(null);
   }
 
+  function addDatesToBooking() {
+    //check that the stay isn't too long (notice it takes the end date first)
+    const stayLength = differenceInCalendarDays(endDate, startDate);
+    // console.log(stayLength);
+    if (
+      stayLength > settings.maxBookingLength ||
+      stayLength < settings.minBookingLength
+    ) {
+      toast.error(
+        `Unfortunately we require your stay to be between ${settings.minBookingLength} and ${settings.maxBookingLength} days in duration and you have selected ${stayLength} overnight`
+      );
+      return;
+    }
+    //check that our range hasn't been selected across already booked dates
+    let isClear = true;
+    //I want to break out of the loop if I find an overlap so used for-of rather than forEach
+    for (const reservedRange of reservedDates) {
+      if (
+        areIntervalsOverlapping(
+          { start: reservedRange.startDate, end: reservedRange.endDate },
+          { start: startDate, end: endDate },
+          { inclusive: true }
+        )
+      ) {
+        isClear = false;
+        break;
+      }
+    }
+    // console.log(`isClear: ${isClear}`);
+    if (!isClear) {
+      toast.error(
+        'You seem to have unavailable dates in your selected date range, please avoid the dates marked in red '
+      );
+      setEndDate(null);
+      return;
+    }
+
+    setStay(startDate, endDate, cabinId);
+    toast.success(
+      `We can't wait to host you between ${dateFormatterLong.format(
+        startDate
+      )} and ${dateFormatterLong.format(endDate)}`
+    );
+    clearDates();
+  }
+
+  function clearDates() {
+    setStartDate(null);
+    setEndDate(null);
+    setAvailDate(null);
+  }
+
   return (
-    <DatePicker
-      selected={availDate}
-      minDate={availDate}
-      //   maxDate={addDays(startDate, settings?.maxBookingLength)}
-      onChange={handleDateSelect}
-      excludeDateIntervals={dpFormatDateRanges}
-      startDate={startDate}
-      endDate={endDate}
-      //   todayButton="Go To Today"
-      selectsRange
-      swapRange
-      //   selectsDisabledDaysInRange
-      //   fixedHeight
-      customInput={<Input />}
-      dateFormat="do MMMM yyyy"
-      inline
-    />
+    <DateContainer>
+      <DatePicker
+        selected={availDate}
+        minDate={availDate}
+        //   maxDate={addDays(startDate, settings?.maxBookingLength)}
+        onChange={handleDateSelect}
+        excludeDateIntervals={dpFormatDateRanges}
+        startDate={startDate}
+        endDate={endDate}
+        //   todayButton="Go To Today"
+        selectsRange
+        swapRange
+        //   selectsDisabledDaysInRange
+        //   fixedHeight
+        // customInput={<Input />}
+        dateFormat="do MMMM yyyy"
+        inline
+      />
+      {(startDate || endDate) && (
+        <>
+          {/* <ButtonGroup> */}
+          <Button
+            size="small"
+            variation="secondary"
+            onClick={() => {
+              clearDates();
+            }}
+          >
+            Clear Selected Dates
+          </Button>
+          {startDate && endDate && (
+            <Button
+              size="small"
+              variation="primary"
+              onClick={addDatesToBooking}
+            >
+              Select Stay
+            </Button>
+          )}
+          {/* </ButtonGroup> */}
+          <DateRangeHeading as="h4">{`${startDate.toDateString()} - ${
+            endDate?.toDateString() ?? ''
+          }`}</DateRangeHeading>
+        </>
+      )}
+    </DateContainer>
   );
 }
 

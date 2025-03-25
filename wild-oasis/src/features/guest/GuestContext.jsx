@@ -16,6 +16,9 @@ const initialState = {
   nationalId: '',
   nationality: '',
   countryFlag: '',
+  startDate: null,
+  endDate: null,
+  cabinID: null,
 };
 
 function reducer(state, action) {
@@ -32,13 +35,29 @@ function reducer(state, action) {
         nationality: action.payload.country,
         countryFlag: action.payload.flag,
       };
+
+    case 'setStay':
+      return {
+        ...state,
+        startDate: action.payload.start,
+        endDate: action.payload.end,
+        cabinID: action.payload.cabinId,
+      };
+    case 'clearStay':
+      return {
+        ...state,
+        startDate: null,
+        endDate: null,
+        cabinID: null,
+      };
     default:
       throw new Error('Guest context does not recognise the action type');
   }
 }
 
+//So I've used anonymous sign-in alomg with the meta-data I can store with it for most of this but now we're getting into putting the booking together I've decided to repurpose it for that
 function GuestContextProvider({ children }) {
-  const { user, isCheckingUser, isAnonymous } = useUser();
+  // const { user, isCheckingUser, isAnonymous } = useUser();
   const [state, dispatch] = useReducer(reducer, initialState);
   //seperating concerns, so put the setter functions in one context and the readable state in the other
   const api = useMemo(() => {
@@ -54,26 +73,14 @@ function GuestContextProvider({ children }) {
     const setCountry = (country, flag) => {
       dispatch({ type: 'setCountry', payload: { country, flag } });
     };
-
-    return { setName, setEmail, setNationalId, setCountry };
+    const setStay = (start, end, cabinId) => {
+      dispatch({ type: 'setStay', payload: { start, end, cabinId } });
+    };
+    const clearStay = () => {
+      dispatch({ type: 'clearStay' });
+    };
+    return { setName, setEmail, setNationalId, setCountry, setStay, clearStay };
   }, [dispatch]);
-
-  // //in case a reload clears the context but the guest has already filled out the form
-  // useEffect(() => {
-  //   if (isCheckingUser) return;
-  //   if (isAnonymous) {
-  //     const data = user.user_metadata;
-  //     dispatch({ type: 'setName', payload: data.fullName });
-  //     dispatch({ type: 'setEmail', payload: data.email });
-  //     dispatch({
-  //       type: 'setCountry',
-  //       payload: { country: data.country, flag: data.avatar },
-  //     });
-  //     dispatch({ type: 'setNationalId', payload: data.nationalId });
-  //   }
-  // }, [user, isCheckingUser, isAnonymous]);
-
-  // console.table(state);
 
   return (
     <GuestApiContext.Provider value={api}>
