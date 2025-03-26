@@ -11,10 +11,12 @@ import GuestParagraph from '../../ui/GuestParagraph';
 import { useUser } from '../authentication/useUser';
 import Button from '../../ui/Button';
 import { useNavigate } from 'react-router-dom';
+import Spinner from '../../ui/Spinner';
 
 const StyledCabinDetailsBox = styled.div`
   display: block;
   background-color: var(--color-grey-100-alpha);
+  border: 1px solid var(--color-grey-100);
   border-radius: var(--border-radius-xl);
   padding: 3rem;
   min-width: 26rem;
@@ -72,10 +74,13 @@ const HeadingContainer = styled.span`
 function CabinDetailsBox({ cabin }) {
   // console.log(cabin.id);
   const navigate = useNavigate();
-  const { isAuthenticated, isAnonymous } = useUser();
+  const { isCheckingUser, isAuthenticated, isAnonymous } = useUser();
   const { isLoading, error, bookingDates } = useBookingDates(cabin.id);
 
   if (error) return <div>ERROR: {error}</div>;
+  if (isCheckingUser || isLoading) return <Spinner />;
+
+  // function handleSelection() {}
 
   return (
     <SlideInY>
@@ -101,7 +106,11 @@ function CabinDetailsBox({ cabin }) {
           {isLoading ? (
             <SpinnerMini />
           ) : isAuthenticated || isAnonymous ? (
-            <CabinDatePicker reservedDates={bookingDates} cabinId={cabin.id} />
+            <CabinDatePicker
+              reservedDates={bookingDates}
+              cabinId={cabin.id}
+              // onSelected={handleSelection}
+            />
           ) : (
             <Button
               size="small"

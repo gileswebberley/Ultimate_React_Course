@@ -4,6 +4,7 @@ import {
   differenceInDays,
   add,
   addDays,
+  eachDayOfInterval,
 } from 'date-fns';
 
 // We want to make this function work for both Date objects and strings (which come from Supabase)
@@ -60,6 +61,17 @@ export function getNextClearDate(reservedDatesArray, date = new Date()) {
   return date;
 }
 
+export function flattenDateRange(dateRangeObject) {
+  return dateRangeObject
+    .map((dateRange) =>
+      eachDayOfInterval({
+        start: dateRange.startDate,
+        end: dateRange.endDate,
+      })
+    )
+    .flat();
+}
+
 export const dateFormatterLong = new Intl.DateTimeFormat('en-GB', {
   weekday: 'long',
   day: 'numeric',
@@ -76,7 +88,7 @@ export const formatCurrency = (value) => {
       currency: 'GBP',
     }).format(value);
   } else {
-    //remove those redundant decimal digits...
+    //remove those redundant decimal part digits...
     return new Intl.NumberFormat('en', {
       style: 'currency',
       currency: 'GBP',
@@ -84,6 +96,10 @@ export const formatCurrency = (value) => {
     }).format(value);
   }
 };
+
+export function getDisplayName(fullName) {
+  return fullName?.split(' ').shift();
+}
 
 export const camelToFlat = (c) => {
   c = c.replace(/[A-Z]/g, ' $&');

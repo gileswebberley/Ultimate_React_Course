@@ -19,6 +19,21 @@ export async function getCabins() {
   return { data, count };
 }
 
+export async function getCabinById(id) {
+  const { data, error } = await supabase
+    .from('cabins')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error(error);
+    throw new Error('Could not load cabin data');
+  }
+
+  return { data };
+}
+
 /**
  * @typedef {Object} CabinObject An object that reflects the data required for a cabin entry in the database table 'cabins'
  * @property {String} name Cabin name

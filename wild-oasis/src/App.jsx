@@ -16,10 +16,12 @@ import GuestLayout from './ui/GuestLayout';
 // import ProtectedRoute from './ui/ProtectedRoute';
 import SpinnerFullPage from './ui/SpinnerFullPage';
 import Welcome from './pages/Welcome';
+// import CompleteBooking from './pages/CompleteBooking';
 // import CabinDetails from './pages/CabinDetails';
 // import CreateGuest from './pages/CreateGuest';
 const CreateGuest = lazy(() => import('./pages/CreateGuest'));
 const CabinDetails = lazy(() => import('./pages/CabinDetails'));
+const CompleteBooking = lazy(() => import('./pages/CompleteBooking'));
 const ProtectedRoute = lazy(() => import('./ui/ProtectedRoute'));
 const AppLayout = lazy(() => import('./ui/AppLayout'));
 // const GlobalStyles = lazy(() => import('./styles/GlobalStyles'));
@@ -75,6 +77,10 @@ function App() {
                   <Route path="welcome" element={<Welcome />} />
                   <Route path="guest" element={<CreateGuest />} />
                   <Route path="cabin-details" element={<CabinDetails />} />
+                  <Route
+                    path="booking-details/:cabinId"
+                    element={<CompleteBooking />}
+                  />
                 </Route>
                 {/* We're going to wrap these routes in a protected one now that we have started to implement authentication */}
                 <Route

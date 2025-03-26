@@ -3,6 +3,8 @@ import styled, { css } from 'styled-components';
 
 const SlideInYTransition = styled.div`
   opacity: 0;
+  /* min-height: 0 is to fix a firefox quirk where the cabins were scrolling off the top of the page */
+  min-height: 0;
   max-width: fit-content;
   justify-content: center;
   transition: opacity 1.8s ease-out;

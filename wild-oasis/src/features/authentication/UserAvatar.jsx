@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components';
 import { useUser } from './useUser';
 import SpinnerMini from '../../ui/SpinnerMini';
+import { getDisplayName } from '../../utils/helpers';
 
 //$guest prop introduced to re-use components in the guest site as they were a bit ugly with the standard colours
 const StyledUserAvatar = styled.div`
@@ -48,7 +49,7 @@ const NameBox = styled.span`
 export default function UserAvatar({ guest = false }) {
   const { user, isCheckingUser } = useUser();
   const { fullName, avatar } = user?.user_metadata ?? {};
-  const displayName = fullName?.split(' ').shift();
+  const displayName = getDisplayName(fullName);
 
   return (
     <>

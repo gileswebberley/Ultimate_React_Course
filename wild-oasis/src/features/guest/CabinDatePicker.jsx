@@ -1,10 +1,10 @@
-import {
-  areIntervalsOverlapping,
-  differenceInCalendarDays,
-  eachDayOfInterval,
-} from 'date-fns';
+import { areIntervalsOverlapping, differenceInCalendarDays } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
-import { dateFormatterLong, getNextClearDate } from '../../utils/helpers';
+import {
+  dateFormatterLong,
+  flattenDateRange,
+  getNextClearDate,
+} from '../../utils/helpers';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useSettings } from '../settings/useSettings';
@@ -13,7 +13,10 @@ import toast from 'react-hot-toast';
 import Button from '../../ui/Button';
 import styled from 'styled-components';
 import Heading from '../../ui/Heading';
-import { useGuestApiContext, useGuestContext } from './GuestContext';
+import { useGuestApiContext } from './GuestContext';
+import { useNavigate } from 'react-router-dom';
+import { useAddBookingToGuest } from './useAddBookingToGuest';
+import SpinnerTiny from '../../ui/SpinnerTiny';
 
 const DateContainer = styled.div`
   display: flex;
@@ -26,29 +29,16 @@ const DateRangeHeading = styled(Heading)`
   color: var(--color-green-700);
 `;
 
-function flattenDateRange(dateRangeObject) {
-  return dateRangeObject
-    .map((dateRange) =>
-      eachDayOfInterval({
-        start: dateRange.startDate,
-        end: dateRange.endDate,
-      })
-    )
-    .flat();
-}
-
 function CabinDatePicker({ reservedDates, cabinId }) {
+  const navigate = useNavigate();
   const [availDate, setAvailDate] = useState();
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   //get the settings cos we've got a maximum booking length to implement
   const { isLoading, error, settings } = useSettings();
+  //I'm moving away from thinking that a context is a good way to take care of this now and instead I am going to add it to the guest user in the db
   const { setStay } = useGuestApiContext();
-  //   const {
-  //     startDate: savedStart,
-  //     endDate: savedEnd,
-  //     cabinID: savedId,
-  //   } = useGuestContext();
+  const { isUpdatingGuest, updateGuest } = useAddBookingToGuest();
 
   //we want to block out all the days that are already booked so they cannot be selected - I'm creating a flat array of all the dates so I can use an includes statement
   const allBookedDates = useMemo(
@@ -69,14 +59,6 @@ function CabinDatePicker({ reservedDates, cabinId }) {
     const clearDate = getNextClearDate(allBookedDates);
     setAvailDate(clearDate);
   }, [allBookedDates]);
-
-  //if there's already a stay selected we'll put it back on the calendar - this is not what I wanted and seemed a little redundant once I'd developed it
-  //   useEffect(() => {
-  //     if (+savedId === +cabinId && !startDate && !endDate) {
-  //       setStartDate(savedStart);
-  //       setEndDate(savedEnd);
-  //     }
-  //   }, [cabinId, endDate, savedEnd, savedId, savedStart, startDate]);
 
   if (isLoading) return <SpinnerMini />;
   if (error)
@@ -130,12 +112,14 @@ function CabinDatePicker({ reservedDates, cabinId }) {
     }
 
     setStay(startDate, endDate, cabinId);
+    updateGuest({ startDate, endDate, cabinId });
     toast.success(
       `We can't wait to host you between ${dateFormatterLong.format(
         startDate
       )} and ${dateFormatterLong.format(endDate)}`
     );
-    clearDates();
+    // clearDates();
+    navigate(`../booking-details/${cabinId}`);
   }
 
   function clearDates() {
@@ -169,6 +153,7 @@ function CabinDatePicker({ reservedDates, cabinId }) {
           <Button
             size="small"
             variation="secondary"
+            disabled={isUpdatingGuest}
             onClick={() => {
               clearDates();
             }}
@@ -179,15 +164,20 @@ function CabinDatePicker({ reservedDates, cabinId }) {
             <Button
               size="small"
               variation="primary"
+              disabled={isUpdatingGuest}
               onClick={addDatesToBooking}
             >
               Select Stay
             </Button>
           )}
           {/* </ButtonGroup> */}
-          <DateRangeHeading as="h4">{`${startDate.toDateString()} - ${
-            endDate?.toDateString() ?? ''
-          }`}</DateRangeHeading>
+          <DateRangeHeading as="h4">
+            {isUpdatingGuest ? (
+              <SpinnerTiny />
+            ) : (
+              `${startDate.toDateString()} - ${endDate?.toDateString() ?? ''}`
+            )}
+          </DateRangeHeading>
         </>
       )}
     </DateContainer>

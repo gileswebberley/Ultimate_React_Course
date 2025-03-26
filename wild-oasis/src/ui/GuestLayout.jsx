@@ -7,7 +7,7 @@ import { useDarkMode } from '../context/DarkModeContext';
 const StyledGuestLayout = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto 1fr auto;
   height: 100vh;
 `;
 
@@ -23,16 +23,17 @@ const BackgroundImage = styled.div`
   z-index: -1;
   width: 110vw;
   height: 110vh;
+  background-image: url('/wild-oasis-bg.jpg');
   ${(props) =>
     props.$dark
       ? css`
           //dark and moody for dark mode
-          background-image: url('./wild-oasis-bg.jpg');
+          /* background-image: url('./wild-oasis-bg.jpg'); */
           filter: brightness(40%) blur(var(--bg-blur-amount));
         `
       : css`
           //light and airy in light mode
-          background-image: url('./wild-oasis-bg.jpg');
+          /* background-image: url('./wild-oasis-bg.jpg'); */
           filter: contrast(30%) brightness(160%) blur(var(--bg-blur-amount));
         `}
   /* There was a white border from the blur so this is to get rid of that */
