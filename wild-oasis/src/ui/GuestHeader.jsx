@@ -54,7 +54,7 @@ const HeaderNavSection = styled.div`
 
 const HeaderTagline = styled.span`
   color: var(--color-brown);
-  transform: rotate(0.5deg) translateY(2.5rem);
+  transform: rotate(-0.5deg) translateY(2.5rem) translateX(-2rem);
   @media (${bp_sizes.lg}) {
     display: none;
   }
