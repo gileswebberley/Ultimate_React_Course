@@ -113,11 +113,11 @@ function CabinDatePicker({ reservedDates, cabinId }) {
 
     setStay(startDate, endDate, cabinId);
     updateGuest({ startDate, endDate, cabinId });
-    toast.success(
-      `We can't wait to host you between ${dateFormatterLong.format(
-        startDate
-      )} and ${dateFormatterLong.format(endDate)}`
-    );
+    // toast.success(
+    //   `We can't wait to host you between ${dateFormatterLong.format(
+    //     startDate
+    //   )} and ${dateFormatterLong.format(endDate)}`
+    // );
     // clearDates();
     navigate(`../booking-details/${cabinId}`);
   }

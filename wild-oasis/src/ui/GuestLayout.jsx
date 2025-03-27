@@ -23,17 +23,15 @@ const BackgroundImage = styled.div`
   z-index: -1;
   width: 110vw;
   height: 110vh;
-  background-image: url('/wild-oasis-bg.jpg');
+  background-image: url('../wild-oasis-bg.jpg');
   ${(props) =>
     props.$dark
       ? css`
           //dark and moody for dark mode
-          /* background-image: url('./wild-oasis-bg.jpg'); */
           filter: brightness(40%) blur(var(--bg-blur-amount));
         `
       : css`
           //light and airy in light mode
-          /* background-image: url('./wild-oasis-bg.jpg'); */
           filter: contrast(30%) brightness(160%) blur(var(--bg-blur-amount));
         `}
   /* There was a white border from the blur so this is to get rid of that */
@@ -42,11 +40,10 @@ const BackgroundImage = styled.div`
   background-size: cover;
 `;
 
-// box-sizing and min-height seemed to make this a solid content holder that centres evryything vertically and horizontally - phew :/
 const PageContent = styled.main`
   display: flex;
   flex-direction: column;
-  box-sizing: content-box;
+  /* box-sizing: content-box; */
   height: 100%;
   width: 100%;
   min-height: fit-content;

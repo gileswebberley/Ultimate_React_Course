@@ -25,7 +25,7 @@ const Container = styled.div`
 function Welcome() {
   const navigate = useNavigate();
   const { isAnonymous, isAuthenticated } = useUser();
-  const loggedIn = isAnonymous || isAuthenticated;
+  const isLoggedIn = isAnonymous || isAuthenticated;
   return (
     <SlideInY>
       <GuestTitleArea>
@@ -47,15 +47,14 @@ function Welcome() {
           you to reconnect with nature and create cherished memories together.
         </GuestParagraph>
         <ButtonGroup>
-          {/* {!loggedIn ? ( */}
-          <Button onClick={() => navigate('../guest')}>
-            Start Your Booking
-          </Button>
-          {/* ) : ( */}
+          {!isLoggedIn && (
+            <Button onClick={() => navigate('../guest')}>
+              Start Your Booking
+            </Button>
+          )}
           <Button onClick={() => navigate('../cabin-details')}>
             View Our Cabins
           </Button>
-          {/* )} */}
         </ButtonGroup>
       </Container>
     </SlideInY>
