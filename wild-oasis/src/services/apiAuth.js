@@ -228,7 +228,6 @@ export async function updateCurrentUser({ fullName, avatar, oldAvatar }) {
 }
 
 export async function updateUserPassword(password) {
-  console.log(password);
   const { data: passwordUpdate, error: passwordError } =
     await supabase.auth.updateUser(password);
   if (passwordError)

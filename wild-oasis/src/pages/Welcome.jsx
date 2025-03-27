@@ -7,25 +7,24 @@ import { useUser } from '../features/authentication/useUser';
 import GuestTitleArea from '../ui/GuestTitleArea';
 import CabinSketchHeading from '../ui/CabinSketchHeading';
 import GuestParagraph from '../ui/GuestParagraph';
-import { bp_sizes } from '../styles/breakpoints';
+import GuestContainer from '../ui/GuestContainer';
+import Spinner from '../ui/Spinner';
 
-const Container = styled.div`
-  max-width: 78rem;
-  display: grid;
-  gap: 3rem;
+const Container = styled(GuestContainer)`
   grid-template-rows: 1fr auto;
   grid-template-columns: 1fr;
-  padding: 2.4rem 4rem;
-  margin: 1rem 1rem;
-  background-color: var(--color-grey-100-alpha);
-  border: 1px solid var(--color-grey-100);
-  border-radius: var(--border-radius-xl);
 `;
 
 function Welcome() {
   const navigate = useNavigate();
-  const { isAnonymous, isAuthenticated } = useUser();
+  const { isCheckingUser, isAnonymous, isAuthenticated, user } = useUser();
+
+  if (isCheckingUser) return <Spinner />;
+
   const isLoggedIn = isAnonymous || isAuthenticated;
+  const bookingCabin = user?.user_metadata?.cabinId;
+  console.log(bookingCabin);
+
   return (
     <SlideInY>
       <GuestTitleArea>
@@ -50,6 +49,13 @@ function Welcome() {
           {!isLoggedIn && (
             <Button onClick={() => navigate('../guest')}>
               Start Your Booking
+            </Button>
+          )}
+          {bookingCabin && (
+            <Button
+              onClick={() => navigate(`../booking-details/${bookingCabin}`)}
+            >
+              Complete Your Booking
             </Button>
           )}
           <Button onClick={() => navigate('../cabin-details')}>
