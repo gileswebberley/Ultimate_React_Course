@@ -75,6 +75,20 @@ export async function addBookingDetailsToGuestUser({
   return updateData;
 }
 
+export async function addDetailsToGuestUser(detailsObj) {
+  const { data: updateData, error: updateError } =
+    await supabase.auth.updateUser({
+      data: { ...detailsObj },
+    });
+
+  if (updateError) {
+    throw new Error(`Guest user update failed: 
+        ERROR: ${updateError.message}`);
+  }
+  console.table(updateData);
+  return updateData;
+}
+
 export async function signUp({ email, password, fullName }) {
   //Thanks to Hiroshi on Udemy for this solution to be able to create a user without signing in as them :)
   // Save the current session before signing up a new user - (TODO - try getUser as it's safer!!)

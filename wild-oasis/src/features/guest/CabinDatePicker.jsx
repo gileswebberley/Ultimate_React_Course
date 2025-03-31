@@ -1,10 +1,6 @@
 import { areIntervalsOverlapping, differenceInCalendarDays } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
-import {
-  dateFormatterLong,
-  flattenDateRange,
-  getNextClearDate,
-} from '../../utils/helpers';
+import { flattenDateRange, getNextClearDate } from '../../utils/helpers';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useSettings } from '../settings/useSettings';
@@ -17,6 +13,7 @@ import { useGuestApiContext } from './GuestContext';
 import { useNavigate } from 'react-router-dom';
 import { useAddBookingToGuest } from './useAddBookingToGuest';
 import SpinnerTiny from '../../ui/SpinnerTiny';
+import { useAddDetailsToGuest } from './useAddDetailsToGuest';
 
 const DateContainer = styled.div`
   display: flex;
@@ -38,7 +35,7 @@ function CabinDatePicker({ reservedDates, cabinId }) {
   const { isLoading, error, settings } = useSettings();
   //I'm moving away from thinking that a context is a good way to take care of this now and instead I am going to add it to the guest user in the db
   const { setStay } = useGuestApiContext();
-  const { isUpdatingGuest, updateGuest } = useAddBookingToGuest();
+  const { isUpdatingGuest, updateGuest } = useAddDetailsToGuest();
 
   //we want to block out all the days that are already booked so they cannot be selected - I'm creating a flat array of all the dates so I can use an includes statement
   const allBookedDates = useMemo(
@@ -71,7 +68,6 @@ function CabinDatePicker({ reservedDates, cabinId }) {
     const [start, end] = dates;
     setStartDate(start);
     setEndDate(end);
-    // setAvailDate(null);
   }
 
   function addDatesToBooking() {
@@ -110,15 +106,8 @@ function CabinDatePicker({ reservedDates, cabinId }) {
       setEndDate(null);
       return;
     }
-
     setStay(startDate, endDate, cabinId);
     updateGuest({ startDate, endDate, cabinId });
-    // toast.success(
-    //   `We can't wait to host you between ${dateFormatterLong.format(
-    //     startDate
-    //   )} and ${dateFormatterLong.format(endDate)}`
-    // );
-    // clearDates();
     navigate(`../booking-details/${cabinId}`);
   }
 
@@ -133,23 +122,18 @@ function CabinDatePicker({ reservedDates, cabinId }) {
       <DatePicker
         selected={availDate}
         minDate={availDate}
-        //   maxDate={addDays(startDate, settings?.maxBookingLength)}
         onChange={handleDateSelect}
         excludeDateIntervals={dpFormatDateRanges}
         startDate={startDate}
         endDate={endDate}
-        //   todayButton="Go To Today"
         selectsRange
         swapRange
-        //   selectsDisabledDaysInRange
-        //   fixedHeight
-        // customInput={<Input />}
         dateFormat="do MMMM yyyy"
         inline
       />
       {(startDate || endDate) && (
         <>
-          {/* <ButtonGroup> */}
+          {/* <ButtonGroup> removed so the buttons create full width rows as it looks nice */}
           <Button
             size="small"
             variation="secondary"

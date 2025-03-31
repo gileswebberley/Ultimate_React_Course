@@ -19,6 +19,9 @@ import Range from '../../ui/Range';
 import ButtonGroup from '../../ui/ButtonGroup';
 import Button from '../../ui/Button';
 import FormRow from '../../ui/FormRow';
+import Textarea from '../../ui/Textarea';
+import { useAddDetailsToGuest } from './useAddDetailsToGuest';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled(GuestContainer)`
   grid-template-rows: auto 1fr auto;
@@ -46,10 +49,14 @@ function BookingForm() {
   const { isCheckingUser, user } = useUser();
   const { isLoading: isLoadingCabin, error, cabin } = useCabin();
   const { isLoading, settings } = useSettings();
+  const { isUpdatingGuest, updateGuest } = useAddDetailsToGuest();
 
+  //Controlled elements
   const [guests, setGuests] = useState(0);
   const [breakfast, setBreakfast] = useState(false);
   const [natId, setNatId] = useState('');
+  const [notes, setNotes] = useState('');
+  const navigate = useNavigate();
 
   if (isCheckingUser || isLoading || isLoadingCabin) return <Spinner />;
 
@@ -65,6 +72,19 @@ function BookingForm() {
 
   function handleSubmit(e) {
     e.preventDefault();
+    let data = {
+      totalGuests: Number(+guests + 1),
+      additionalNotes: notes,
+      hasBreakfast: breakfast,
+    };
+    if (!nationalId && natId) {
+      data = { ...data, nationalId: natId };
+    }
+    //Create the booking or simply add this final information to the user as we have everything else?
+
+    updateGuest(data, {
+      onSuccess: () => navigate('../confirm-booking'),
+    });
     // console.log(e.target);
   }
 
@@ -95,13 +115,14 @@ function BookingForm() {
               max={cabin.maxCapacity - 1}
               value={guests}
               onChange={(e) => setGuests(e.target.value)}
+              disabled={isUpdatingGuest}
             />
           </NoErrorRow>
           <CheckboxRow>
             <Checkbox
               checked={breakfast}
               onChange={() => setBreakfast((val) => !val)}
-              // disabled={isAddingBreakfast}
+              disabled={isUpdatingGuest}
               id="addBreakfast"
             >
               <details>
@@ -120,6 +141,25 @@ function BookingForm() {
               </details>
             </Checkbox>
           </CheckboxRow>
+          <NoErrorRow>
+            <label htmlFor="notes">
+              <details>
+                <summary>Additional Notes</summary>
+                Let us know if you have any special requests or stuff you&#39;d
+                like us to know about you and your guests to make your stay as
+                relaxing as possible.{' '}
+                {breakfast &&
+                  'If you have any dietary requirements please mention those here too so your breakfast can be the perfect start to your day.'}
+              </details>
+            </label>
+            <Textarea
+              id="notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              disabled={isUpdatingGuest}
+              alt="Additional Notes"
+            />
+          </NoErrorRow>
           {!nationalId && (
             <NoErrorRow>
               <label htmlFor="nId">
@@ -133,6 +173,7 @@ function BookingForm() {
                 id="nId"
                 value={natId}
                 onChange={(e) => setNatId(e.target.value)}
+                disabled={isUpdatingGuest}
                 alt="National ID input"
               />
             </NoErrorRow>

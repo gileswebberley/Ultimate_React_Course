@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { bp_sizes } from '../styles/breakpoints';
 
 const Textarea = styled.textarea`
   padding: 0.8rem 1.2rem;
@@ -8,6 +9,10 @@ const Textarea = styled.textarea`
   box-shadow: var(--shadow-sm);
   min-width: 20rem;
   height: 8rem;
+  @media (${bp_sizes.md}) {
+    min-width: 100%;
+    min-height: 10rem;
+  }
 `;
 
 export default Textarea;
