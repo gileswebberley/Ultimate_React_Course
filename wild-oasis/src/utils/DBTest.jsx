@@ -3,7 +3,6 @@ import { useIndexedDB } from '../hooks/useIndexedDB';
 import { useEffect } from 'react';
 import { iDB } from './shared_constants';
 import Spinner from '../ui/Spinner';
-import { addDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
 const TestContainer = styled.div`
@@ -17,7 +16,6 @@ function DBTest() {
     errors,
     data,
     getCurrentData,
-    updateCurrentData,
     createCurrentObject,
     currentObjectId,
   } = useIndexedDB(iDB.name, [iDB.store], iDB.key);
@@ -34,15 +32,6 @@ function DBTest() {
   useEffect(() => {
     if (!isDBBusy) getCurrentData(iDB.store);
   }, [isDBBusy, getCurrentData]);
-
-  const updateTest = () => {
-    if (!isDBBusy) {
-      updateCurrentData(iDB.store, {
-        startDate: new Date(),
-        endDate: addDays(new Date(), 5),
-      });
-    }
-  };
 
   const navigate = useNavigate();
 

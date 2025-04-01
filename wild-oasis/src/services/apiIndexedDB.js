@@ -10,14 +10,9 @@ export let defaultKeyPath = iDB.key;
 //so we can have the uuid for each store ie {[storeName]: uuid}
 export let keyPathRegister = { [iDB.store]: iDB.key };
 
-//example {fullName:'', guestId: undefined, etc}
-// export function setSchema(schemaObject) {
-//   dbSchema = { ...schemaObject };
-// }
-
-//schemaUniqueId is the string name of the property of your schema that you wish to use as the unique id for the object you are storing - eg for our booking we'll probably make it the guestId that is generated when the guest anonymously signs in or a uuid for that booking session, bit I'm trying to keep it flexible
+//schemaUniqueId is the string name of the property of your schema that you wish to use as the unique id for the object you are storing - eg for our booking we'll probably make it the guestId that is generated when the guest anonymously signs in or a uuid for that booking session, I'm just trying to keep it flexible
 //for our first use of this we'll probably have storeName as 'bookings' then each entry will be a booking{} - {bookingId:uuid, startDate: Date, endDate: Date, cabinId:Number, totalGuests: number, hasBreakfast: Boolean, notes: String}
-//I'm wondering whether to make the uuid self generated, perhaps with a create entry function?
+//I'm wondering whether to make the uuid self generated, perhaps with a create entry function - see createNewDBObject
 export function initDB(dbName, storeNamesArray, schemaUniqueProperty) {
   return new Promise((resolve, reject) => {
     //check that the browser supports it first
