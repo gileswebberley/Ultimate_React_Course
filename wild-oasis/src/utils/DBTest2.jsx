@@ -19,7 +19,7 @@ function DBTest2() {
     updateCurrentData,
     createCurrentObject,
     currentObjectId,
-  } = useIndexedDB(iDB.name, [iDB.store], iDB.key);
+  } = useIndexedDB(iDB.name);
 
   // useEffect(() => {
   //   if (!isDBBusy && !currentObjectId)

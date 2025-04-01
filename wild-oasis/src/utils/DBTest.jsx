@@ -17,17 +17,17 @@ function DBTest() {
     data,
     getCurrentData,
     createCurrentObject,
-    currentObjectId,
-  } = useIndexedDB(iDB.name, [iDB.store], iDB.key);
+    currentObjectIdState,
+  } = useIndexedDB(iDB.name, [{ name: iDB.store, key: iDB.key }], iDB.key);
 
   useEffect(() => {
-    if (!isDBBusy && !currentObjectId)
+    if (!isDBBusy && !currentObjectIdState)
       createCurrentObject(iDB.store, {
         guestId: 67,
         cabinId: 12,
         totalGuests: 5,
       });
-  }, [isDBBusy, createCurrentObject, currentObjectId]);
+  }, [isDBBusy, createCurrentObject, currentObjectIdState]);
 
   useEffect(() => {
     if (!isDBBusy) getCurrentData(iDB.store);

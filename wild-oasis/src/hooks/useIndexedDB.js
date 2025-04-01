@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
+  addKeyPathRegister,
   createNewDBObject,
+  defaultKeyPath,
   deleteDB,
   getDBEntry,
   initDB,
+  setDefaultKeyPath,
   updateDBEntry,
 } from '../services/apiIndexedDB';
 import { useLocalStorageState } from './useLocalStorageState';
 
-//realised this wouldn't persist so trying to fix that otherwise it's useless - seems to be a solution from my small tests - nope, a reload obviously gets rid of it so I've decided to use a tiny local storage entry instead
-// let currentObjectId = null;
-
-export function useIndexedDB(dbName, storeNamesArray, schemaUniqueProperty) {
+export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
   //all of the state to register to
   const [db, setDb] = useState(null);
   const [data, setData] = useState(null);
@@ -22,14 +22,27 @@ export function useIndexedDB(dbName, storeNamesArray, schemaUniqueProperty) {
     null,
     'currentIDBObject'
   );
+  //we want to be able to change the default key but also have it set to something if it's not passed as an argument. This should be called on the first instantiation of the db
+  if (
+    (!defaultKeyPath || defaultKeyPath === 'keyId') &&
+    defaultKey !== defaultKeyPath
+  ) {
+    setDefaultKeyPath(defaultKey);
+  }
 
-  console.log(`local store: ${currentObjectIdState}`);
+  //let's also set the registry if we have passed a store array in (which means we're setting up the stores when opening the connection)
+  if (storeArray.length !== 0) {
+    storeArray.forEach((store) => {
+      addKeyPathRegister(store.name, store.key ?? defaultKey);
+    });
+  }
+
   //ended up in hell loops when calling this in a useEffect inside the component using it so found a solution by having constants defined in shared_constants when 'using' this custom hook
   useEffect(() => {
     const initialiseDB = () => {
-      initDB(dbName, storeNamesArray, schemaUniqueProperty)
+      initDB(dbName, storeArray)
         .then((response) => {
-          setIsDBBusy(false);
+          //   setIsDBBusy(false);
           setDb(response);
         })
         .catch((error) => {
@@ -40,10 +53,11 @@ export function useIndexedDB(dbName, storeNamesArray, schemaUniqueProperty) {
         });
     };
     if (!db) initialiseDB();
-  }, [db, dbName, schemaUniqueProperty, storeNamesArray]);
+  }, [db, dbName, storeArray]);
 
   //I'm using the useCallback on these as I believe that stops them being reproduced every time a bit of state is altered however I am still unsure about memoisation tbh.
 
+  //Private function
   const resetAll = useCallback(() => {
     setDb(null);
     setData(null);
@@ -66,6 +80,22 @@ export function useIndexedDB(dbName, storeNamesArray, schemaUniqueProperty) {
     [setCurrentObjectIdState]
   );
 
+  //should this change the current object to this id or leave it as a seperate function - just thinking, you might want to get other data whilst working on the current object so it's probably best not - I'll add a move reference function rather than open the state to fiddling with directly. I also use this for getting the current data so that would be making changes that are not required
+  const getDataById = useCallback((storeName, objectId) => {
+    setIsDBBusy(true);
+    getDBEntry(storeName, objectId)
+      .then((data) => {
+        //setCurrentObjectIdState(objectId);
+        setData(data);
+      })
+      .catch((err) =>
+        console.error(
+          `Could not get data from ${storeName} with id ${objectId}: ${err}`
+        )
+      )
+      .finally(setIsDBBusy(false));
+  }, []);
+
   //does what it says on the tin I think, I decided to just keep a reference to whatever data (entry) we wanted to work on so that it can look after it's own state if that makes sense
   const getCurrentData = useCallback(
     (storeName) => {
@@ -73,51 +103,40 @@ export function useIndexedDB(dbName, storeNamesArray, schemaUniqueProperty) {
         console.log('No current object set');
         return;
       }
-      setIsDBBusy(true);
-      getDBEntry(storeName, currentObjectIdState)
-        .then((data) => setData(data))
-        .catch((err) =>
-          console.error(
-            `Could not get data from ${storeName} with id ${currentObjectIdState}: ${err}`
-          )
-        )
-        .finally(setIsDBBusy(false));
+      getDataById(storeName, currentObjectIdState);
     },
-    [currentObjectIdState]
+    [currentObjectIdState, getDataById]
   );
 
-  const getDataById = useCallback(
-    (storeName, objectId) => {
+  const updateDataById = useCallback(
+    (storeName, uid, data) => {
       setIsDBBusy(true);
-      getDBEntry(storeName, objectId)
-        .then((data) => {
-          setCurrentObjectIdState(objectId);
-          setData(data);
-        })
+      updateDBEntry(storeName, uid, data)
+        .then((data) => getCurrentData(storeName))
         .catch((err) =>
           console.error(
-            `Could not get data from ${storeName} with id ${objectId}: ${err}`
+            `Could not update data from ${storeName} with id ${uid}: ${err}`
           )
         )
         .finally(setIsDBBusy(false));
     },
-    [setCurrentObjectIdState]
+    [getCurrentData]
   );
 
   const updateCurrentData = useCallback(
     (storeName, data) => {
       if (!currentObjectIdState) return;
-      setIsDBBusy(true);
-      updateDBEntry(storeName, currentObjectIdState, data)
-        .then((data) => getCurrentData(storeName))
-        .catch((err) =>
-          console.error(
-            `Could not update data from ${storeName} with id ${currentObjectIdState}: ${err}`
-          )
-        )
-        .finally(setIsDBBusy(false));
+      updateDataById(storeName, currentObjectIdState, data);
     },
-    [currentObjectIdState, getCurrentData]
+    [currentObjectIdState, updateDataById]
+  );
+
+  //indirect access to change the 'current' entry
+  const moveCurrentReference = useCallback(
+    (newId) => {
+      setCurrentObjectIdState(newId);
+    },
+    [setCurrentObjectIdState]
   );
 
   const deleteDatabase = useCallback(
@@ -138,8 +157,10 @@ export function useIndexedDB(dbName, storeNamesArray, schemaUniqueProperty) {
     errors,
     data,
     currentObjectIdState,
-    getCurrentData,
     getDataById,
+    updateDataById,
+    moveCurrentReference,
+    getCurrentData,
     createCurrentObject,
     updateCurrentData,
     deleteDatabase,

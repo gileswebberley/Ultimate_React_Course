@@ -1,37 +1,48 @@
 import { v4 as createUUID } from 'uuid';
-import { iDB } from '../utils/shared_constants';
 
-// let request;
 let db = null;
 let version = 1;
-// let dbSchema = {};
 //so we can set this up in the custom hook that uses it
-export let defaultKeyPath = iDB.key;
+export let defaultKeyPath;
+export const setDefaultKeyPath = (key) => (defaultKeyPath = key);
 //so we can have the uuid for each store ie {[storeName]: uuid}
-export let keyPathRegister = { [iDB.store]: iDB.key };
+let keyPathRegister = {};
+export const addKeyPathRegister = (storeName, keyName) => {
+  if (
+    Object.hasOwn(keyPathRegister, storeName) &&
+    keyPathRegister[storeName] !== keyName
+  ) {
+    //it's already set so we want to change it
+    keyPathRegister[storeName] = keyName;
+    return;
+  } else {
+    keyPathRegister = { ...keyPathRegister, [storeName]: keyName };
+  }
+};
 
 //schemaUniqueId is the string name of the property of your schema that you wish to use as the unique id for the object you are storing - eg for our booking we'll probably make it the guestId that is generated when the guest anonymously signs in or a uuid for that booking session, I'm just trying to keep it flexible
 //for our first use of this we'll probably have storeName as 'bookings' then each entry will be a booking{} - {bookingId:uuid, startDate: Date, endDate: Date, cabinId:Number, totalGuests: number, hasBreakfast: Boolean, notes: String}
-//I'm wondering whether to make the uuid self generated, perhaps with a create entry function - see createNewDBObject
-export function initDB(dbName, storeNamesArray, schemaUniqueProperty) {
+
+//let's make it so the stores are sent through as an array of objects that contain the name and key properties eg [{name:'booking', key: 'guestId'}]
+export function initDB(dbName, storeArray) {
   return new Promise((resolve, reject) => {
     //check that the browser supports it first
     if (!window.indexedDB) reject('indexedDB is not supported in your browser');
-    //After developing for a bit and getting to understand how it works it has become apparent that you can simply add properties to existing objects (entries) so don't have to define a schema
-    // if (Object.keys(dbSchema).length === 0)
-    //   reject('Please set up your db schema before initialising the indexedDB');
-    if (!schemaUniqueProperty) schemaUniqueProperty = defaultKeyPath;
     const request = indexedDB.open(dbName, version);
     //if there's no db with the name defined set up yet then this will run before onsuccess - however you can only set up stores when opening a new database, you can't add stores later it seems!
     request.onupgradeneeded = (e) => {
       db = e.target.result;
-      storeNamesArray.forEach((storeName) => {
-        //if the DB store doesn't exist yet then create it
-        if (!doesStoreExist(storeName)) {
-          console.log(`Creating ${storeName} DB store...`);
-          keyPathRegister[storeName] = schemaUniqueProperty;
+      storeArray.forEach((store) => {
+        //just trying to make it look after bad calls, if the key property is missing we'll just use the deafult that we have set
+        if (!Object.hasOwn(store, 'key')) {
+          store.key = defaultKeyPath;
+        }
+        if (!doesStoreExist(store.name)) {
+          //if the DB store doesn't exist yet then create it
+          console.log(`Creating ${store.name} DB store...`);
+          addKeyPathRegister(store.name, store.key);
           //otherwise safely create the store
-          db.createObjectStore(storeName, { keyPath: schemaUniqueProperty });
+          db.createObjectStore(store.name, { keyPath: store.key });
         }
       });
 
@@ -43,7 +54,7 @@ export function initDB(dbName, storeNamesArray, schemaUniqueProperty) {
     request.onsuccess = (e) => {
       db = e.target.result; // this is request.result in tutorial but like this on mdn guide
       console.log(`DB ${dbName} opened successfully`);
-      //   console.log(keyPathRegister);
+      console.log(`keyPathRegister is: ${JSON.stringify(keyPathRegister)}`);
       resolve(db);
     };
 
@@ -55,25 +66,24 @@ export function initDB(dbName, storeNamesArray, schemaUniqueProperty) {
 
 //I want to be able to remove this from the user's computer when I'm finished with it
 export function deleteDB(dbName) {
-  if (typeof db !== 'undefined') {
-    // db.close();
-    const closeRequest = indexedDB.deleteDatabase(dbName);
-
-    closeRequest.onblocked = () => {
-      console.error(`${dbName} was blocked from closing`);
-    };
-
-    closeRequest.onerror = () => {
-      console.error(`There was an error whilst trying to delete ${dbName}`);
-    };
-
-    closeRequest.onsuccess = () => {
-      console.log(`The database ${dbName} was successfully deleted`);
-      db = null;
-    };
-  } else {
-    console.log(`${dbName} does not exist and therefore could not be deleted`);
+  //check whether the db we're trying to delete is the currently opened one in which case we must close it so that the deletion isn't blocked
+  if (db.name === dbName) {
+    db.close();
   }
+  const deleteRequest = indexedDB.deleteDatabase(dbName);
+
+  deleteRequest.onblocked = () => {
+    console.error(`${dbName} was blocked from closing`);
+  };
+
+  deleteRequest.onerror = () => {
+    console.error(`There was an error whilst trying to delete ${dbName}`);
+  };
+
+  deleteRequest.onsuccess = () => {
+    console.log(`The database ${dbName} was successfully deleted`);
+    db = null;
+  };
 }
 
 //helper function
@@ -94,14 +104,14 @@ export function addToDB(storeName, data) {
 
     transaction.oncomplete = (e) => {
       console.log(
-        'Adding to db completed: transaction.oncomplete returns:' + e.target
+        `Adding data through this transaction to ${storeName} has completed`
       );
     };
 
     const store = transaction.objectStore(storeName);
     const request = store.put(data);
     request.onsuccess = (e) => {
-      console.log('request.onsuccess returns:' + e.target.result);
+      //resolving here rather than in the oncomplete as this is the keyPath id for the data which we've just added and that information isn't available in oncomplete
       resolve(e.target.result);
     };
   });
@@ -116,14 +126,9 @@ export function createNewDBObject(storeName, data = {}) {
       );
     }
     const key = keyPathRegister[storeName];
-    console.log(
-      `Key stored is ${key} that matches defaultKeyPath? ${
-        key === defaultKeyPath
-      } and the data is:`
-    );
-    console.table(data);
     if (key === defaultKeyPath && !Object.hasOwn(data, key)) {
       //our keyPath is the default and isn't being defined in the data object so create a uuid
+      console.log(`Creating a uuid for the ${key} of the new object`);
       const keyPathValue = createUUID();
       data = { ...data, [key]: keyPathValue };
     }
@@ -131,6 +136,7 @@ export function createNewDBObject(storeName, data = {}) {
     (async () => {
       try {
         const success = await addToDB(storeName, data);
+        //resolve with the keyPath value for this data
         return resolve(success);
       } catch (error) {
         return reject(
