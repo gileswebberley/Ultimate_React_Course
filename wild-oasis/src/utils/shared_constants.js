@@ -10,3 +10,10 @@ export const IS_PAGINATED = {
 };
 //freezing so that it can only be set here, in one place, to avoid losing track of it. It's meant to be a simple configuration type system after all.
 Object.freeze(IS_PAGINATED);
+
+//try to get the indexedDB working across pages
+export const iDB = {
+  name: 'CabinBookingDB',
+  store: 'booking',
+  key: 'guestId',
+};

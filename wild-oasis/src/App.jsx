@@ -16,6 +16,8 @@ import GuestLayout from './ui/GuestLayout';
 // import ProtectedRoute from './ui/ProtectedRoute';
 import SpinnerFullPage from './ui/SpinnerFullPage';
 import Welcome from './pages/Welcome';
+import DBTest from './utils/DBTest';
+import DBTest2 from './utils/DBTest2';
 // import CompleteBooking from './pages/CompleteBooking';
 // import CabinDetails from './pages/CabinDetails';
 // import CreateGuest from './pages/CreateGuest';
@@ -81,6 +83,8 @@ function App() {
                     path="booking-details/:cabinId"
                     element={<CompleteBooking />}
                   />
+                  <Route path="dbtest" element={<DBTest />} />
+                  <Route path="dbtest2" element={<DBTest2 />} />
                 </Route>
                 {/* We're going to wrap these routes in a protected one now that we have started to implement authentication */}
                 <Route
