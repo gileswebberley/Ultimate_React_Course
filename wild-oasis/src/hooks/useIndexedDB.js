@@ -119,7 +119,10 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
 
   const updateCurrentData = useCallback(
     (storeName, data) => {
-      if (!currentObjectIdState) return;
+      if (!currentObjectIdState) {
+        setErrors('There is no current object set that can be updated');
+        return;
+      }
       updateDataById(storeName, currentObjectIdState, data);
     },
     [currentObjectIdState, updateDataById]
@@ -156,12 +159,19 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
     [setCurrentObjectIdState, getDataById]
   );
 
-  const deleteCurrentObject = useCallback((storeName) => {
-    startConnection();
-    deleteEntry(storeName, currentObjectIdState)
-      .catch((err) => setErrors(err))
-      .finally(setIsDBBusy(false));
-  }, []);
+  const deleteCurrentObject = useCallback(
+    (storeName) => {
+      startConnection();
+      deleteEntry(storeName, currentObjectIdState)
+        .then(() => {
+          setCurrentObjectIdState(null);
+          setData(null);
+        })
+        .catch((err) => setErrors(err.message))
+        .finally(setIsDBBusy(false));
+    },
+    [currentObjectIdState, setCurrentObjectIdState]
+  );
 
   //indirect access to change the 'current' entry
   const moveCurrentReference = useCallback(

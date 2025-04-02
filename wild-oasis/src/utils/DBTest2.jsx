@@ -20,6 +20,7 @@ function DBTest2() {
     createCurrentObject,
     currentObjectId,
     getByNonKey,
+    deleteCurrentObject,
   } = useIndexedDB(iDB.name);
 
   //{
@@ -42,6 +43,11 @@ function DBTest2() {
       });
     }
   };
+  const deleteTest = () => {
+    if (!isDBBusy) {
+      deleteCurrentObject(iDB.store);
+    }
+  };
 
   if (isDBBusy) return <Spinner />;
 
@@ -51,6 +57,7 @@ function DBTest2() {
       <div>errors:{errors}</div>
       <div>data:{JSON.stringify(data)}</div>
       <button onClick={updateTest}>Click update</button>
+      <button onClick={deleteTest}>delete</button>
     </TestContainer>
   );
 }

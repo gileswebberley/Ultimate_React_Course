@@ -19,10 +19,7 @@ function Logo() {
 
   return (
     <StyledLogo onClick={() => navigate('../', { replace: true })}>
-      <Img
-        src={isDarkMode ? './logo-dark.png' : './logo-light.png'}
-        alt="Logo"
-      />
+      <Img src={isDarkMode ? '/logo-dark.png' : '/logo-light.png'} alt="Logo" />
     </StyledLogo>
   );
 }

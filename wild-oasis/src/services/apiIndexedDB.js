@@ -133,19 +133,19 @@ export function deleteEntry(storeName, uid) {
     if (!doesStoreExist(storeName)) {
       reject(`You have tried to access ${storeName} which doesn't exist`);
     }
-    const store = db.transaction([storeName]).objectStore(storeName);
+    const store = db
+      .transaction([storeName], 'readwrite')
+      .objectStore(storeName);
     store.onerror = (e) => {
       reject(`Failed to get store ${storeName}`);
     };
 
-    store.onsuccess = (e) => {
-      const deletion = store.delete(uid);
-      deletion.onerror = () => {
-        reject(`Could not delete entry with the ${store.keyPath}: ${uid}`);
-      };
-      deletion.onsuccess = () => {
-        resolve(true);
-      };
+    const deletion = store.delete(uid);
+    deletion.onerror = () => {
+      reject(`Could not delete entry with the ${store.keyPath}: ${uid}`);
+    };
+    deletion.onsuccess = () => {
+      resolve(true);
     };
   });
 }
