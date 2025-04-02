@@ -18,7 +18,8 @@ function DBTest() {
     getCurrentData,
     createCurrentObject,
     currentObjectIdState,
-  } = useIndexedDB(iDB.name, [{ name: iDB.store, key: iDB.key }], iDB.key);
+  } = useIndexedDB(iDB.name, [{ name: iDB.store }]); //here we are using a auto-generated keyPath as we have now implemented the search by other property functionality
+  //useIndexedDB(iDB.name, [{ name: iDB.store, key: iDB.key }], iDB.key);
 
   useEffect(() => {
     if (!isDBBusy && !currentObjectIdState)
@@ -30,8 +31,10 @@ function DBTest() {
   }, [isDBBusy, createCurrentObject, currentObjectIdState]);
 
   useEffect(() => {
-    if (!isDBBusy) getCurrentData(iDB.store);
-  }, [isDBBusy, getCurrentData]);
+    if (!isDBBusy && currentObjectIdState) {
+      getCurrentData(iDB.store);
+    }
+  }, [currentObjectIdState, getCurrentData, isDBBusy]);
 
   const navigate = useNavigate();
 
@@ -39,7 +42,6 @@ function DBTest() {
 
   return (
     <TestContainer>
-      <div>busy:{isDBBusy}</div>
       <div>errors:{errors}</div>
       <div>data:{JSON.stringify(data)}</div>
       <button onClick={() => navigate('../dbtest2')}>go to other test</button>

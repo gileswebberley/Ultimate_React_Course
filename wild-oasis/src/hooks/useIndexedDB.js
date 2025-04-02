@@ -1,18 +1,22 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  addKeyPathRegister,
   createNewDBObject,
   defaultKeyPath,
   deleteDB,
+  deleteEntry,
   getDBEntry,
+  getEntryByNonKeyValue,
+  getStoreKeyPath,
   initDB,
   setDefaultKeyPath,
   updateDBEntry,
 } from '../services/apiIndexedDB';
 import { useLocalStorageState } from './useLocalStorageState';
 
+//IMPORTANT - always include your stores when first setting up the database because you can't add them to a database that already exists and is open
 export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
-  //all of the state to register to
+  //all of the state to register to except db which is for private use in the hook
+  //I decided this shouldn't be a reference to the db itself so it is now just the name
   const [db, setDb] = useState(null);
   const [data, setData] = useState(null);
   const [errors, setErrors] = useState(null);
@@ -30,12 +34,12 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
     setDefaultKeyPath(defaultKey);
   }
 
-  //let's also set the registry if we have passed a store array in (which means we're setting up the stores when opening the connection)
-  if (storeArray.length !== 0) {
-    storeArray.forEach((store) => {
-      addKeyPathRegister(store.name, store.key ?? defaultKey);
-    });
-  }
+  //let's also set the registry if we have passed a store array in (which means we're setting up the stores when opening the connection) - hmm, this is done in the setup of the db, what if someone calls an already existing db with new stores which won't be created? Maybe we should recreate it in this case? No that would lose all of the data already in a store! I think this is mainly for use whilst testing anyway
+  //   if (storeArray.length !== 0) {
+  //     storeArray.forEach((store) => {
+  //       addKeyPathRegister(store.name, store.key ?? defaultKey);
+  //     });
+  //   }
 
   //ended up in hell loops when calling this in a useEffect inside the component using it so found a solution by having constants defined in shared_constants when 'using' this custom hook
   useEffect(() => {
@@ -52,37 +56,27 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
           setIsDBBusy(false);
         });
     };
-    if (!db) initialiseDB();
+    if (!db || db !== dbName) initialiseDB();
   }, [db, dbName, storeArray]);
 
   //I'm using the useCallback on these as I believe that stops them being reproduced every time a bit of state is altered however I am still unsure about memoisation tbh.
 
-  //Private function
+  //Private functions
   const resetAll = useCallback(() => {
     setDb(null);
     setData(null);
     setErrors(null);
     setCurrentObjectIdState(null);
-    // currentObjectId = null;
   }, [setCurrentObjectIdState]);
 
-  //This creates a new object and sets the currentObjectId to the value defined. In shared_constants we've set which property will act as the keyPath for the db (eg guestId) however if the user doesn't define a value for this property this function will create a uuid for that property
-  const createCurrentObject = useCallback(
-    (storeName, data = {}) => {
-      setIsDBBusy(true);
-      createNewDBObject(storeName, data)
-        .then((key) => {
-          //   currentObjectId = key;
-          setCurrentObjectIdState(key);
-        })
-        .finally(setIsDBBusy(false));
-    },
-    [setCurrentObjectIdState]
-  );
+  const startConnection = () => {
+    setIsDBBusy(true);
+    setErrors(null);
+  };
 
   //should this change the current object to this id or leave it as a seperate function - just thinking, you might want to get other data whilst working on the current object so it's probably best not - I'll add a move reference function rather than open the state to fiddling with directly. I also use this for getting the current data so that would be making changes that are not required
   const getDataById = useCallback((storeName, objectId) => {
-    setIsDBBusy(true);
+    startConnection();
     getDBEntry(storeName, objectId)
       .then((data) => {
         //setCurrentObjectIdState(objectId);
@@ -110,7 +104,7 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
 
   const updateDataById = useCallback(
     (storeName, uid, data) => {
-      setIsDBBusy(true);
+      startConnection();
       updateDBEntry(storeName, uid, data)
         .then((data) => getCurrentData(storeName))
         .catch((err) =>
@@ -131,6 +125,44 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
     [currentObjectIdState, updateDataById]
   );
 
+  //If you need to find an entry but don't have the value for the keyPath then you can get the first entry that has another property (valueName) with the value of searchValue - eg search for an entry that has cabinId of 12. Do I want to set the current object to this one? I think it makes sense because whatever entry we've selected should be expected to be the one we update etc
+  const getByNonKey = useCallback(
+    (storeName, valueName, searchValue) => {
+      startConnection();
+      getEntryByNonKeyValue(storeName, valueName, searchValue)
+        .then((data) => {
+          setData(data);
+          getStoreKeyPath(storeName).then((key) =>
+            setCurrentObjectIdState(data[key])
+          );
+        })
+        .catch((err) => setErrors(err))
+        .finally(setIsDBBusy(false));
+    },
+    [setCurrentObjectIdState]
+  );
+
+  //This creates a new object and sets the currentObjectId to the value defined. In shared_constants we've set which property will act as the keyPath for the db (eg guestId) however if the user doesn't define a value for this property this function will create a uuid for that property
+  const createCurrentObject = useCallback(
+    (storeName, data = {}) => {
+      startConnection();
+      createNewDBObject(storeName, data)
+        .then((key) => {
+          setCurrentObjectIdState(key); //force it not to batch so we can set the data straight afterwards...
+          getDataById(storeName, key);
+        })
+        .finally(setIsDBBusy(false));
+    },
+    [setCurrentObjectIdState, getDataById]
+  );
+
+  const deleteCurrentObject = useCallback((storeName) => {
+    startConnection();
+    deleteEntry(storeName, currentObjectIdState)
+      .catch((err) => setErrors(err))
+      .finally(setIsDBBusy(false));
+  }, []);
+
   //indirect access to change the 'current' entry
   const moveCurrentReference = useCallback(
     (newId) => {
@@ -141,7 +173,7 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
 
   const deleteDatabase = useCallback(
     (dbName) => {
-      setIsDBBusy(true);
+      startConnection();
       deleteDB(dbName)
         .then(() => {
           console.warn(`Database has been deleted permanently`);
@@ -159,10 +191,12 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
     currentObjectIdState,
     getDataById,
     updateDataById,
+    getByNonKey,
     moveCurrentReference,
     getCurrentData,
     createCurrentObject,
     updateCurrentData,
+    deleteCurrentObject,
     deleteDatabase,
   };
 }

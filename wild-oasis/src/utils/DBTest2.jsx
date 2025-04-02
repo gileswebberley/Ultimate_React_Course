@@ -19,20 +19,20 @@ function DBTest2() {
     updateCurrentData,
     createCurrentObject,
     currentObjectId,
+    getByNonKey,
   } = useIndexedDB(iDB.name);
 
-  // useEffect(() => {
-  //   if (!isDBBusy && !currentObjectId)
-  //     createCurrentObject(iDB.store, {
+  //{
   //       guestId: 67,
   //       cabinId: 12,
   //       totalGuests: 5,
-  //     });
-  // }, [isDBBusy, createCurrentObject, currentObjectId]);
+  //}
 
   useEffect(() => {
-    if (!isDBBusy) getCurrentData(iDB.store);
-  }, [isDBBusy, getCurrentData]);
+    if (!isDBBusy) {
+      getByNonKey(iDB.store, 'guestId', 67);
+    } //getCurrentData(iDB.store);}
+  }, [isDBBusy, getByNonKey]);
 
   const updateTest = () => {
     if (!isDBBusy) {
