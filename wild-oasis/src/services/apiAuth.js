@@ -12,7 +12,7 @@ export async function signInGuest({
   country,
   nationalId,
 }) {
-  const { data, error } = await supabase.auth.signInAnonymously({
+  const { error } = await supabase.auth.signInAnonymously({
     options: {
       data: { fullName, email, avatar, country, nationalId },
     },
@@ -57,24 +57,6 @@ export async function signInGuest({
 }
 
 //I have realised that a context is not the place to keep this stuff as it is not state but instead it is data. It might be better to use local storage but seeing as this can be used and they need to be online to make the booking I'll stick witht this for now
-export async function addBookingDetailsToGuestUser({
-  startDate,
-  endDate,
-  cabinId,
-}) {
-  const { data: updateData, error: updateError } =
-    await supabase.auth.updateUser({
-      data: { startDate, endDate, cabinId },
-    });
-
-  if (updateError) {
-    throw new Error(`Guest user update failed: 
-        ERROR: ${updateError.message}`);
-  }
-
-  return updateData;
-}
-
 export async function addDetailsToGuestUser(detailsObj) {
   const { data: updateData, error: updateError } =
     await supabase.auth.updateUser({

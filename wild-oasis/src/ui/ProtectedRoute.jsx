@@ -1,4 +1,4 @@
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '../features/authentication/useUser';
 import Spinner from './Spinner';
 import toast from 'react-hot-toast';

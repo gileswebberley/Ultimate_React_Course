@@ -11,7 +11,7 @@ import GuestContainer from '../ui/GuestContainer';
 import Spinner from '../ui/Spinner';
 
 const Container = styled(GuestContainer)`
-  grid-template-rows: 1fr auto;
+  grid-template-rows: auto 1fr auto;
   grid-template-columns: 1fr;
 `;
 
@@ -29,12 +29,12 @@ function Welcome() {
     <SlideInY>
       <GuestTitleArea>
         <CabinSketchHeading as="h1">WELCOME TO WILD OASIS</CabinSketchHeading>
+      </GuestTitleArea>
+      <Container>
         <CabinSketchHeading as="h2">
           It&#39;s only natural to need a break from the rush of modern life
           which is why we offer our little bit of wilderness
         </CabinSketchHeading>
-      </GuestTitleArea>
-      <Container>
         <GuestParagraph>
           We are a serene retreat nestled within the heart of a lush forest,
           where nature's beauty surrounds you at every turn. Our park offers a

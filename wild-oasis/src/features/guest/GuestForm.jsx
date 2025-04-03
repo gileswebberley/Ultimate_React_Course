@@ -4,7 +4,6 @@ import SimpleFormRow from '../../ui/SimpleFormRow';
 import ButtonGroup from '../../ui/ButtonGroup';
 import Button from '../../ui/Button';
 import toast from 'react-hot-toast';
-import { useGuestApiContext, useGuestContext } from './GuestContext';
 //for the attempt at putting the country select in here
 import countries_data from '../../data/countries_list.json';
 import Heading from '../../ui/Heading';
@@ -13,6 +12,9 @@ import { useNavigate } from 'react-router-dom';
 import SlideInY from '../../ui/SlideInY';
 import CabinSketchHeading from '../../ui/CabinSketchHeading';
 import GuestTitleArea from '../../ui/GuestTitleArea';
+import { useIndexedDB } from '../../hooks/useIndexedDB';
+import { iDB } from '../../utils/shared_constants';
+import Spinner from '../../ui/Spinner';
 
 const StyledGuestForm = styled.div`
   padding: 2.4rem 4rem;
@@ -27,25 +29,21 @@ const StyledGuestForm = styled.div`
   margin-top: 2rem;
 `;
 
-const FormTitle = styled.div`
-  padding-bottom: 2.4rem;
-  max-width: 78rem;
-  place-self: center;
-`;
-
 function GuestForm() {
   const { signInGuest, isSigningInGuest } = useGuestSignIn();
-  const { setName, setEmail, setCountry, setNationalId } = useGuestApiContext();
-  // const {
-  //   fullName: guestName,
-  //   email: guestEmail,
-  //   nationalId: guestNId,
-  // } = useGuestContext();
-  // console.log(`guest: ${guestName}`);
-  const navigate = useNavigate();
-  let countryName = null,
-    countryFlag = null;
+  //right let's get this new indexedDB system running so I'm not storing the booking on the user in supabase...here I'm creating a new db without defining a key for the store or a default override key, let it look after itself.
+  const {
+    isDBBusy,
+    errors: iDBErrors,
+    createCurrentObject,
+  } = useIndexedDB(iDB.name, [{ name: iDB.store }]);
 
+  const navigate = useNavigate();
+
+  let countryName = null;
+  let countryFlag = null;
+
+  //Callback handler for our country select form element
   function handleSelect(cn, cf) {
     countryName = cn;
     countryFlag = cf;
@@ -56,10 +54,7 @@ function GuestForm() {
       toast.error('Please select your country from the options');
       return;
     }
-    setCountry(countryName, countryFlag);
-    setName(data.fullName);
-    setEmail(data.email);
-    setNationalId(data.nationalId);
+    //This logs in as an anonymous user and also creates a guest who's id it adds to the user data
     signInGuest(
       {
         fullName: data.fullName,
@@ -69,8 +64,11 @@ function GuestForm() {
         nationalId: data.nationalId,
       },
       {
-        onSuccess: () => {
-          navigate('../cabin-details');
+        onSuccess: (data) => {
+          //Had to make this promise based so wait for then() to navigate
+          createCurrentObject(iDB.store, {
+            guestID: data.user?.user_metadata?.guestId,
+          }).then(() => navigate('../cabin-details'));
         },
       }
     );
@@ -80,6 +78,10 @@ function GuestForm() {
     toast.error(`Please make sure you have filled out all the fields
         ${error.message ? 'ERROR: ' + error.message : ''}`);
   }
+
+  if (isDBBusy) return <Spinner />;
+  if (iDBErrors) return <div>ERROR: {iDBErrors}</div>;
+
   return (
     <SlideInY>
       <GuestTitleArea>

@@ -8,7 +8,7 @@ import CabinSketchHeading from '../../ui/CabinSketchHeading';
 import { formatCurrency, getDisplayName } from '../../utils/helpers';
 import styled from 'styled-components';
 import { useSettings } from '../settings/useSettings';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Checkbox from '../../ui/Checkbox';
 import SimpleFormRow from '../../ui/SimpleFormRow';
 import Input from '../../ui/Input';
@@ -22,6 +22,7 @@ import FormRow from '../../ui/FormRow';
 import Textarea from '../../ui/Textarea';
 import { useAddDetailsToGuest } from './useAddDetailsToGuest';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const Container = styled(GuestContainer)`
   grid-template-rows: auto 1fr auto;
@@ -46,7 +47,7 @@ const NoErrorRow = styled(SimpleFormRow)`
 `;
 
 function BookingForm() {
-  const { isCheckingUser, user } = useUser();
+  const { isCheckingUser, user, isAuthenticated, isAnonymous } = useUser();
   const { isLoading: isLoadingCabin, error, cabin } = useCabin();
   const { isLoading, settings } = useSettings();
   const { isUpdatingGuest, updateGuest } = useAddDetailsToGuest();
@@ -57,6 +58,16 @@ function BookingForm() {
   const [natId, setNatId] = useState('');
   const [notes, setNotes] = useState('');
   const navigate = useNavigate();
+
+  //if not authenticated user redirect
+  useEffect(() => {
+    if (!isAuthenticated && !isAnonymous && !isCheckingUser) {
+      toast.error(
+        `Please sign up as a guest and select your cabin before visiting this page`
+      );
+      navigate('../guest');
+    }
+  }, [isAuthenticated, isCheckingUser, navigate, isAnonymous]);
 
   if (isCheckingUser || isLoading || isLoadingCabin) return <Spinner />;
 

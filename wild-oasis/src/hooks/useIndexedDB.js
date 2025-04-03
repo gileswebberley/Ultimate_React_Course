@@ -12,8 +12,10 @@ import {
   updateDBEntry,
 } from '../services/apiIndexedDB';
 import { useLocalStorageState } from './useLocalStorageState';
+import { flushSync } from 'react-dom';
 
 //IMPORTANT - always include your stores when first setting up the database because you can't add them to a database that already exists and is open
+//I'm putting some of the functionality inside Promises and using flushSync as when I first tried using it in my site the current object id was not being set and I could not navigate to another page safely. It's just a matter of putting your navigate() call inside then then() clause of the call (first discovered when trying to createCurrentObject as I submitted a form with navigation in the onsuccess callback) I think I'll just need to do it in the create and update (ie the setters) rather than the 'getters'
 export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
   //all of the state to register to except db which is for private use in the hook
   //I decided this shouldn't be a reference to the db itself so it is now just the name
@@ -69,32 +71,43 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
     setCurrentObjectIdState(null);
   }, [setCurrentObjectIdState]);
 
+  //We don't want these state changes batched as we want isDBBusy to act as a lock flag
   const startConnection = () => {
-    setIsDBBusy(true);
-    setErrors(null);
+    console.log('Starting db connection...');
+    flushSync(() => {
+      setIsDBBusy(true);
+      setErrors(null);
+    });
   };
 
-  //should this change the current object to this id or leave it as a seperate function - just thinking, you might want to get other data whilst working on the current object so it's probably best not - I'll add a move reference function rather than open the state to fiddling with directly. I also use this for getting the current data so that would be making changes that are not required
+  //should this change the current object to this id or leave it as a seperate function - just thinking, you might want to get other data whilst working on the current object so it's probably best not - I'll add a move reference function rather than open the state to fiddling with directly. I also use this for getting the current data so that would be making changes that are not required. Had to put this in a promise because it is used by the update data methods and they also rely on this to set isDBBusy to false!!
   const getDataById = useCallback((storeName, objectId) => {
     startConnection();
-    getDBEntry(storeName, objectId)
-      .then((data) => {
-        //setCurrentObjectIdState(objectId);
-        setData(data);
-      })
-      .catch((err) =>
-        console.error(
-          `Could not get data from ${storeName} with id ${objectId}: ${err}`
+    return new Promise((resolve) => {
+      getDBEntry(storeName, objectId)
+        .then((data) => {
+          //setCurrentObjectIdState(objectId);
+          flushSync(() => {
+            setData(data);
+          });
+        })
+        .catch((err) =>
+          setErrors(
+            `Could not get data from ${storeName} with id ${objectId}: ${err}`
+          )
         )
-      )
-      .finally(setIsDBBusy(false));
+        .finally(() => {
+          setIsDBBusy(false);
+          resolve(true);
+        });
+    });
   }, []);
 
-  //does what it says on the tin I think, I decided to just keep a reference to whatever data (entry) we wanted to work on so that it can look after it's own state if that makes sense
+  //does what it says on the tin I think, I decided to just keep a reference to whatever data (entry) we wanted to work on so that it can look after it's own state if that makes sense. getDataById looks after the isDBBusy state so not needed here I don't think. Also I don't see a use-case where this will need a Promise as I don't think people will be doing any navigating after calling this...I wait to be proved wrong though
   const getCurrentData = useCallback(
     (storeName) => {
       if (!currentObjectIdState) {
-        console.log('No current object set');
+        setErrors('No current object set');
         return;
       }
       getDataById(storeName, currentObjectIdState);
@@ -104,26 +117,40 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
 
   const updateDataById = useCallback(
     (storeName, uid, data) => {
-      startConnection();
-      updateDBEntry(storeName, uid, data)
-        .then((data) => getCurrentData(storeName))
-        .catch((err) =>
-          console.error(
-            `Could not update data from ${storeName} with id ${uid}: ${err}`
+      return new Promise((resolve) => {
+        startConnection();
+        updateDBEntry(storeName, uid, data)
+          .then((data) =>
+            getDataById(storeName, uid).then(() => {
+              //isDBBusy has already been set to false by getDataById
+              resolve(true);
+            })
           )
-        )
-        .finally(setIsDBBusy(false));
+          .catch((err) => {
+            setErrors(
+              `Could not update data from ${storeName} with id ${uid}: ${err}`
+            );
+            setIsDBBusy(false);
+            resolve(false);
+          });
+      });
     },
-    [getCurrentData]
+    [getDataById]
   );
 
   const updateCurrentData = useCallback(
     (storeName, data) => {
-      if (!currentObjectIdState) {
-        setErrors('There is no current object set that can be updated');
-        return;
-      }
-      updateDataById(storeName, currentObjectIdState, data);
+      return new Promise((resolve) => {
+        startConnection();
+        if (!currentObjectIdState) {
+          setErrors('There is no current object set that can be updated');
+          setIsDBBusy(false);
+          resolve(false);
+        }
+        updateDataById(storeName, currentObjectIdState, data).then(() =>
+          resolve(true)
+        );
+      });
     },
     [currentObjectIdState, updateDataById]
   );
@@ -148,13 +175,22 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
   //This creates a new object and sets the currentObjectId to the value defined. In shared_constants we've set which property will act as the keyPath for the db (eg guestId) however if the user doesn't define a value for this property this function will create a uuid for that property
   const createCurrentObject = useCallback(
     (storeName, data = {}) => {
-      startConnection();
-      createNewDBObject(storeName, data)
-        .then((key) => {
-          setCurrentObjectIdState(key); //force it not to batch so we can set the data straight afterwards...
-          getDataById(storeName, key);
-        })
-        .finally(setIsDBBusy(false));
+      return new Promise((resolve) => {
+        startConnection();
+        createNewDBObject(storeName, data)
+          .then((key) => {
+            //as soon as I tried using this in my app it's failed to set the current object when navigating, tried the promise.then() idea but to no avail so I'm going to try to force the issue :( Seems to have worked, I'll try to see if the promise is required...yes it is!
+            flushSync(() => {
+              setCurrentObjectIdState(key);
+            });
+
+            getDataById(storeName, key);
+          })
+          .finally(() => {
+            setIsDBBusy(false);
+            resolve(true);
+          });
+      });
     },
     [setCurrentObjectIdState, getDataById]
   );
@@ -176,7 +212,9 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
   //indirect access to change the 'current' entry
   const moveCurrentReference = useCallback(
     (newId) => {
-      setCurrentObjectIdState(newId);
+      flushSync(() => {
+        setCurrentObjectIdState(newId);
+      });
     },
     [setCurrentObjectIdState]
   );

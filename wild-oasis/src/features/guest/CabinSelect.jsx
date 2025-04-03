@@ -4,7 +4,6 @@ import Spinner from '../../ui/Spinner';
 import CabinDetailsBox from './CabinDetailsBox';
 import { useCabins } from '../cabins/useCabins';
 import { useCabinFilters } from '../cabins/useCabinFilters';
-import Heading from '../../ui/Heading';
 import CabinSelectSort from './CabinSelectSort';
 import SlideInY from '../../ui/SlideInY';
 import CabinSketchHeading from '../../ui/CabinSketchHeading';
@@ -21,6 +20,7 @@ const StyledCabinSelect = styled.div`
 
 function CabinSelect() {
   const { isLoading, cabins, error, count } = useCabins();
+
   // let paginationCount = count;
   //sorting and filtering are defined in the url - see the CabinTableOperations component
   // const [searchParams] = useSearchParams();
@@ -32,16 +32,17 @@ function CabinSelect() {
 
   return (
     <>
-      <CabinSketchHeading as="h1">
-        Let&#39;s Find Your Perfect Cabin
-      </CabinSketchHeading>
-      {/* <CabinTableOperations /> */}
-      <CabinSelectSort />
-      <StyledCabinSelect>
-        {filteredCabins.map((cabin) => (
-          <CabinDetailsBox cabin={cabin} key={cabin.id} />
-        ))}
-      </StyledCabinSelect>
+      <SlideInY>
+        <CabinSketchHeading as="h1">
+          Let&#39;s Find Your Perfect Cabin
+        </CabinSketchHeading>
+        <CabinSelectSort />
+        <StyledCabinSelect>
+          {filteredCabins.map((cabin) => (
+            <CabinDetailsBox cabin={cabin} key={cabin.id} />
+          ))}
+        </StyledCabinSelect>
+      </SlideInY>
     </>
   );
 }

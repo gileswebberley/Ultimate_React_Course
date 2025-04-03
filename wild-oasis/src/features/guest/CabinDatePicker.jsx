@@ -11,7 +11,6 @@ import styled from 'styled-components';
 import Heading from '../../ui/Heading';
 import { useGuestApiContext } from './GuestContext';
 import { useNavigate } from 'react-router-dom';
-import { useAddBookingToGuest } from './useAddBookingToGuest';
 import SpinnerTiny from '../../ui/SpinnerTiny';
 import { useAddDetailsToGuest } from './useAddDetailsToGuest';
 

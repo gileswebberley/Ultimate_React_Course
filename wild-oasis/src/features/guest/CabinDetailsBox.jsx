@@ -78,7 +78,7 @@ function CabinDetailsBox({ cabin }) {
   const { isLoading, error, bookingDates } = useBookingDates(cabin.id);
 
   if (error) return <div>ERROR: {error}</div>;
-  if (isCheckingUser || isLoading) return <Spinner />;
+  if (isCheckingUser || isLoading) return null;
 
   // function handleSelection() {}
 
