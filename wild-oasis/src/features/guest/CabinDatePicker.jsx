@@ -9,10 +9,11 @@ import toast from 'react-hot-toast';
 import Button from '../../ui/Button';
 import styled from 'styled-components';
 import Heading from '../../ui/Heading';
-import { useGuestApiContext } from './GuestContext';
 import { useNavigate } from 'react-router-dom';
 import SpinnerTiny from '../../ui/SpinnerTiny';
 import { useAddDetailsToGuest } from './useAddDetailsToGuest';
+import { useIndexedDB } from '../../hooks/useIndexedDB';
+import { iDB } from '../../utils/shared_constants';
 
 const DateContainer = styled.div`
   display: flex;
@@ -33,8 +34,11 @@ function CabinDatePicker({ reservedDates, cabinId }) {
   //get the settings cos we've got a maximum booking length to implement
   const { isLoading, error, settings } = useSettings();
   //I'm moving away from thinking that a context is a good way to take care of this now and instead I am going to add it to the guest user in the db
-  const { setStay } = useGuestApiContext();
-  const { isUpdatingGuest, updateGuest } = useAddDetailsToGuest();
+  // const { setStay } = useGuestApiContext();
+  // const { isUpdatingGuest, updateGuest } = useAddDetailsToGuest();
+  const { updateCurrentData, isDBBusy: isUpdatingGuest } = useIndexedDB(
+    iDB.name
+  );
 
   //we want to block out all the days that are already booked so they cannot be selected - I'm creating a flat array of all the dates so I can use an includes statement
   const allBookedDates = useMemo(
@@ -105,9 +109,11 @@ function CabinDatePicker({ reservedDates, cabinId }) {
       setEndDate(null);
       return;
     }
-    setStay(startDate, endDate, cabinId);
-    updateGuest({ startDate, endDate, cabinId });
-    navigate(`../booking-details/${cabinId}`);
+    // setStay(startDate, endDate, cabinId);
+    // updateGuest({ startDate, endDate, cabinId });
+    updateCurrentData(iDB.store, { startDate, endDate, cabinId }).then(
+      navigate(`../booking-details/${cabinId}`)
+    );
   }
 
   function clearDates() {

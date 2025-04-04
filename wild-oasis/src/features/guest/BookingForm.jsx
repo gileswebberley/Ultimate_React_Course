@@ -23,6 +23,8 @@ import Textarea from '../../ui/Textarea';
 import { useAddDetailsToGuest } from './useAddDetailsToGuest';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useIndexedDB } from '../../hooks/useIndexedDB';
+import { iDB } from '../../utils/shared_constants';
 
 const Container = styled(GuestContainer)`
   grid-template-rows: auto 1fr auto;
@@ -47,16 +49,20 @@ const NoErrorRow = styled(SimpleFormRow)`
 `;
 
 function BookingForm() {
+  //ok we need a lot of data from various database sources so let's grab all that....
   const { isCheckingUser, user, isAuthenticated, isAnonymous } = useUser();
   const { isLoading: isLoadingCabin, error, cabin } = useCabin();
   const { isLoading, settings } = useSettings();
-  const { isUpdatingGuest, updateGuest } = useAddDetailsToGuest();
+  const { isUpdatingGuest: isGuestBusy, updateGuest } = useAddDetailsToGuest();
+  const { isDBBusy, data, updateCurrentData, getCurrentData, deleteDatabase } =
+    useIndexedDB(iDB.name);
 
-  //Controlled elements
+  //Controlled elements for the form, getting to the point where it might be worth using a different solution but this is fine
   const [guests, setGuests] = useState(0);
   const [breakfast, setBreakfast] = useState(false);
   const [natId, setNatId] = useState('');
   const [notes, setNotes] = useState('');
+
   const navigate = useNavigate();
 
   //if not authenticated user redirect
@@ -65,38 +71,58 @@ function BookingForm() {
       toast.error(
         `Please sign up as a guest and select your cabin before visiting this page`
       );
+      deleteDatabase(iDB.name);
       navigate('../guest');
     }
-  }, [isAuthenticated, isCheckingUser, navigate, isAnonymous]);
+  }, [isAuthenticated, isCheckingUser, navigate, isAnonymous, deleteDatabase]);
 
-  if (isCheckingUser || isLoading || isLoadingCabin) return <Spinner />;
+  //This is how we get the data from the new indexedDB implementation, this sets 'data' to the data it fetched
+  useEffect(() => {
+    if (!isDBBusy && !data) {
+      getCurrentData(iDB.store);
+    }
+    console.log(`Effect for iDB data:`);
+    console.table(data);
+  }, [data, getCurrentData, isDBBusy]);
 
-  //   console.table(user?.user_metadata);
-  //   console.table(cabin);
-  const { fullName, cabinId, guestId, startDate, endDate, nationalId } =
-    user?.user_metadata ?? {};
+  //Derived api busy constants
+  const isUpdatingGuest = isGuestBusy || isDBBusy;
+  const isLoadingData = isCheckingUser || isLoading || isLoadingCabin;
+  if (isLoadingData) return <Spinner />;
 
-  //convert the date strings from supabase to Date
-  const start = parseISO(startDate);
-  const end = parseISO(endDate);
+  //No point working these out if we're still loading the data but if we've got here then we have finished loading, although just to avoid single render problems we safely null-coalesce these destructuring statements
+  const { fullName, nationalId } = user?.user_metadata ?? {};
+  const { startDate, endDate } = data ?? {};
+  //convert the date strings from supabase to Date, no need with the new indexedDB
+  const start = startDate; //parseISO(startDate);
+  const end = endDate; //parseISO(endDate);
   const stayLength = differenceInDays(end, start);
 
   function handleSubmit(e) {
     e.preventDefault();
+    const cabinCost =
+      (Number(cabin.regularPrice) - Number(cabin.discount)) * stayLength;
+    const brekkieCost = breakfast
+      ? Number(settings.breakfastPrice) * stayLength * (+guests + 1)
+      : 0;
     let data = {
-      totalGuests: Number(+guests + 1),
-      additionalNotes: notes,
+      numNights: stayLength,
+      numGuests: Number(+guests + 1),
+      cabinPrice: cabinCost,
+      extrasPrice: brekkieCost,
+      totalPrice: cabinCost + brekkieCost,
+      status: 'unconfirmed',
       hasBreakfast: breakfast,
+      isPaid: false,
+      observations: notes,
     };
     if (!nationalId && natId) {
-      data = { ...data, nationalId: natId };
+      updateGuest({ nationalId: natId });
     }
     //Create the booking or simply add this final information to the user as we have everything else?
-
-    updateGuest(data, {
-      onSuccess: () => navigate('../confirm-booking'),
+    updateCurrentData(iDB.store, data).then(() => {
+      // navigate('../confirm-booking')
     });
-    // console.log(e.target);
   }
 
   return (
@@ -107,7 +133,7 @@ function BookingForm() {
         </CabinSketchHeading>
       </GuestTitleArea>
       <Container>
-        {/* Pop al of this within a div so that we have the bottom row of our container grid free for the button */}
+        {/* Pop all of this within a div so that we have the bottom row of our container grid free for the button */}
         <CabinSketchHeading as="h3">
           We just need a few more details so we can confirm your booking for our
           cabin &#39;
@@ -141,7 +167,7 @@ function BookingForm() {
                   Add Daily Breakfast for
                   {' ' +
                     formatCurrency(
-                      settings.breakfastPrice * stayLength * (guests + 1)
+                      settings.breakfastPrice * stayLength * (+guests + 1)
                     )}
                 </summary>
                 Would you like to add a delicious breakfast crafted by our chefs

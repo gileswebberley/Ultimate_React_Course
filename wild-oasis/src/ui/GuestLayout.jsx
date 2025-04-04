@@ -55,17 +55,17 @@ function GuestLayout() {
   const { isDarkMode } = useDarkMode();
   return (
     <>
-      <GuestContextProvider>
-        <StyledGuestLayout>
-          <GuestHeader />
-          <Main id="main">
-            <PageContent>
-              <Outlet />
-            </PageContent>
-          </Main>
-          <BackgroundImage $dark={isDarkMode} />
-        </StyledGuestLayout>
-      </GuestContextProvider>
+      {/* <GuestContextProvider> */}
+      <StyledGuestLayout>
+        <GuestHeader />
+        <Main id="main">
+          <PageContent>
+            <Outlet />
+          </PageContent>
+        </Main>
+        <BackgroundImage $dark={isDarkMode} />
+      </StyledGuestLayout>
+      {/* </GuestContextProvider> */}
     </>
   );
 }

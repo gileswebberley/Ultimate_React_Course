@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import SlideInY from '../../ui/SlideInY';
-import Heading from '../../ui/Heading';
 import { bp_sizes } from '../../styles/breakpoints';
 import { formatCurrency } from '../../utils/helpers';
 import { useBookingDates } from '../bookings/useBookingDates';
@@ -11,7 +10,6 @@ import GuestParagraph from '../../ui/GuestParagraph';
 import { useUser } from '../authentication/useUser';
 import Button from '../../ui/Button';
 import { useNavigate } from 'react-router-dom';
-import Spinner from '../../ui/Spinner';
 
 const StyledCabinDetailsBox = styled.div`
   display: block;
@@ -65,6 +63,7 @@ const Paragraph = styled(GuestParagraph)`
 const HeadingContainer = styled.span`
   display: flex;
   justify-content: space-between;
+  gap: 2rem;
   //convert to a column on small screens
   @media ${bp_sizes.sm} {
     flex-direction: column;
@@ -87,11 +86,15 @@ function CabinDetailsBox({ cabin }) {
       <StyledCabinDetailsBox>
         <DetailsLayout>
           <HeadingContainer>
-            <CabinSketchHeading as="h2">
-              {cabin.name} for {cabin.maxCapacity} Guests
+            <CabinSketchHeading as="h2" style={{ textAlign: 'left' }}>
+              {cabin.name}
+              <br /> for {cabin.maxCapacity} Guests
             </CabinSketchHeading>
-            <CabinSketchHeading as="h3">
-              {formatCurrency(cabin.regularPrice - cabin.discount)} per night
+            <CabinSketchHeading as="h3" style={{ textAlign: 'right' }}>
+              {formatCurrency(cabin.regularPrice - cabin.discount)} per night{' '}
+              <br />
+              {cabin.discount > 0 &&
+                'with ' + formatCurrency(cabin.discount) + ' off'}
             </CabinSketchHeading>
           </HeadingContainer>
           <DetailsRow>

@@ -13,12 +13,14 @@ const addKeyPathRegister = (storeName, keyName) => {
     Object.hasOwn(keyPathRegister, storeName) &&
     keyPathRegister[storeName] !== keyName
   ) {
-    //it's already set so we want to change it
-    keyPathRegister[storeName] = keyName;
-    return;
+    //it's already set so we want to change it - hmm this is probably wrong to do cos if it already exists then it has been created as a store and this will not change the actual keyPath
+    console.warn(
+      `You have tried to change the key for '${storeName}' in the keyPathRegister to ${keyName} even though it will not affect the store itself`
+    );
   } else {
     keyPathRegister = { ...keyPathRegister, [storeName]: keyName };
   }
+  console.log(`keyPathRegister is now: ${JSON.stringify(keyPathRegister)}`);
 };
 
 export function getStoreKeyPath(storeName) {
@@ -28,12 +30,11 @@ export function getStoreKeyPath(storeName) {
     }
     const store = db.transaction([storeName]).objectStore(storeName);
     store.onerror = (e) => {
-      reject(`Failed to get store ${storeName}`);
+      reject(`Failed to get keyPath for store ${storeName}`);
     };
 
-    store.onsuccess = (e) => {
-      resolve(store.keyPath);
-    };
+    //Don't ever forget again that store does not have an onsuccess handler!!
+    resolve(store.keyPath);
   });
 }
 
@@ -41,9 +42,6 @@ export function getStoreKeyPath(storeName) {
 function doesStoreExist(storeName) {
   return db?.objectStoreNames?.contains(storeName);
 }
-
-//schemaUniqueId is the string name of the property of your schema that you wish to use as the unique id for the object you are storing - eg for our booking we'll probably make it the guestId that is generated when the guest anonymously signs in or a uuid for that booking session, I'm just trying to keep it flexible
-//for our first use of this we'll probably have storeName as 'bookings' then each entry will be a booking{} - {bookingId:uuid, startDate: Date, endDate: Date, cabinId:Number, totalGuests: number, hasBreakfast: Boolean, notes: String}
 
 //let's make it so the stores are sent through as an array of objects that contain the name and key properties eg [{name:'booking', key: 'guestId'}]
 export function initDB(dbName, storeArray) {
@@ -53,9 +51,11 @@ export function initDB(dbName, storeArray) {
       reject(
         'indexedDB is not supported in your browser and we need it to make this website work'
       );
+    //This is the flag to let us know if stores will have been set up according to the storeArray
     let hasUpgraded = false;
+
     const request = indexedDB.open(dbName, version);
-    //if there's no db with the name defined set up yet then this will run before onsuccess - however you can only set up stores when opening a new database, you can't add stores later it seems!
+    //if there's no db with this name defined yet then this will run before onsuccess - however you can only set up stores when opening a new database, you can't add stores later it seems!
     request.onupgradeneeded = (e) => {
       db = e.target.result;
       hasUpgraded = true;
@@ -64,11 +64,10 @@ export function initDB(dbName, storeArray) {
         if (!Object.hasOwn(store, 'key')) {
           store.key = defaultKeyPath;
         }
+        //Now check that this store doesn't already exist and create if not
         if (!doesStoreExist(store.name)) {
-          //if the DB store doesn't exist yet then create it
-          console.log(`Creating ${store.name} DB store...`);
+          //   console.log(`Creating ${store.name} DB store...`);
           addKeyPathRegister(store.name, store.key);
-          //otherwise safely create the store
           db.createObjectStore(store.name, { keyPath: store.key });
         }
       });
@@ -80,24 +79,34 @@ export function initDB(dbName, storeArray) {
 
     request.onsuccess = (e) => {
       db = e.target.result;
-      //should we check that if someone has opened an already existing db but tried to add new stores? Let's make a flag that let's us know.
+      //we should check if someone has opened an already existing db but tried to add new stores using our flag defined at the top...
       if (!hasUpgraded) {
+        //if we've been passed a store list we'll authenticate the list and reject the initialisation incase they think they've added a store but it doesn't exist
         storeArray.forEach((store) => {
           if (!doesStoreExist(store.name)) {
             reject(
               `You have tried to add ${store.name} to ${db.name} when the DB already exists. Try creating a new DB or excluding your storeArray`
             );
-          } else if (!keyPathRegister[store.name]) {
-            //belt and braces for the keyPathRegister sync
-            addKeyPathRegister(store.name, store.key ?? defaultKeyPath);
           }
         });
+
+        //Now go through the stores that exist and update the keyPathRegistry to reflect the current state incase it's got out of sync.
+        console.log('running store sync');
+        for (let i = 0; i < db.objectStoreNames.length; i++) {
+          //This is a DOMStringList hence the access through the item method
+          const storeName = db.objectStoreNames.item(i);
+          getStoreKeyPath(storeName)
+            .then((storeKey) => {
+              addKeyPathRegister(storeName, storeKey);
+            })
+            .catch(() => console.warn(`Failed to get store key`));
+        }
       }
-      console.log(`keyPathRegister is: ${JSON.stringify(keyPathRegister)}`);
-      //I don't think I should be passing a reference to the db itself, maybe just resolve the name?
+      //I don't think I should be passing a reference to the db itself, maybe just resolve the name
       resolve(db.name);
     };
 
+    //Finally just deal with any errors that might have occured whilst trying to open the db connection
     request.onerror = (e) => {
       reject(`An error occured during initDB: ${e.target.error?.message}`);
     };
@@ -136,6 +145,7 @@ export function deleteEntry(storeName, uid) {
     const store = db
       .transaction([storeName], 'readwrite')
       .objectStore(storeName);
+
     store.onerror = (e) => {
       reject(`Failed to get store ${storeName}`);
     };
@@ -170,7 +180,7 @@ export function addToDB(storeName, data) {
     const store = transaction.objectStore(storeName);
     const request = store.put(data);
     request.onsuccess = (e) => {
-      //resolving here rather than in the oncomplete as this is the keyPath id for the data which we've just added and that information isn't available in oncomplete
+      //resolving here rather than in the oncomplete as this is the keyPath id for the data which we've just added and that information isn't available in the transaction oncomplete
       resolve(e.target.result);
     };
   });
@@ -189,7 +199,7 @@ export function createNewDBObject(storeName, data = {}) {
       const keyPathValue = createUUID();
       data = { ...data, [key]: keyPathValue };
     }
-    //Add the new entry to the store in a self-invoking async function (based on advice found in a tutorial)
+    //Add the new entry to the store in a self-invoking async function (based on advice I found in a tutorial)
     (async () => {
       try {
         const success = await addToDB(storeName, data);

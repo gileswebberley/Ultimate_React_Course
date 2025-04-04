@@ -15,7 +15,7 @@ import { useLocalStorageState } from './useLocalStorageState';
 import { flushSync } from 'react-dom';
 
 //IMPORTANT - always include your stores when first setting up the database because you can't add them to a database that already exists and is open
-//I'm putting some of the functionality inside Promises and using flushSync as when I first tried using it in my site the current object id was not being set and I could not navigate to another page safely. It's just a matter of putting your navigate() call inside then then() clause of the call (first discovered when trying to createCurrentObject as I submitted a form with navigation in the onsuccess callback) I think I'll just need to do it in the create and update (ie the setters) rather than the 'getters'
+//I'm putting some of the functionality inside Promises and using flushSync (warning - this can't be used in a life-cycle method) as when I first tried using it in my site the current object id was not being set and I could not navigate to another page safely. It's just a matter of putting your navigate() call inside then then() clause of the call (first discovered when trying to createCurrentObject as I submitted a form with navigation in the onsuccess callback) I think I'll just need to do it in the create and update (ie the setters) rather than the 'getters'
 export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
   //all of the state to register to except db which is for private use in the hook
   //I decided this shouldn't be a reference to the db itself so it is now just the name
@@ -35,13 +35,6 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
   ) {
     setDefaultKeyPath(defaultKey);
   }
-
-  //let's also set the registry if we have passed a store array in (which means we're setting up the stores when opening the connection) - hmm, this is done in the setup of the db, what if someone calls an already existing db with new stores which won't be created? Maybe we should recreate it in this case? No that would lose all of the data already in a store! I think this is mainly for use whilst testing anyway
-  //   if (storeArray.length !== 0) {
-  //     storeArray.forEach((store) => {
-  //       addKeyPathRegister(store.name, store.key ?? defaultKey);
-  //     });
-  //   }
 
   //ended up in hell loops when calling this in a useEffect inside the component using it so found a solution by having constants defined in shared_constants when 'using' this custom hook
   useEffect(() => {
@@ -71,13 +64,9 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
     setCurrentObjectIdState(null);
   }, [setCurrentObjectIdState]);
 
-  //We don't want these state changes batched as we want isDBBusy to act as a lock flag
   const startConnection = () => {
-    console.log('Starting db connection...');
-    flushSync(() => {
-      setIsDBBusy(true);
-      setErrors(null);
-    });
+    setIsDBBusy(true);
+    setErrors(null);
   };
 
   //should this change the current object to this id or leave it as a seperate function - just thinking, you might want to get other data whilst working on the current object so it's probably best not - I'll add a move reference function rather than open the state to fiddling with directly. I also use this for getting the current data so that would be making changes that are not required. Had to put this in a promise because it is used by the update data methods and they also rely on this to set isDBBusy to false!!
@@ -86,10 +75,7 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
     return new Promise((resolve) => {
       getDBEntry(storeName, objectId)
         .then((data) => {
-          //setCurrentObjectIdState(objectId);
-          flushSync(() => {
-            setData(data);
-          });
+          setData(data);
         })
         .catch((err) =>
           setErrors(
@@ -104,6 +90,14 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
   }, []);
 
   //does what it says on the tin I think, I decided to just keep a reference to whatever data (entry) we wanted to work on so that it can look after it's own state if that makes sense. getDataById looks after the isDBBusy state so not needed here I don't think. Also I don't see a use-case where this will need a Promise as I don't think people will be doing any navigating after calling this...I wait to be proved wrong though
+  /**
+   * @example
+   *useEffect(() => {
+       if (!isDBBusy && !data) {
+         getCurrentData(iDB.store);
+       }
+     }, [data, getCurrentData, isDBBusy]);
+   */
   const getCurrentData = useCallback(
     (storeName) => {
       if (!currentObjectIdState) {
@@ -115,6 +109,7 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
     [currentObjectIdState, getDataById]
   );
 
+  //Do any navigation or the such in the then() method that this resolves
   const updateDataById = useCallback(
     (storeName, uid, data) => {
       return new Promise((resolve) => {
