@@ -11,22 +11,17 @@ import { lazy, Suspense } from 'react';
 import { DarkModeProvider } from './context/DarkModeContext';
 
 import GlobalStyles from './styles/GlobalStyles';
-// import AppLayout from './ui/AppLayout';
 import GuestLayout from './ui/GuestLayout';
-// import ProtectedRoute from './ui/ProtectedRoute';
 import SpinnerFullPage from './ui/SpinnerFullPage';
 import Welcome from './pages/Welcome';
-import DBTest from './utils/DBTest';
-import DBTest2 from './utils/DBTest2';
-// import CompleteBooking from './pages/CompleteBooking';
-// import CabinDetails from './pages/CabinDetails';
-// import CreateGuest from './pages/CreateGuest';
+//Frontend (public) components
 const CreateGuest = lazy(() => import('./pages/CreateGuest'));
+const ConfirmBooking = lazy(() => import('./pages/ConfirmBooking'));
 const CabinDetails = lazy(() => import('./pages/CabinDetails'));
 const CompleteBooking = lazy(() => import('./pages/CompleteBooking'));
 const ProtectedRoute = lazy(() => import('./ui/ProtectedRoute'));
+//Backend components
 const AppLayout = lazy(() => import('./ui/AppLayout'));
-// const GlobalStyles = lazy(() => import('./styles/GlobalStyles'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Account = lazy(() => import('./pages/Account'));
 const Bookings = lazy(() => import('./pages/Bookings'));
@@ -83,8 +78,12 @@ function App() {
                     path="booking-details/:cabinId"
                     element={<CompleteBooking />}
                   />
-                  <Route path="dbtest" element={<DBTest />} />
-                  <Route path="dbtest2" element={<DBTest2 />} />
+                  <Route
+                    path="confirm-booking/:cabinId"
+                    element={<ConfirmBooking />}
+                  />
+                  {/* <Route path="dbtest" element={<DBTest />} />
+                  <Route path="dbtest2" element={<DBTest2 />} /> */}
                 </Route>
                 {/* We're going to wrap these routes in a protected one now that we have started to implement authentication */}
                 <Route

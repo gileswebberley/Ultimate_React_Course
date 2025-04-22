@@ -145,3 +145,16 @@ export async function deleteBooking(id) {
   }
   return data;
 }
+
+export async function createBooking(booking) {
+  const { data, error } = await supabase
+    .from('bookings')
+    .insert(booking)
+    .select()
+    .single();
+  if (error) {
+    console.error(error);
+    throw new Error(`Booking could not be added`);
+  }
+  return data;
+}

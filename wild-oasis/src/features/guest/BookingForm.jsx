@@ -1,30 +1,31 @@
-import { differenceInDays, format, parseISO } from 'date-fns';
-import Spinner from '../../ui/Spinner';
+import toast from 'react-hot-toast';
+import styled from 'styled-components';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { differenceInDays, format } from 'date-fns';
+import { formatCurrency, getDisplayName } from '../../utils/helpers';
+import { bp_sizes } from '../../styles/breakpoints';
 import { useUser } from '../authentication/useUser';
 import { useCabin } from '../cabins/useCabin';
+import { useSettings } from '../settings/useSettings';
+import { useAddDetailsToGuest } from './useAddDetailsToGuest';
+import { useIndexedDB } from '../../hooks/useIndexedDB';
+import { iDB } from '../../utils/shared_constants';
+
+import Spinner from '../../ui/Spinner';
 import SlideInY from '../../ui/SlideInY';
 import GuestTitleArea from '../../ui/GuestTitleArea';
 import CabinSketchHeading from '../../ui/CabinSketchHeading';
-import { formatCurrency, getDisplayName } from '../../utils/helpers';
-import styled from 'styled-components';
-import { useSettings } from '../settings/useSettings';
-import { useEffect, useState } from 'react';
-import Checkbox from '../../ui/Checkbox';
-import SimpleFormRow from '../../ui/SimpleFormRow';
-import Input from '../../ui/Input';
-import Form from '../../ui/Form';
-import { bp_sizes } from '../../styles/breakpoints';
 import GuestContainer from '../../ui/GuestContainer';
 import Range from '../../ui/Range';
 import ButtonGroup from '../../ui/ButtonGroup';
 import Button from '../../ui/Button';
 import FormRow from '../../ui/FormRow';
 import Textarea from '../../ui/Textarea';
-import { useAddDetailsToGuest } from './useAddDetailsToGuest';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import { useIndexedDB } from '../../hooks/useIndexedDB';
-import { iDB } from '../../utils/shared_constants';
+import Checkbox from '../../ui/Checkbox';
+import SimpleFormRow from '../../ui/SimpleFormRow';
+import Input from '../../ui/Input';
+import Form from '../../ui/Form';
 
 const Container = styled(GuestContainer)`
   grid-template-rows: auto 1fr auto;
@@ -103,7 +104,9 @@ function BookingForm() {
     const cabinCost =
       (Number(cabin.regularPrice) - Number(cabin.discount)) * stayLength;
     const brekkieCost = breakfast
-      ? Number(settings.breakfastPrice) * stayLength * (+guests + 1)
+      ? Math.ceil(
+          Number(settings.breakfastPrice) * stayLength * (+guests + 1) * 100
+        ) / 100
       : 0;
     let data = {
       numNights: stayLength,
@@ -121,7 +124,7 @@ function BookingForm() {
     }
     //Create the booking or simply add this final information to the user as we have everything else?
     updateCurrentData(iDB.store, data).then(() => {
-      // navigate('../confirm-booking')
+      navigate(`../confirm-booking/${cabin.id}`);
     });
   }
 
@@ -218,7 +221,7 @@ function BookingForm() {
           <FormRow>
             <ButtonGroup>
               {/* Should I add the booking here or wait for confirmation? */}
-              <Button>Confirm</Button>
+              <Button>Continue</Button>
             </ButtonGroup>
           </FormRow>
         </Form>

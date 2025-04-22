@@ -54,7 +54,7 @@ const HeaderNavSection = styled.div`
 
 const HeaderTagline = styled.span`
   color: var(--color-brown);
-  transform: rotate(-0.5deg) translateY(2.5rem) translateX(-2rem);
+  transform: rotate(-0.5deg) translateY(2.5rem); // translateX(-1rem);
   @media (${bp_sizes.lg}) {
     display: none;
   }
@@ -68,7 +68,7 @@ function GuestHeader() {
       <LogoSmall />
       <HeaderTagline>
         <CabinSketchHeading style={{ color: 'var(--color-brown)' }} as="h1">
-          Not All Who Wander Are Lost
+          &#xFF02;Not All Who Wander Are Lost&#xFF02;
         </CabinSketchHeading>
       </HeaderTagline>
       <HeaderNav>
