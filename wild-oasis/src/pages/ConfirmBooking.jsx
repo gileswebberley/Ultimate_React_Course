@@ -16,6 +16,7 @@ import { differenceInDays, format } from 'date-fns';
 import ButtonGroup from '../ui/ButtonGroup';
 import Button from '../ui/Button';
 import { formatCurrency } from '../utils/helpers';
+import { useCreateBooking } from '../features/bookings/useCreateBooking';
 
 const Container = styled(GuestContainer)`
   grid-template-rows: auto 1fr auto;
@@ -66,6 +67,7 @@ function ConfirmBooking() {
   const { isDBBusy, data, getCurrentData, deleteDatabase } = useIndexedDB(
     iDB.name
   );
+  const { createBookingMutate, isCreatingBooking } = useCreateBooking();
 
   const navigate = useNavigate();
 
@@ -92,6 +94,7 @@ function ConfirmBooking() {
     startDate,
     endDate,
     cabinId,
+    guestID,
     numNights,
     numGuests,
     cabinPrice,
@@ -111,6 +114,23 @@ function ConfirmBooking() {
     e.preventDefault();
     toast.success(`DEMO VERSION (Booking added to DB)
       In production you would be sent an email and taken to a checkout page...`);
+    const booking = {
+      startDate,
+      endDate,
+      numNights,
+      numGuests,
+      cabinPrice,
+      extrasPrice,
+      totalPrice,
+      status,
+      hasBreakfast,
+      isPaid,
+      observations,
+      cabinID: cabinId,
+      guestID,
+    };
+
+    createBookingMutate(booking);
   }
 
   return (
@@ -166,7 +186,9 @@ function ConfirmBooking() {
             {formatCurrency(totalPrice)}
           </DetailsRow>
           <ButtonGroup>
-            <Button onPointerDown={handleSubmit}>Confirm Booking</Button>
+            <Button onPointerDown={handleSubmit} disabled={isCreatingBooking}>
+              Confirm Booking
+            </Button>
           </ButtonGroup>
         </DetailsSection>
       </Container>
