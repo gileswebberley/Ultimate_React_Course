@@ -84,6 +84,10 @@ export function initDB(dbName, storeArray) {
         //if we've been passed a store list we'll authenticate the list and reject the initialisation incase they think they've added a store but it doesn't exist
         storeArray.forEach((store) => {
           if (!doesStoreExist(store.name)) {
+            //maybe this should be more graceful, perhaps I should try to change the version number and create again? Doesn't work sadly
+            // version++;
+            // initDB(dbName, storeArray);
+            //How about deleting and then recreating?
             reject(
               `You have tried to add ${store.name} to ${db.name} when the DB already exists. Try creating a new DB or excluding your storeArray`
             );

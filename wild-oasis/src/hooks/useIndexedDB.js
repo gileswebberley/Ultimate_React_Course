@@ -46,6 +46,11 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
         })
         .catch((error) => {
           setErrors(error);
+          //I'll try to gracefully deal with the errors as currently we are getting in trouble if we try to go to the guest form via other pages that use this hook
+          deleteDB(dbName).then(() => {
+            setErrors(null);
+            initDB(dbName, storeArray);
+          });
         })
         .finally(() => {
           setIsDBBusy(false);

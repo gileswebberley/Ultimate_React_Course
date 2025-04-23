@@ -14,6 +14,7 @@ import GlobalStyles from './styles/GlobalStyles';
 import GuestLayout from './ui/GuestLayout';
 import SpinnerFullPage from './ui/SpinnerFullPage';
 import Welcome from './pages/Welcome';
+//Lazy load as much as possible to make performance better
 //Frontend (public) components
 const CreateGuest = lazy(() => import('./pages/CreateGuest'));
 const ConfirmBooking = lazy(() => import('./pages/ConfirmBooking'));

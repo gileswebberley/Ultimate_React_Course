@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import GlobalStyles from './styles/GlobalStyles';
-import Button from './ui/Button';
-import Row from './ui/Row';
+import GlobalStyles from '../styles/GlobalStyles';
+import Button from '../ui/Button';
+import Row from '../ui/Row';
 
 const StyledApp = styled.main`
   margin: 10px;

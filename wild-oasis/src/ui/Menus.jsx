@@ -1,4 +1,4 @@
-import { Component, createContext, useContext, useRef, useState } from 'react';
+import { createContext, useContext, useRef, useState } from 'react';
 import { HiEllipsisVertical } from 'react-icons/hi2';
 import styled from 'styled-components';
 import { useClickOutside } from '../hooks/useClickOutside';

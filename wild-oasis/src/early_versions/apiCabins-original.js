@@ -1,4 +1,4 @@
-import supabase from './supabase';
+import supabase from '../services/supabase';
 const supabaseUrl = process.env.SUPABASE_URL;
 
 const storageUrl = `${supabaseUrl}/storage/v1/object/public/`;

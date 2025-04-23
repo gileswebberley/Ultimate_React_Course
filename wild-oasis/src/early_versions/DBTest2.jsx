@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useIndexedDB } from '../hooks/useIndexedDB';
 import { useEffect } from 'react';
-import { iDB } from './shared_constants';
+import { iDB } from '../utils/shared_constants';
 import Spinner from '../ui/Spinner';
 import { addDays } from 'date-fns';
 
