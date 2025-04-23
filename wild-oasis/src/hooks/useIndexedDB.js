@@ -36,7 +36,7 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
     setDefaultKeyPath(defaultKey);
   }
 
-  //ended up in hell loops when calling this in a useEffect inside the component using it so found a solution by having constants defined in shared_constants when 'using' this custom hook
+  //ended up in hell loops when calling this in a useEffect inside the component using it so found a solution by having constants defined in shared_constants which are passed to this custom hook
   useEffect(() => {
     const initialiseDB = () => {
       initDB(dbName, storeArray)

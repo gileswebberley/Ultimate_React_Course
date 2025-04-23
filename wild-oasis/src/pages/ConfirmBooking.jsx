@@ -17,6 +17,8 @@ import ButtonGroup from '../ui/ButtonGroup';
 import Button from '../ui/Button';
 import { formatCurrency } from '../utils/helpers';
 import { useCreateBooking } from '../features/bookings/useCreateBooking';
+import { useLogout } from '../features/authentication/useLogout';
+import GuestTitleArea from '../ui/GuestTitleArea';
 
 const Container = styled(GuestContainer)`
   grid-template-rows: auto 1fr auto;
@@ -70,6 +72,7 @@ function ConfirmBooking() {
   const { createBookingMutate, isCreatingBooking } = useCreateBooking();
 
   const navigate = useNavigate();
+  const { logout } = useLogout();
 
   //if not authenticated user redirect
   useEffect(() => {
@@ -128,21 +131,27 @@ function ConfirmBooking() {
       guestID,
     };
 
+    //Just have to think about what to do at this point - perhaps delete the local db, log the user out (because the database booking is created when logging in so causes a lot of problems with the deletion), and navigate to the home page?
     createBookingMutate(booking, {
       onSuccess: () => {
-        deleteDatabase(iDB.name).then(() => navigate('/'));
+        logout(false, {
+          onSuccess: () => {
+            deleteDatabase(iDB.name).then(() =>
+              navigate('../', { replace: true })
+            );
+          },
+        });
       },
     });
-    //Just have to think about what to do at this point - perhaps delete the local db, log the user out (don't think so), and navigate to the home page?
   }
 
   return (
     <SlideInY>
-      {/* <GuestTitleArea>
+      <GuestTitleArea>
         <CabinSketchHeading as="h1">
-          Let&#39;s get this completed
+          Let&#39;s get you booked in
         </CabinSketchHeading>
-      </GuestTitleArea> */}
+      </GuestTitleArea>
       <Container>
         <CabinSketchHeading as="h2">
           Please check that all of the details of your stay are correct before
