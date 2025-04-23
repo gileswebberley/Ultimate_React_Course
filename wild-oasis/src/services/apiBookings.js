@@ -147,11 +147,12 @@ export async function deleteBooking(id) {
 }
 
 export async function createBooking(booking) {
-  const { data, error } = await supabase.from('bookings').insert(booking);
+  const { error } = await supabase.from('bookings').insert(booking);
+  //I'm not sure why adding select() to this call produces an error considering it is advised in the api guide? Having tried a few different techniques to no avail I will have to leave it for now and simply return true I think :(
 
   if (error) {
     console.error(error);
     throw new Error(`Booking could not be added`);
   }
-  return data;
+  return true;
 }

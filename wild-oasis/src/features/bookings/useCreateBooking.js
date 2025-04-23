@@ -11,7 +11,9 @@ export function useCreateBooking() {
       onSuccess: (data) => {
         // console.table(data);
         toast.success(
-          `Booking  ${data.id ?? 'Anon'} has been successfully created`
+          `Booking for ${
+            data.guests?.fullName ?? 'Anon'
+          } has been successfully created`
         );
         queryClient.invalidateQueries({ queryKey: ['bookings'] });
       },

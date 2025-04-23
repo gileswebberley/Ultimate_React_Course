@@ -52,7 +52,7 @@ const NoErrorRow = styled(SimpleFormRow)`
 function BookingForm() {
   //ok we need a lot of data from various database sources so let's grab all that....
   const { isCheckingUser, user, isAuthenticated, isAnonymous } = useUser();
-  const { isLoading: isLoadingCabin, error, cabin } = useCabin();
+  const { isLoading: isLoadingCabin, cabin } = useCabin();
   const { isLoading, settings } = useSettings();
   const { isUpdatingGuest: isGuestBusy, updateGuest } = useAddDetailsToGuest();
   const { isDBBusy, data, updateCurrentData, getCurrentData, deleteDatabase } =
@@ -72,18 +72,16 @@ function BookingForm() {
       toast.error(
         `Please sign up as a guest and select your cabin before visiting this page`
       );
-      deleteDatabase(iDB.name);
-      navigate('../guest');
+      deleteDatabase(iDB.name).finally(() => navigate('../guest'));
     }
   }, [isAuthenticated, isCheckingUser, navigate, isAnonymous, deleteDatabase]);
 
   //This is how we get the data from the new indexedDB implementation, this sets 'data' to the data it fetched
   useEffect(() => {
     if (!isDBBusy && !data) {
+      console.log(`BookingForm is loading current data`);
       getCurrentData(iDB.store);
     }
-    console.log(`Effect for iDB data:`);
-    console.table(data);
   }, [data, getCurrentData, isDBBusy]);
 
   //Derived api busy constants
@@ -220,8 +218,15 @@ function BookingForm() {
           )}
           <FormRow>
             <ButtonGroup>
-              {/* Should I add the booking here or wait for confirmation? */}
-              <Button>Continue</Button>
+              <Button
+                onPointerDown={() => navigate(-1)}
+                disabled={isUpdatingGuest}
+              >
+                Back
+              </Button>
+              <Button onPointerDown={handleSubmit} disabled={isUpdatingGuest}>
+                Continue
+              </Button>
             </ButtonGroup>
           </FormRow>
         </Form>

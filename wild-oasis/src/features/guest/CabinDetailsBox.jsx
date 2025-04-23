@@ -100,6 +100,7 @@ function CabinDetailsBox({ cabin }) {
           <DetailsRow>
             <CabinImg
               src={cabin.imageUrl}
+              loading="lazy"
               alt={`Image of Cabin ${cabin.name}`}
             />
             <div>

@@ -23,6 +23,11 @@ function Login() {
       <Heading as="h3" style={{ textAlign: 'center' }}>
         Registered Users Please Enter Your Details
       </Heading>
+      <Heading as="h4">
+        <aside>
+          <i>For demo purposes you can use giles@example.com with pass9487</i>
+        </aside>
+      </Heading>
       <LoginForm />
     </LoginLayout>
   );

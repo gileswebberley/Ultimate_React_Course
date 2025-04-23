@@ -205,6 +205,7 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
   );
 
   //indirect access to change the 'current' entry
+  //NOTE: Needs testing
   const moveCurrentReference = useCallback(
     (newId) => {
       flushSync(() => {
@@ -214,15 +215,24 @@ export function useIndexedDB(dbName, storeArray = [], defaultKey = 'keyId') {
     [setCurrentObjectIdState]
   );
 
+  //This does work but it's very dangerous if used incorrectly!!
   const deleteDatabase = useCallback(
     (dbName) => {
-      startConnection();
-      deleteDB(dbName)
-        .then(() => {
-          console.warn(`Database has been deleted permanently`);
-          resetAll();
-        })
-        .finally(setIsDBBusy(false));
+      return new Promise((resolve, reject) => {
+        startConnection();
+        deleteDB(dbName)
+          .then(() => {
+            console.warn(`Database has been deleted permanently`);
+            flushSync(() => resetAll());
+            setIsDBBusy(false);
+            resolve(true);
+          })
+          .catch((error) => {
+            console.error(`Database deletion failed: ${error}`);
+            setIsDBBusy(false);
+            resolve(false);
+          });
+      });
     },
     [resetAll]
   );

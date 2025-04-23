@@ -11,7 +11,6 @@ import styled from 'styled-components';
 import Heading from '../../ui/Heading';
 import { useNavigate } from 'react-router-dom';
 import SpinnerTiny from '../../ui/SpinnerTiny';
-import { useAddDetailsToGuest } from './useAddDetailsToGuest';
 import { useIndexedDB } from '../../hooks/useIndexedDB';
 import { iDB } from '../../utils/shared_constants';
 

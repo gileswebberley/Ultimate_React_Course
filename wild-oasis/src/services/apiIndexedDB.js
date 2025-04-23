@@ -20,7 +20,7 @@ const addKeyPathRegister = (storeName, keyName) => {
   } else {
     keyPathRegister = { ...keyPathRegister, [storeName]: keyName };
   }
-  console.log(`keyPathRegister is now: ${JSON.stringify(keyPathRegister)}`);
+  // console.log(`keyPathRegister is now: ${JSON.stringify(keyPathRegister)}`);
 };
 
 export function getStoreKeyPath(storeName) {
@@ -91,7 +91,7 @@ export function initDB(dbName, storeArray) {
         });
 
         //Now go through the stores that exist and update the keyPathRegistry to reflect the current state incase it's got out of sync.
-        console.log('running store sync');
+        // console.log('running store sync');
         for (let i = 0; i < db.objectStoreNames.length; i++) {
           //This is a DOMStringList hence the access through the item method
           const storeName = db.objectStoreNames.item(i);
@@ -118,12 +118,14 @@ export function deleteDB(dbName) {
   return new Promise((resolve, reject) => {
     //check whether the db we're trying to delete is the currently opened one in which case we must close it so that the deletion isn't blocked
     if (db.name === dbName) {
+      console.log('Trying to close the db for deletion...');
       db.close();
     }
+    //it seems that the delete request does delete even if it is initially blocked, therefore I believe I should simply log the blocking rather than rejecting the promise
     const deleteRequest = indexedDB.deleteDatabase(dbName);
 
     deleteRequest.onblocked = () => {
-      reject(`${dbName} was blocked from closing`);
+      console.warn(`${dbName} was blocked from closing`);
     };
 
     deleteRequest.onerror = () => {
@@ -282,6 +284,7 @@ export function getEntryByNonKeyValue(storeName, valueName, searchValue) {
 }
 
 //get an array of all entries that match the criteria
+//NOTE: This has not been tested yet, simply here because it was so similar to the single entry version and seemed an obvious extension that might be handy and is based on tested logic!!!
 export function getAllEntriesByNonKeyValue(storeName, valueName, searchValue) {
   return new Promise((resolve, reject) => {
     if (!doesStoreExist(storeName)) {

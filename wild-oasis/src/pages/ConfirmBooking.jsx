@@ -12,7 +12,7 @@ import styled from 'styled-components';
 import GuestContainer from '../ui/GuestContainer';
 import GuestSubContainer from '../ui/GuestSubContainer';
 import { bp_sizes } from '../styles/breakpoints';
-import { differenceInDays, format } from 'date-fns';
+import { format } from 'date-fns';
 import ButtonGroup from '../ui/ButtonGroup';
 import Button from '../ui/Button';
 import { formatCurrency } from '../utils/helpers';
@@ -63,7 +63,7 @@ const DetailsLabel = styled.span`
 
 function ConfirmBooking() {
   const { isCheckingUser, user, isAuthenticated, isAnonymous } = useUser();
-  const { isLoading: isLoadingCabin, error, cabin } = useCabin();
+  const { isLoading: isLoadingCabin, cabin } = useCabin();
   const { isDBBusy, data, getCurrentData, deleteDatabase } = useIndexedDB(
     iDB.name
   );
@@ -77,8 +77,8 @@ function ConfirmBooking() {
       toast.error(
         `Please sign up as a guest and select your cabin before visiting this page`
       );
-      deleteDatabase(iDB.name);
-      navigate('../guest');
+      //clear any data that might be in storage from a previous user or the such?
+      deleteDatabase(iDB.name).finally(() => navigate('../guest'));
     }
   }, [isAuthenticated, isCheckingUser, navigate, isAnonymous, deleteDatabase]);
 
@@ -86,8 +86,6 @@ function ConfirmBooking() {
     if (!isDBBusy && !data) {
       getCurrentData(iDB.store);
     }
-    console.log(`Effect for iDB data:`);
-    console.table(data);
   }, [data, getCurrentData, isDBBusy]);
 
   const {
@@ -130,7 +128,12 @@ function ConfirmBooking() {
       guestID,
     };
 
-    createBookingMutate(booking);
+    createBookingMutate(booking, {
+      onSuccess: () => {
+        deleteDatabase(iDB.name).then(() => navigate('/'));
+      },
+    });
+    //Just have to think about what to do at this point - perhaps delete the local db, log the user out (don't think so), and navigate to the home page?
   }
 
   return (
@@ -186,6 +189,12 @@ function ConfirmBooking() {
             {formatCurrency(totalPrice)}
           </DetailsRow>
           <ButtonGroup>
+            <Button
+              onPointerDown={() => navigate(-1)}
+              disabled={isCreatingBooking}
+            >
+              Back
+            </Button>
             <Button onPointerDown={handleSubmit} disabled={isCreatingBooking}>
               Confirm Booking
             </Button>
