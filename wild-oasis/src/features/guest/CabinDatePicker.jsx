@@ -118,7 +118,7 @@ function CabinDatePicker({ reservedDates, cabinId }) {
   function clearDates() {
     setStartDate(null);
     setEndDate(null);
-    setAvailDate(null);
+    // setAvailDate(null);
   }
 
   return (

@@ -9,7 +9,7 @@ const Textarea = styled.textarea`
   box-shadow: var(--shadow-sm);
   min-width: 20rem;
   height: 8rem;
-  @media (${bp_sizes.md}) {
+  @media (${bp_sizes.sm}) {
     min-width: 100%;
     min-height: 10rem;
   }

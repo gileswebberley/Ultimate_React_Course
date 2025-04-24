@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import SlideInY from '../../ui/SlideInY';
+import SlideInY from '../ui/SlideInY';
 
 const TestSquare = styled.div`
   width: 300px;

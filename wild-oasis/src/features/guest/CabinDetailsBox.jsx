@@ -19,6 +19,7 @@ const StyledCabinDetailsBox = styled.div`
   padding: 3rem;
   min-width: 26rem;
   max-width: 88rem;
+  /* width: 88rem; */
 `;
 
 const DetailsLayout = styled.section`
