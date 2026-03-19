@@ -66,7 +66,7 @@ export default function App() {
   const [movies, isError, isLoading] = useOmdbFetch(query, OMDbKEY);
 
   //implement further details being displayed
-  const [selctedMovieId, setSelectedMovieId] = useState(null);
+  const [selectedMovieId, setSelectedMovieId] = useState(null);
 
   function handleSelectMovie(id) {
     //implement it closing on second click of the same MovieListing with this ternary operation
@@ -86,7 +86,7 @@ export default function App() {
     if (watched.map((w) => w.imdbID).includes(movie.imdbID)) {
       //remove it and readd it, or alter the entry? Alter, works nicely with {...w, userRating: movie.userRating} or simply replace as we do here
       setWatched((wArr) =>
-        wArr.map((w) => (w.imdbID === movie.imdbID ? movie : w))
+        wArr.map((w) => (w.imdbID === movie.imdbID ? movie : w)),
       );
     } else {
       setWatched((w) => [...w, movie]);
@@ -128,7 +128,7 @@ export default function App() {
       </NavBar>
 
       <Main>
-        <ToggleBox>
+        <ToggleBox title="Search Results">
           {movies.length === 0 && !isLoading && !isError ? (
             <p className="loader">
               Please hit Enter to search for movies via the OMDb website
@@ -143,10 +143,10 @@ export default function App() {
           )}
           {isError && !isLoading && <Error message={isError} />}
         </ToggleBox>
-        <ToggleBox>
-          {selctedMovieId ? (
+        <ToggleBox title={selectedMovieId ? 'Movie Details' : 'Watched Movies'}>
+          {selectedMovieId ? (
             <MovieDetails
-              selectedId={selctedMovieId}
+              selectedId={selectedMovieId}
               onCloseDetails={handleCloseDetails}
               onAddWatched={handleAddWatchedMovie}
               watched={watched}

@@ -19,17 +19,17 @@ export function WatchedListing({ movie, onDeleteWatched, onSelectMovie }) {
           <span>⏳</span>
           <span>{movie.runtime} min</span>
         </p>
+        <button
+          className="btn-delete"
+          onClick={(e) => {
+            //because I added the onSelectMovie functionality to the listing I want the click to stop here
+            e.stopPropagation();
+            onDeleteWatched(movie.imdbID);
+          }}
+        >
+          X
+        </button>
       </div>
-      <button
-        className="btn-delete"
-        onClick={(e) => {
-          //because I added the onSelectMovie functionality to the listing I want the click to stop here
-          e.stopPropagation();
-          onDeleteWatched(movie.imdbID);
-        }}
-      >
-        X
-      </button>
     </li>
   );
 }

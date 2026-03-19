@@ -14,7 +14,7 @@ export function MovieDetails({
   // Loading of details extracted into a custom hook called useMovieDetails
   const [currentMovie, isError, isLoading] = useMovieDetails(
     OMDbKEY,
-    selectedId
+    selectedId,
   );
   //destructure the movie data
   const {
@@ -65,7 +65,7 @@ export function MovieDetails({
         //This is an important JavaScript concept which is useful to understand when working within React.
       };
     },
-    [Title]
+    [Title],
   );
 
   //then return the details or error or loading....
@@ -89,11 +89,13 @@ export function MovieDetails({
               watched={watched}
               handleAddWatched={handleAddWatched}
             />
-            <p>
-              <em>{Plot}</em>
-            </p>
-            <p>Starring {Actors}</p>
-            <p>Directed by {Director}</p>
+            <section className="plot-etc">
+              <p>
+                <em>{Plot}</em>
+              </p>
+              <p>Starring {Actors}</p>
+              <p>Directed by {Director}</p>
+            </section>
           </section>
         </>
       )}
@@ -116,7 +118,7 @@ function MovieReview({ selectedId, watched, handleAddWatched }) {
     : 0;
   //going to add the possibility to attach a user review/notes to a watched movie
   const watchedUserReview = checkWatched
-    ? watched.find((w) => w.imdbID === selectedId)?.userReview ?? ''
+    ? (watched.find((w) => w.imdbID === selectedId)?.userReview ?? '')
     : '';
 
   function handleEditReview() {
@@ -134,7 +136,7 @@ function MovieReview({ selectedId, watched, handleAddWatched }) {
         setEditReview(true);
       }
     },
-    [watchedUserRating, watchedUserReview]
+    [watchedUserRating, watchedUserReview],
   );
 
   return (
