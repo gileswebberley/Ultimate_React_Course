@@ -71,6 +71,30 @@
         "lng": -2.577452659606934
       },
       "id": "yGeoNDCYYR4RUjxJW4muW"
+    },
+    {
+      "cityName": "Wallasey",
+      "country": "GB",
+      "emoji": "🇬🇧",
+      "date": "2025-09-16T15:34:22.259Z",
+      "notes": "",
+      "position": {
+        "lat": 53.40728062471215,
+        "lng": -3.0199527740478516
+      },
+      "id": "HLwigyNwWE7uoB10hiufv"
+    },
+    {
+      "cityName": "Birmingham",
+      "country": "GB",
+      "emoji": "🇬🇧",
+      "date": "2025-09-16T15:34:22.259Z",
+      "notes": "",
+      "position": {
+        "lat": 52.47776193184992,
+        "lng": -1.8869018554687502
+      },
+      "id": "93F5VuKsDhHK0rYI99oTA"
     }
   ]
 }
