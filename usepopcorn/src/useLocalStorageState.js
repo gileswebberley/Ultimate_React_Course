@@ -9,12 +9,12 @@ export function useLocalStorageState(keyName) {
     try {
       //catch a SecurityError if thrown by getItem()
       storedList = localStorage.getItem(keyName);
-      //if storedList is undefined also throw an error
-      if (!storedList) throw new ReferenceError('No Locally Stored Watch List');
+      //if storedList is undefined also throw an error - change so that on your first visit it doesn't alert the problem
+      if (!storedList) return []; //throw new ReferenceError('No Locally Stored Watch List');
     } catch (error) {
       //if there's been an error watched is simply set to an empty array (to avoid errors further down the tree)
       alert(
-        `Something went wrong (${error.message}) whilst collecting your ${keyName}, please ensure that local storage is allowed`
+        `Something went wrong (${error.message}) whilst collecting your ${keyName}, please ensure that local storage is allowed`,
       );
       return [];
     }
@@ -30,7 +30,7 @@ export function useLocalStorageState(keyName) {
     function () {
       localStorage.setItem(keyName, JSON.stringify(value));
     },
-    [value, keyName]
+    [value, keyName],
   );
 
   return [value, setValue];

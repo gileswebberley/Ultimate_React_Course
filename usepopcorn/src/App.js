@@ -118,11 +118,11 @@ export default function App() {
   //doing here with the NavBar and SearchResultNumber (NavBar no longer needs the
   //movies prop which it was simply passing down to it's child before using this technique)
   //Taking the technique further we end up with a nice component tree view in the App
-  //Note that components can also be passed as explicit props (ie not the in-built children)
+  //Note that components can also be passed as explicit props (ie not the in-built children) imageString="🍿"
   return (
     <>
       <NavBar>
-        <Logo divClass="logo" imageString="🍿" title="usePopcorn" />
+        <Logo divClass="logo" title="popcorn" />
         <Search query={query} onSetQuery={setQuery} />
         <SearchResultNumber movies={movies} />
       </NavBar>
