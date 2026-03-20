@@ -3,7 +3,7 @@ import { ToggleButton } from './ToggleButton';
 
 //The box component that utilises the ToggleButton functionality to show/hide it's children
 export function ToggleBox({ children, title }) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="box">
       <ToggleButton toggleFunction={setIsOpen} toggleVariable={isOpen} />

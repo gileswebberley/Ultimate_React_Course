@@ -130,9 +130,7 @@ export default function App() {
       <Main>
         <ToggleBox title="Search Results">
           {movies.length === 0 && !isLoading && !isError ? (
-            <p className="loader">
-              Please hit Enter to search for movies via the OMDb website
-            </p>
+            <p className="loader">search for movies via the OMDb website</p>
           ) : (
             ''
           )}
